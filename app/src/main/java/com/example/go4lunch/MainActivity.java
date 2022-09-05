@@ -1,6 +1,6 @@
 package com.example.go4lunch;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
@@ -8,18 +8,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import com.example.go4lunch.databinding.ActivityMainBinding;
+
+public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    ActivityMainBinding getViewBinding() {
+        return ActivityMainBinding.inflate(getLayoutInflater());
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        // setContentView(R.layout.activity_main);  // Useless with initBinding in BaseActivity ?
+
         // Get the toolbar view
         this.configureToolbar();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         // Inflate the menu and add it to the Toolbar
         getMenuInflater().inflate(R.menu.menu_activity_main, menu);
         return true;
@@ -27,9 +35,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void configureToolbar(){
         // Get the toolbar view inside the activity layout
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+            /*  // Case 1 : Using findViewById()
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            */
+
+            //  // Cas 2 : Using View Binding
+            ActivityMainBinding binding = getViewBinding();
+            setContentView(binding.getRoot());
+            Toolbar toolbar = binding.toolbar;
+            //
+
         // Sets the Toolbar
         setSupportActionBar(toolbar);
+
     }
 
     @Override

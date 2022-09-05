@@ -6,6 +6,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.103125" />
         <entry key="app/src/main/res/layout/fragment_map_view.xml" value="0.103125" />
         <entry key="app/src/main/res/layout/toolbar.xml" value="0.10208333333333333" />
+        <entry key="app/src/main/res/layout/toolbar_activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/menu/menu_activity_main.xml" value="0.18" />
       </map>
     </option>
