@@ -1,4 +1,4 @@
-package com.example.go4lunch;
+package com.example.go4lunch.Activities;
 
 import android.os.Bundle;
 import android.view.View;
