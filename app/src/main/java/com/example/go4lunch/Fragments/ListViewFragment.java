@@ -17,6 +17,7 @@ import com.example.go4lunch.R;
  */
 public class ListViewFragment extends Fragment {
 
+    /*  // To delete
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -25,6 +26,7 @@ public class ListViewFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    */
 
     public ListViewFragment() {
         // Required empty public constructor
@@ -38,6 +40,7 @@ public class ListViewFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment ListViewFragment.
      */
+    /*  // To delete
     // TODO: Rename and change types and number of parameters
     public static ListViewFragment newInstance(String param1, String param2) {
         ListViewFragment fragment = new ListViewFragment();
@@ -47,7 +50,14 @@ public class ListViewFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    */
 
+    // Factory method to create a new instance of this fragment
+    public static ListViewFragment newInstance() {
+        return (new ListViewFragment());
+    }
+
+    /*  // To delete ?
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +66,7 @@ public class ListViewFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+    */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

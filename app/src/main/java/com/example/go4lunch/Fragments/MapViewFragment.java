@@ -38,6 +38,11 @@ public class MapViewFragment extends Fragment {
         }
     };
 
+    // Factory method to create a new instance of this fragment
+    public static MapViewFragment newInstance() {
+        return (new MapViewFragment());
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,

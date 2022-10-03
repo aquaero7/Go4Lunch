@@ -17,6 +17,7 @@ import com.example.go4lunch.R;
  */
 public class WorkmatesFragment extends Fragment {
 
+    /*  // To delete
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -25,6 +26,7 @@ public class WorkmatesFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    */
 
     public WorkmatesFragment() {
         // Required empty public constructor
@@ -38,6 +40,7 @@ public class WorkmatesFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment WorkmatesFragment.
      */
+    /*  // To delete
     // TODO: Rename and change types and number of parameters
     public static WorkmatesFragment newInstance(String param1, String param2) {
         WorkmatesFragment fragment = new WorkmatesFragment();
@@ -47,7 +50,14 @@ public class WorkmatesFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    */
 
+    // Factory method to create a new instance of this fragment
+    public static WorkmatesFragment newInstance() {
+        return (new WorkmatesFragment());
+    }
+
+    /*  // To delete ?
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +66,7 @@ public class WorkmatesFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+    */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
