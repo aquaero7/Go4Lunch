@@ -23,6 +23,7 @@
         app:tabIndicatorColor="@color/black"
         app:tabTextColor="@color/black"
         app:tabSelectedTextColor="@color/app_background"
+        app:tabIconTint="@color/color_selector"
         app:tabTextAppearance="@android:style/TextAppearance"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

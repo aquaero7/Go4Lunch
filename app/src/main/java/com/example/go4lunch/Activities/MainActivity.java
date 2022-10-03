@@ -1,7 +1,9 @@
 package com.example.go4lunch.Activities;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
@@ -22,10 +24,12 @@ import java.util.Locale;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
+    /*
     // 1 - Declare main fragment
     private MapViewFragment mMapViewFragment;
     private ListViewFragment mListViewFragment;
     private WorkmatesFragment mWorkmatesFragment;
+    */
 
     @Override
     ActivityMainBinding getViewBinding() {
@@ -140,6 +144,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private void configureViewPagerAndTabs(){
 
+        // Initialize title list
+        String [] tabTitles={"Map View","List View","Workmates"};
+
+        // Initialize icon list
+        int[] tabIcons = {
+                R.drawable.ic_baseline_map_black_24,
+                R.drawable.ic_baseline_view_list_black_24,
+                R.drawable.ic_baseline_group_black_24
+        };
+
         // Get ViewPager from layout
         ViewPager2 pager = (ViewPager2)findViewById(R.id.activity_main_viewpager);
 
@@ -153,14 +167,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         new TabLayoutMediator(tabs, pager, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
-                String [] tabTiles={"Map View","List View","Workmates"};
-                tab.setText(tabTiles[position]);
+                // Setup tab title
+                tab.setText(tabTitles[position]);
+                // Setup tab icon
+                tab.setIcon(tabIcons[position]);
             }
         }).attach();
 
         // Design purpose. Tabs have the same width
-        //tabs.setTabMode(TabLayout.MODE_FIXED);
-
+        tabs.setTabMode(TabLayout.MODE_FIXED);
 
     }
 
