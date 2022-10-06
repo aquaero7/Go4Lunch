@@ -1,9 +1,10 @@
 package com.example.go4lunch.Activities;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
@@ -11,21 +12,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.go4lunch.Fragments.ListViewFragment;
-import com.example.go4lunch.Fragments.MapViewFragment;
 import com.example.go4lunch.Fragments.PagerAdapter;
-import com.example.go4lunch.Fragments.WorkmatesFragment;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-import java.util.Locale;
+public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
 
-public class MainActivity extends BaseActivity<ActivityMainBinding> {
+    // For Navigation Drawer design
+    private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
 
     /*
-    // 1 - Declare main fragment
+    // Declare main fragment
     private MapViewFragment mMapViewFragment;
     private ListViewFragment mListViewFragment;
     private WorkmatesFragment mWorkmatesFragment;
@@ -52,14 +54,65 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
         // Configure ViewPager and tabs
         this.configureViewPagerAndTabs();
+
+        // Configure Navigation Drawer views
+        this.configureDrawerLayout();
+        this.configureNavigationView();
     }
 
     @Override
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         // Inflate the menu and add it to the Toolbar
-        getMenuInflater().inflate(R.menu.menu_activity_main, menu);
+        getMenuInflater().inflate(R.menu.activity_main_menu, menu);
         return true;
     }
+
+    @Override
+    public void onBackPressed() {
+        // Handle Navigation Drawer back click to close menu
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            this.drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle Navigation Drawer Item Click
+        int id = item.getItemId();
+        switch (id){
+            case R.id.activity_main_drawer_lunch:
+                break;
+            case R.id.activity_main_drawer_settings:
+                break;
+            case R.id.activity_main_drawer_logout:
+                break;
+            default:
+                break;
+        }
+        this.drawerLayout.closeDrawer(GravityCompat.START);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle actions on menu items
+        switch (item.getItemId()) {
+            case R.id.menu_activity_main_search:
+                Toast.makeText(this, "Recherche indisponible, demandez plutôt l'avis de Google, c'est mieux et plus rapide.", Toast.LENGTH_LONG).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /*
+    * ---------------------
+    * CONFIGURATIONS
+    * ---------------------
+    */
 
     private void configureToolbar(){
         // Get the toolbar view inside the activity layout
@@ -78,18 +131,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         // Sets the Toolbar
         setSupportActionBar(toolbar);
 
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle actions on menu items
-        switch (item.getItemId()) {
-            case R.id.menu_activity_main_search:
-                Toast.makeText(this, "Recherche indisponible, demandez plutôt l'avis de Google, c'est mieux et plus rapide.", Toast.LENGTH_LONG).show();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     /*
@@ -177,6 +218,20 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         // Design purpose. Tabs have the same width
         tabs.setTabMode(TabLayout.MODE_FIXED);
 
+    }
+
+    // Configure Drawer Layout
+    private void configureDrawerLayout(){
+        this.drawerLayout = (DrawerLayout) findViewById(R.id.activity_main_drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+    }
+
+    // Configure NavigationView
+    private void configureNavigationView(){
+        this.navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
 }

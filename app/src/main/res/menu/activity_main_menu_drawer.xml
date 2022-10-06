@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/activity_main_drawer_lunch"
+            android:icon="@drawable/ic_baseline_local_dining_white_24"
+            android:title="YOUR LUNCH" />
+
+        <item
+            android:id="@+id/activity_main_drawer_settings"
+            android:icon="@drawable/ic_baseline_settings_white_24"
+            android:title="SETTINGS" />
+
+        <item
+            android:id="@+id/activity_main_drawer_logout"
+            android:icon="@drawable/ic_baseline_power_settings_new_white_24"
+            android:title="LOGOUT" />
+
+    </group>
+
+    <item
+        android:title="Configuration">
+        <menu>
+            <group
+                android:checkableBehavior="single">
+
+            </group>
+
+        </menu>
+
+    </item>
+
+</menu>
