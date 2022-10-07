@@ -5,6 +5,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
@@ -12,7 +13,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.go4lunch.Fragments.MapViewFragment;
 import com.example.go4lunch.Fragments.PagerAdapter;
+import com.example.go4lunch.Fragments.RestaurantFragment;
+import com.example.go4lunch.Fragments.SettingFragment;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
@@ -25,6 +29,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+
+    // For fragments
+    // 1 - Declare fragment handled by Navigation Drawer
+    private Fragment fragmentRestaurant;
+    private Fragment fragmentSetting;
+
+    // For datas
+    // 2 - Identify each fragment with a number
+    private static final int FRAGMENT_RESTAURANT = 0;
+    private static final int FRAGMENT_SETTING = 1;
 
     /*
     // Declare main fragment
@@ -83,10 +97,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         int id = item.getItemId();
         switch (id){
             case R.id.activity_main_drawer_lunch:
+                this.showFragment(FRAGMENT_RESTAURANT);
                 break;
             case R.id.activity_main_drawer_settings:
+                this.showFragment(FRAGMENT_SETTING);
                 break;
             case R.id.activity_main_drawer_logout:
+                // TODO
                 break;
             default:
                 break;
@@ -117,71 +134,19 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void configureToolbar(){
         // Get the toolbar view inside the activity layout
 
-            //  // Case 1 : Using findViewById()
+            /*  // Case 1 : Without Navigation Drawer
             // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             Toolbar toolbar = findViewById(R.id.toolbar);
-            //
-
-            /*  // Cas 2 : Using View Binding
-            ActivityMainBinding binding = getViewBinding();
-            setContentView(binding.getRoot());
-            Toolbar toolbar = binding.toolbar;
             */
+
+            // // Case 2 : With Navigation Drawer
+            this.toolbar = (Toolbar) findViewById(R.id.toolbar);
+            //
 
         // Sets the Toolbar
         setSupportActionBar(toolbar);
 
     }
-
-    /*
-    private void configureAndShowMapViewFragment(){
-
-        // Get FragmentManager (Support) and Try to find existing instance of fragment in FrameLayout container
-        mMapViewFragment = (MapViewFragment) getSupportFragmentManager().findFragmentById(R.id.fm_lyt_map_view);
-
-        // We only add MapViewFragment if found fm_lyt_map_view (in Tablet mode)
-        if (mMapViewFragment == null && findViewById(R.id.fm_lyt_map_view) != null) {
-            // Create new main fragment
-            mMapViewFragment = new MapViewFragment();
-            // Add it to FrameLayout container
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fm_lyt_map_view, mMapViewFragment)
-                    .commit();
-        }
-    }
-
-    private void configureAndShowListViewFragment(){
-
-        // Get FragmentManager (Support) and Try to find existing instance of fragment in FrameLayout container
-        mListViewFragment = (ListViewFragment) getSupportFragmentManager().findFragmentById(R.id.fm_lyt_list_view);
-
-        // We only add ListViewFragment if found fm_lyt_list_view (in Tablet mode)
-        if (mListViewFragment == null && findViewById(R.id.fm_lyt_list_view) != null) {
-            // Create new main fragment
-            mListViewFragment = new ListViewFragment();
-            // Add it to FrameLayout container
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fm_lyt_list_view, mListViewFragment)
-                    .commit();
-        }
-    }
-
-    private void configureAndShowWorkmatesFragment(){
-
-        // Get FragmentManager (Support) and Try to find existing instance of fragment in FrameLayout container
-        mWorkmatesFragment = (WorkmatesFragment) getSupportFragmentManager().findFragmentById(R.id.fm_lyt_workmates);
-
-        // We only add WorkmatesFragment if found fm_lyt_workmates (in Tablet mode)
-        if (mWorkmatesFragment == null && findViewById(R.id.fm_lyt_workmates) != null) {
-            // Create new main fragment
-            mWorkmatesFragment = new WorkmatesFragment();
-            // Add it to FrameLayout container
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fm_lyt_workmates, mWorkmatesFragment)
-                    .commit();
-        }
-    }
-    */
 
     private void configureViewPagerAndTabs(){
 
@@ -233,5 +198,100 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         this.navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
+
+
+    /*
+     * ---------------------
+     * FRAGMENTS
+     * ---------------------
+     */
+
+    /*
+    private void configureAndShowMapViewFragment(){
+
+        // Get FragmentManager (Support) and Try to find existing instance of fragment in FrameLayout container
+        mMapViewFragment = (MapViewFragment) getSupportFragmentManager().findFragmentById(R.id.fm_lyt_map_view);
+
+        // We only add MapViewFragment if found fm_lyt_map_view (in Tablet mode)
+        if (mMapViewFragment == null && findViewById(R.id.fm_lyt_map_view) != null) {
+            // Create new main fragment
+            mMapViewFragment = new MapViewFragment();
+            // Add it to FrameLayout container
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fm_lyt_map_view, mMapViewFragment)
+                    .commit();
+        }
+    }
+
+    private void configureAndShowListViewFragment(){
+
+        // Get FragmentManager (Support) and Try to find existing instance of fragment in FrameLayout container
+        mListViewFragment = (ListViewFragment) getSupportFragmentManager().findFragmentById(R.id.fm_lyt_list_view);
+
+        // We only add ListViewFragment if found fm_lyt_list_view (in Tablet mode)
+        if (mListViewFragment == null && findViewById(R.id.fm_lyt_list_view) != null) {
+            // Create new main fragment
+            mListViewFragment = new ListViewFragment();
+            // Add it to FrameLayout container
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fm_lyt_list_view, mListViewFragment)
+                    .commit();
+        }
+    }
+
+    private void configureAndShowWorkmatesFragment(){
+
+        // Get FragmentManager (Support) and Try to find existing instance of fragment in FrameLayout container
+        mWorkmatesFragment = (WorkmatesFragment) getSupportFragmentManager().findFragmentById(R.id.fm_lyt_workmates);
+
+        // We only add WorkmatesFragment if found fm_lyt_workmates (in Tablet mode)
+        if (mWorkmatesFragment == null && findViewById(R.id.fm_lyt_workmates) != null) {
+            // Create new main fragment
+            mWorkmatesFragment = new WorkmatesFragment();
+            // Add it to FrameLayout container
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fm_lyt_workmates, mWorkmatesFragment)
+                    .commit();
+        }
+    }
+    */
+
+
+    // 5 - Show fragment according an Identifier
+    private void showFragment(int fragmentIdentifier){
+        switch (fragmentIdentifier){
+            case FRAGMENT_RESTAURANT:
+                this.showRestaurantFragment();
+                break;
+            case FRAGMENT_SETTING:
+                this.showSettingFragment();
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    // 4 - Create each fragment page and show it
+
+    private void showRestaurantFragment(){
+        if (this.fragmentRestaurant == null) this.fragmentRestaurant = RestaurantFragment.newInstance();
+        this.startTransactionFragment(this.fragmentRestaurant);
+    }
+
+    private void showSettingFragment(){
+        if (this.fragmentSetting == null) this.fragmentSetting = SettingFragment.newInstance();
+        this.startTransactionFragment(this.fragmentSetting);
+    }
+
+
+    // 3 - Generic method that will replace and show a fragment inside the MainActivity Frame Layout
+    private void startTransactionFragment(Fragment fragment){
+        if (!fragment.isVisible()){
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.activity_main_frame_layout, fragment).commit();
+        }
+    }
+
 
 }

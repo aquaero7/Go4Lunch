@@ -17,6 +17,4 @@
 
     android:theme="@style/ToolbarTheme"
     app:titleTextAppearance="@style/Toolbar.TitleText"
-    app:title="I'm Hungry!"
-    app:navigationIcon="@drawable/ic_baseline_menu_white_24"
-    />
+    app:title="I'm Hungry!" />

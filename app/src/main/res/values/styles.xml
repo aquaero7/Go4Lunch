@@ -7,6 +7,10 @@
         <item name="colorPrimary">@color/app_background</item>
         <item name="colorPrimaryDark">@color/app_background_dark</item>
         <item name="colorAccent">@color/design_default_color_primary_variant</item>
+
+        <!-- Customize color of Nav Drawer button -->
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+
     </style>
 
     <!-- NO ACTIONBAR THEME -->
@@ -26,6 +30,12 @@
         <item name="android:textSize">21sp</item>
         <item name="android:textStyle">italic</item>
         <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- TOOLBAR NAV DRAWER BUTTON THEME -->
+    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <!-- Color of the Nav Drawer button in the Toolbar -->
+        <item name="color">@color/white</item>
     </style>
 
 </resources>
