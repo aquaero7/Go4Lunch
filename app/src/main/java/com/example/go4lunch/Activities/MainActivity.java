@@ -5,18 +5,15 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.go4lunch.Fragments.MapViewFragment;
 import com.example.go4lunch.Fragments.PagerAdapter;
-import com.example.go4lunch.Fragments.RestaurantFragment;
-import com.example.go4lunch.Fragments.SettingFragment;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
@@ -29,16 +26,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-
-    // For fragments
-    // 1 - Declare fragment handled by Navigation Drawer
-    private Fragment fragmentRestaurant;
-    private Fragment fragmentSetting;
-
-    // For datas
-    // 2 - Identify each fragment with a number
-    private static final int FRAGMENT_RESTAURANT = 0;
-    private static final int FRAGMENT_SETTING = 1;
 
     /*
     // Declare main fragment
@@ -97,10 +84,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         int id = item.getItemId();
         switch (id){
             case R.id.activity_main_drawer_lunch:
-                this.showFragment(FRAGMENT_RESTAURANT);
+                launchDetailRestaurantActivity();
                 break;
             case R.id.activity_main_drawer_settings:
-                this.showFragment(FRAGMENT_SETTING);
+                launchSettingActivity();
                 break;
             case R.id.activity_main_drawer_logout:
                 // TODO
@@ -256,42 +243,14 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
     */
 
-
-    // 5 - Show fragment according an Identifier
-    private void showFragment(int fragmentIdentifier){
-        switch (fragmentIdentifier){
-            case FRAGMENT_RESTAURANT:
-                this.showRestaurantFragment();
-                break;
-            case FRAGMENT_SETTING:
-                this.showSettingFragment();
-                break;
-            default:
-                break;
-        }
+    private void launchDetailRestaurantActivity() {
+        Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
+        startActivity(intent);
     }
 
-
-    // 4 - Create each fragment page and show it
-
-    private void showRestaurantFragment(){
-        if (this.fragmentRestaurant == null) this.fragmentRestaurant = RestaurantFragment.newInstance();
-        this.startTransactionFragment(this.fragmentRestaurant);
+    private void launchSettingActivity() {
+        Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+        startActivity(intent);
     }
-
-    private void showSettingFragment(){
-        if (this.fragmentSetting == null) this.fragmentSetting = SettingFragment.newInstance();
-        this.startTransactionFragment(this.fragmentSetting);
-    }
-
-
-    // 3 - Generic method that will replace and show a fragment inside the MainActivity Frame Layout
-    private void startTransactionFragment(Fragment fragment){
-        if (!fragment.isVisible()){
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.activity_main_frame_layout, fragment).commit();
-        }
-    }
-
 
 }
