@@ -8,35 +8,23 @@
         android:checkableBehavior="none">
         <!-- checkableBehavior set to none to clear last selection memory (last item colored) -->
         <item
+            android:title="" />
+
+        <item
             android:id="@+id/activity_main_drawer_lunch"
             android:icon="@drawable/ic_baseline_local_dining_white_24"
-            android:title="YOUR LUNCH" />
+            android:title="YOUR LUNCH"/>
 
         <item
             android:id="@+id/activity_main_drawer_settings"
             android:icon="@drawable/ic_baseline_settings_white_24"
-            android:title="SETTINGS" />
+            android:title="SETTINGS"/>
 
         <item
             android:id="@+id/activity_main_drawer_logout"
             android:icon="@drawable/ic_baseline_power_settings_new_white_24"
-            android:title="LOGOUT" />
+            android:title="LOGOUT"/>
 
     </group>
-
-
-    <!-- TODO : Delete item and all inside below -->
-    <item
-        android:title="Configuration">
-        <menu>
-            <group
-                android:checkableBehavior="single">
-
-            </group>
-        </menu>
-    </item>
-    <!-- -->
-
-
 
 </menu>
