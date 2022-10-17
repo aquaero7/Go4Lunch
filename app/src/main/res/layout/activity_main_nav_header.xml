@@ -46,10 +46,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:background="@drawable/ic_baseline_account_circle_white_24"
-                android:backgroundTint="#00AAFF"
-                android:scaleX="2"
-                android:scaleY="2"
+                android:src="@drawable/ic_baseline_account_circle_white_24"
+                app:tint="@color/blue_ic"
+                android:background="@drawable/round_corner_bg"
+                android:scaleX="1.7"
+                android:scaleY="1.7"
                 android:contentDescription="TODO"/>
 
         </LinearLayout>

@@ -8,6 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="blue_ic">#FF00AAFF</color>
+    <color name="yellow_ic">#FFFFFF00</color>
+
     <color name="app_background">#F35F5F</color>
     <color name="app_background_dark">#BE4141</color>
 
