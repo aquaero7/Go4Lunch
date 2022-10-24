@@ -8,14 +8,17 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.go4lunch.Fragments.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -26,6 +29,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+
 
     /*
     // Declare main fragment
@@ -59,6 +63,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Configure Navigation Drawer views
         this.configureDrawerLayout();
         this.configureNavigationView();
+
     }
 
     @Override
@@ -252,5 +257,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         Intent intent = new Intent(MainActivity.this, SettingActivity.class);
         startActivity(intent);
     }
+
+
 
 }

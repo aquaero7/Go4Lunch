@@ -3,16 +3,22 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable-v24/ic_baseline_check_circle_outline_green_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable-xxhdpi/ic_baseline_account_circle_yellow_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_account_circle_white_24.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_baseline_check_circle_outline_white_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_emoji_people_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_twotone_account_circle_white_24.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_twotone_check_circle_white_green_24.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/round_corner_2_bg.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/round_corner_bg.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/roundcorner.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_detail_restaurant.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main_nav_header.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_main_toolbar.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_setting.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_detail_restaurant.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_list_view.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_map_view.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_restaurant.xml" value="0.15" />

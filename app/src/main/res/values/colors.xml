@@ -10,6 +10,8 @@
 
     <color name="blue_ic">#FF00AAFF</color>
     <color name="yellow_ic">#FFFFFF00</color>
+    <color name="green_fab">#FF00AA00</color>
+    <color name="grey_fab">#FFCCCCCC</color>
 
     <color name="app_background">#F35F5F</color>
     <color name="app_background_dark">#BE4141</color>
