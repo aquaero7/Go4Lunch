@@ -4,6 +4,7 @@ import static java.lang.String.valueOf;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class DetailRestaurantActivity extends AppCompatActivity implements DetailRestaurantFragment.OnButtonClickedListener {
 
     private Boolean fabChecked = false; // TODO : Update status with information in database
+    private String toastText;
 
 
     @Override
@@ -33,15 +35,34 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
     @Override
     public void onButtonClicked(View view) {
         // Handle the FloatingActionButton click event
+        String tag = String.valueOf(view.getTag());
+        switch (tag) {
+            case "BTN_CALL" :
+                // Launch action    TODO
+                toastText = tag;    // TODO : Delete after action completion
+                break;
+            case "BTN_LIKE" :
+                // Launch action    TODO
+                toastText = tag;    // TODO : Delete after action completion
+                break;
+            case "BTN_WEBSITE" :
+                // Launch action    TODO
+                toastText = tag;    // TODO : Delete after action completion
+                break;
+            case "FAB" :
+                FloatingActionButton selectionFab = findViewById(R.id.selection_fab);
+                // Toggle FAB status
+                fabChecked = !fabChecked;
+                // Update toast text
+                toastText = (fabChecked) ? getString(R.string.fabChecked) : getString(R.string.fabUnchecked);
+                // Launch actions
+                toggleSelectionFabDisplay(selectionFab);
+                updateDatabase();
+                break;
+        }
 
-        FloatingActionButton selectionFab = findViewById(R.id.selection_fab);
-        // Toggle FAB status
-        fabChecked = !fabChecked;
-
-        // Launch actions
-        toggleSelectionFabDisplay(selectionFab);
-        updateDatabase();
         displayToast();
+
     }
 
     private void toggleSelectionFabDisplay(FloatingActionButton fab) {
@@ -56,11 +77,10 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
     }
 
     private void displayToast() {
-        // Define the text of the toast, according to new FAB status
-        String toastText = (fabChecked) ? getString(R.string.fabChecked) : getString(R.string.fabUnchecked);
-        // Display the toast
         Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
     }
+
+
 
 
 }

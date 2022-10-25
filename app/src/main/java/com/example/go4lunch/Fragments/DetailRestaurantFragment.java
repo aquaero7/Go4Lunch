@@ -5,12 +5,15 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.Views.DetailRestaurantWorkmateAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +36,9 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
     // Declare callback
     private OnButtonClickedListener mCallback;
+
+    // Declare RecyclerView
+    private RecyclerView mRecyclerView;
 
 
     public DetailRestaurantFragment() {
@@ -84,6 +90,14 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         //Set onClickListener to selection fab
         result.findViewById(R.id.selection_fab).setOnClickListener(this);
 
+        //Set onClickListener to buttons
+        result.findViewById(R.id.callButton).setOnClickListener(this);
+        result.findViewById(R.id.likeButton).setOnClickListener(this);
+        result.findViewById(R.id.websiteButton).setOnClickListener(this);
+
+        mRecyclerView = result.findViewById(R.id.rv_detail_restaurant);
+        configureRecyclerView();
+
         return result;
     }
 
@@ -116,7 +130,16 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         }
     }
 
+    // Configure RecyclerView, Adapter, LayoutManager & glue it together
+    private void configureRecyclerView() {
+        // 3.2 - Declare and create adapter (TODO : Pass the list of workmates)
+        DetailRestaurantWorkmateAdapter detailRestaurantWorkmateAdapter = new DetailRestaurantWorkmateAdapter();
+        // 3.3 - Attach the adapter to the recyclerview to populate items
+        mRecyclerView.setAdapter(detailRestaurantWorkmateAdapter);
+        // 3.4 - Set layout manager to position the items
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+    }
 
 
 }
