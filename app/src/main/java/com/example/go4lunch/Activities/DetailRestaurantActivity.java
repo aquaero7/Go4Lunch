@@ -18,7 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class DetailRestaurantActivity extends AppCompatActivity implements DetailRestaurantFragment.OnButtonClickedListener {
 
-    private Boolean fabChecked = false; // TODO : Update status with information in database
+    private Boolean fabChecked = true; // TODO : Update status with information in database
     private String toastText;
 
 
@@ -38,15 +38,15 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
         String tag = String.valueOf(view.getTag());
         switch (tag) {
             case "BTN_CALL" :
-                // Launch action    TODO
+                callRestaurant();
                 toastText = tag;    // TODO : Delete after action completion
                 break;
             case "BTN_LIKE" :
-                // Launch action    TODO
+                likeRestaurant();
                 toastText = tag;    // TODO : Delete after action completion
                 break;
             case "BTN_WEBSITE" :
-                // Launch action    TODO
+                displayRestaurantWebsite();
                 toastText = tag;    // TODO : Delete after action completion
                 break;
             case "FAB" :
@@ -80,7 +80,17 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
         Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
     }
 
+    private void callRestaurant(){
+        // TODO
+    }
 
+    private void likeRestaurant(){
+        // TODO
+    }
+
+    private void displayRestaurantWebsite(){
+        // TODO
+    }
 
 
 }
