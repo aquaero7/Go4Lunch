@@ -5,10 +5,11 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +19,6 @@ import android.widget.Toast;
 import com.example.go4lunch.Fragments.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -29,6 +29,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+
 
 
     /*
@@ -48,14 +49,14 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);  // Useless with initBinding in BaseActivity ?
 
-        // Get the toolbar view
-        this.configureToolbar();
-
         /*
         this.configureAndShowMapViewFragment();
         this.configureAndShowListViewFragment();
         this.configureAndShowWorkmatesFragment();
         */
+
+        // Get the toolbar view
+        this.configureToolbar();
 
         // Configure ViewPager and tabs
         this.configureViewPagerAndTabs();
@@ -95,7 +96,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 launchSettingActivity();
                 break;
             case R.id.activity_main_drawer_logout:
-                // TODO
+                logout();
                 break;
             default:
                 break;
@@ -126,14 +127,14 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void configureToolbar(){
         // Get the toolbar view inside the activity layout
 
-            /*  // Case 1 : Without Navigation Drawer
-            // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            Toolbar toolbar = findViewById(R.id.toolbar);
-            */
+        /*  // Case 1 : Without Navigation Drawer
+        // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        */
 
-            // // Case 2 : With Navigation Drawer
-            this.toolbar = (Toolbar) findViewById(R.id.toolbar);
-            //
+        // // Case 2 : With Navigation Drawer
+        this.toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //
 
         // Sets the Toolbar
         setSupportActionBar(toolbar);
@@ -256,6 +257,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void launchSettingActivity() {
         Intent intent = new Intent(MainActivity.this, SettingActivity.class);
         startActivity(intent);
+    }
+
+    private void logout(){
+        // TODO
+        Toast.makeText(this, "Logout", Toast.LENGTH_SHORT).show();
     }
 
 

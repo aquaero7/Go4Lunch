@@ -48,6 +48,7 @@ public class MapViewFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
         return inflater.inflate(R.layout.fragment_map_view, container, false);
     }
 
@@ -60,4 +61,12 @@ public class MapViewFragment extends Fragment {
             mapFragment.getMapAsync(callback);
         }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Setup toolbar title (Activity title)  // TODO test
+        getActivity().setTitle(R.string.mapView_toolbar_title);
+    }
+
 }

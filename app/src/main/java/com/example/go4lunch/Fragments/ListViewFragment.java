@@ -71,7 +71,16 @@ public class ListViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_list_view, container, false);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Setup toolbar title (Activity title)  // TODO test
+        getActivity().setTitle(R.string.listView_toolbar_title);
+    }
+
 }

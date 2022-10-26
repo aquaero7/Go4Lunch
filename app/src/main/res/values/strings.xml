@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Go4Lunch</string>
+    <string name="mapView_toolbar_title">I\'m Hungry!</string>
+    <string name="listView_toolbar_title">I\'m Hungry!</string>
+    <string name="workmates_toolbar_title">Available workmates</string>
     <string name="search_menu">Search</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -15,7 +18,6 @@
     <string name="selection_fab">Selection FAB</string>
     <string name="im_detail_restaurant">Restaurant picture</string>
     <string name="im_workmate_item">Workmate picture</string>
-
 
     <!-- FAB actions -->
     <string name="fabChecked">Restaurant selected</string>

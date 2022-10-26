@@ -8,7 +8,7 @@
     >
 
     <ImageView
-        android:id="@+id/detail_restaurant_workmate_item_picture"
+        android:id="@+id/workmate_item_picture"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginStart="12dp"
@@ -17,11 +17,12 @@
         android:contentDescription="@string/im_workmate_item"/>
 
     <TextView
-        android:id="@+id/detail_restaurant_workmate_item_title"
+        android:id="@+id/workmate_item_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:paddingHorizontal="12dp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:textColor="@color/black"/>
 
 </LinearLayout>

@@ -1,14 +1,24 @@
 package com.example.go4lunch.Fragments;
 
+import android.app.Activity;
+import android.app.Application;
 import android.os.Bundle;
 
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toolbar;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.Views.DetailRestaurantWorkmateAdapter;
+import com.example.go4lunch.Views.WorkmateAdapter;
+import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.example.go4lunch.databinding.ActivityMainToolbarBinding;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,6 +38,10 @@ public class WorkmatesFragment extends Fragment {
     private String mParam2;
     */
 
+    // Declare RecyclerView
+    private RecyclerView mRecyclerView;
+
+    // Constructor
     public WorkmatesFragment() {
         // Required empty public constructor
     }
@@ -72,6 +86,30 @@ public class WorkmatesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_workmates, container, false);
+        View result = inflater.inflate(R.layout.fragment_workmates, container, false);
+
+        mRecyclerView = result.findViewById(R.id.rv_workmates);
+        configureRecyclerView();
+
+        return result;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Setup toolbar title (Activity title)  // TODO test
+        getActivity().setTitle(R.string.workmates_toolbar_title);
+    }
+
+    // Configure RecyclerView, Adapter, LayoutManager & glue it together
+    private void configureRecyclerView() {
+        // 3.2 - Declare and create adapter (TODO : Pass the list of workmates)
+        WorkmateAdapter workmateAdapter = new WorkmateAdapter();
+        // 3.3 - Attach the adapter to the recyclerview to populate items
+        mRecyclerView.setAdapter(workmateAdapter);
+        // 3.4 - Set layout manager to position the items
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+    }
+
 }

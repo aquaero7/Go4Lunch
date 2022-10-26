@@ -10,36 +10,35 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 
-public class DetailRestaurantWorkmateAdapter extends RecyclerView.Adapter<DetailRestaurantWorkmateViewHolder> {
+public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateViewHolder> {
 
     // Constructor
-    public DetailRestaurantWorkmateAdapter() {
+    public WorkmateAdapter() {
 
     }
 
     @NonNull
     @Override
-    public DetailRestaurantWorkmateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public WorkmateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Create view holder and inflate its layout
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.workmate_list_item, parent, false);
 
-        return new DetailRestaurantWorkmateViewHolder(view);
+        return new WorkmateViewHolder(view);
+
     }
 
-    // Update view holder with workmates who have selected this restaurant
+    // Update view holder with workmates
     @Override
-    public void onBindViewHolder(@NonNull DetailRestaurantWorkmateViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull WorkmateViewHolder viewHolder, int position) {
         viewHolder.updateWithWorkmate();
 
     }
 
-    // Return the total count of workmates who have selected this restaurant
+    // Return the total count of workmates
     @Override
     public int getItemCount() {
         return 9;
     }
-
-
 }
