@@ -79,7 +79,7 @@ public class ListViewFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Setup toolbar title (Activity title)  // TODO test
+        // Setup toolbar title (Activity title)
         getActivity().setTitle(R.string.listView_toolbar_title);
     }
 

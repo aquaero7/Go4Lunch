@@ -65,7 +65,7 @@ public class MapViewFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Setup toolbar title (Activity title)  // TODO test
+        // Setup toolbar title (Activity title)
         getActivity().setTitle(R.string.mapView_toolbar_title);
     }
 
