@@ -31,7 +31,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private NavigationView navigationView;
 
 
-
     /*
     // Declare main fragment
     private MapViewFragment mMapViewFragment;

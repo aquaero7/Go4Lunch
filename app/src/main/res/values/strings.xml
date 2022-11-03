@@ -16,8 +16,10 @@
 
     <!-- contentDescriptions -->
     <string name="selection_fab">Selection FAB</string>
-    <string name="im_detail_restaurant">Restaurant picture</string>
+    <string name="im_detail_restaurant">Restaurant image</string>
     <string name="im_workmate_item">Workmate picture</string>
+    <string name="im_restaurant_item">Restaurant picture</string>
+    <string name="ic_workmate_logo">Workmate logo</string>
 
     <!-- FAB actions -->
     <string name="fabChecked">Restaurant selected</string>
@@ -28,5 +30,8 @@
     <string name="call">BTN_CALL</string>
     <string name="like">BTN_LIKE</string>
     <string name="website">BTN_WEBSITE</string>
+
+    <!-- separators -->
+    <string name="hyphen">-</string>
 
 </resources>

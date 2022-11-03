@@ -1,0 +1,115 @@
+package com.example.go4lunch.Views;
+
+import android.util.TypedValue;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RatingBar;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.go4lunch.R;
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class ListViewViewHolder extends RecyclerView.ViewHolder {
+
+    private final TextView tvTitle;
+    private final TextView tvDistance;
+    private final TextView tvCountry;
+    private final TextView tvAddress;
+    private final TextView tvWorkmatesCount;
+    private final TextView tvOpenTime;
+    private final ImageView ivWorkmateLogo;
+    private final RatingBar mRatingBar;
+    private final ImageView ivPicture;
+
+
+    public ListViewViewHolder(@NonNull View itemView) {
+        super(itemView);
+        tvTitle = itemView.findViewById(R.id.restaurant_item_title);
+        tvDistance = itemView.findViewById(R.id.restaurant_item_distance);
+        tvCountry = itemView.findViewById(R.id.restaurant_item_country);
+        tvAddress = itemView.findViewById(R.id.restaurant_item_address);
+        ivWorkmateLogo = itemView.findViewById(R.id.restaurant_item_workmate_logo);
+        tvWorkmatesCount = itemView.findViewById(R.id.restaurant_item_workmates_count);
+        tvOpenTime = itemView.findViewById(R.id.restaurant_item_openTime);
+        mRatingBar = itemView.findViewById(R.id.restaurant_item_rating_bar);
+        ivPicture = itemView.findViewById(R.id.restaurant_item_picture);
+    }
+
+    public void updateWithRestaurants() {
+        // Display restaurant name
+        tvTitle.setText("This restaurant");
+        // Display restaurant distance
+        tvDistance.setText("700m");
+        // Display restaurant country
+        tvCountry.setText("Frenchy");
+        // Display restaurant address
+        tvAddress.setText("7 rue de la Petite Faim 69069 Trifouillis les Oies");
+        // Display workmate logo
+        ivWorkmateLogo.setImageResource(R.drawable.ic_baseline_account_circle_white_24);
+        // Display workmates count
+        tvWorkmatesCount.setText("("+"3"+")");
+        // Display restaurant opening time
+        tvOpenTime.setText("Open 24/7");
+        // Display restaurant rating
+        mRatingBar.setRating(3);
+        // Display restaurant picture
+        ivPicture.setImageResource(R.drawable.im_detail_restaurant);
+
+        // Set text scrolling and adapt fields max size in line 2
+        ResizeAndScroll();
+    }
+
+    private void ResizeAndScroll() {
+
+        ////////////
+        // Resize //
+        ////////////
+
+        // Adjust max sizes in line 2 according to each text length
+        final int TEXT_SIZE_FACTOR = 8; // Size of a character in dp
+        final int RESIZING_LENGTH_LIMIT = 16;   // Limit for tvCountry to allow resizing
+        // Convert width in px into width in dp and apply TEXT_SIZE_FACTOR to convert width in dp into length
+        int tvCountryDefaultMaxTextLength = (int) ((tvCountry.getMaxWidth() / tvCountry.getContext().getResources().getDisplayMetrics().density + 0.5f) / TEXT_SIZE_FACTOR) - 1;
+        int tvAddressDefaultMaxTextLength = (int) ((tvAddress.getMaxWidth() / tvAddress.getContext().getResources().getDisplayMetrics().density + 0.5f) / TEXT_SIZE_FACTOR) - 1;
+        int tvCountryTextLength = tvCountry.getText().length();
+        // Calculate length delta
+        int deltaLength = tvCountryTextLength - tvCountryDefaultMaxTextLength;
+
+        // Allow resizing only if new length is shorter than the new length limit
+        if( deltaLength > 0 && tvCountryTextLength <= RESIZING_LENGTH_LIMIT) {
+
+            // Increase tvCountry max width by the delta to fit better or totally to the text
+            // Convert length into width in dp
+            int newTvCountryMaxWidthInDp = (tvCountryTextLength + 1) * TEXT_SIZE_FACTOR;
+            // Convert width in dp into width in px
+            int newTvCountryMaxWidthInPx = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, newTvCountryMaxWidthInDp, tvCountry.getResources().getDisplayMetrics()));
+            // Set new width max
+            tvCountry.setMaxWidth(newTvCountryMaxWidthInPx);
+
+            // Decrease tvAddress max width by the same delta so as not to overflow the screen
+            // Convert length into width in dp
+            int newTvAddressMaxWidthInDp = (tvAddressDefaultMaxTextLength - deltaLength + 1) * TEXT_SIZE_FACTOR;
+            // Convert width in dp into width in px
+            int newTvAddressMaxWidthInPx = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, newTvAddressMaxWidthInDp, tvAddress.getResources().getDisplayMetrics()));
+            // Set new width max
+            tvAddress.setMaxWidth(newTvAddressMaxWidthInPx);
+        }
+
+        ////////////
+        // Scroll //
+        ////////////
+
+        // Set TextView selected for text scrolling
+        List<TextView> fields = Arrays.asList(tvTitle, tvCountry, tvAddress, tvOpenTime);
+        for (TextView field : fields) {
+            field.setSelected(true);
+        }
+    }
+
+}

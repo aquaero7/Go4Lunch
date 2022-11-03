@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="84dp">
+
+    <!-- Line 1 -->
+    <TextView
+        android:id="@+id/restaurant_item_title"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="12dp"
+        android:gravity="bottom"
+        android:paddingHorizontal="4dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:maxWidth="280dp"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/restaurant_item_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginEnd="12dp"
+        android:gravity="bottom"
+        android:paddingHorizontal="4dp"
+        android:textColor="@color/grey_fab"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_item_picture"/>
+
+    <!-- Line 2 -->
+    <TextView
+        android:id="@+id/restaurant_item_country"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginStart="4dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="4dp"
+        android:textColor="@color/black"
+        android:maxWidth="80dp"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_item_title"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/separator"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginStart="0dp"
+        android:gravity="center_vertical"
+        android:text="@string/hyphen"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_item_title"
+        app:layout_constraintStart_toEndOf="@id/restaurant_item_country"/>
+
+    <TextView
+        android:id="@+id/restaurant_item_address"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginStart="0dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="4dp"
+        android:textColor="@color/black"
+        android:maxWidth="184dp"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_item_title"
+        app:layout_constraintStart_toEndOf="@id/separator"/>
+
+    <ImageView
+        android:id="@+id/restaurant_item_workmate_logo"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginEnd="4dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_item_distance"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_item_workmates_count"
+        android:contentDescription="@string/ic_workmate_logo"/>
+
+    <TextView
+        android:id="@+id/restaurant_item_workmates_count"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginEnd="4dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="4dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_item_distance"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_item_picture"/>
+
+    <!-- Line 3 -->
+    <TextView
+        android:id="@+id/restaurant_item_openTime"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginStart="4dp"
+        android:gravity="top"
+        android:paddingHorizontal="4dp"
+        android:textColor="@color/black"
+        android:maxWidth="280dp"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_item_country"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <RatingBar
+        android:id="@+id/restaurant_item_rating_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:progressTint="@color/green_fab"
+        android:progressBackgroundTint="@color/white"
+        android:numStars="3"
+        android:rating="0"
+        android:stepSize="0.1"
+        android:isIndicator="true"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_item_workmates_count"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_item_picture" />
+
+    <!-- Picture -->
+    <ImageView
+        android:id="@+id/restaurant_item_picture"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/im_restaurant_item"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
