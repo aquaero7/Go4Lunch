@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.Views.DetailRestaurantWorkmateAdapter;
+import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,7 +42,11 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     // Declare RecyclerView
     private RecyclerView mRecyclerView;
 
+    // Declare ViewBinding
+    private FragmentDetailRestaurantBinding binding;
 
+
+    // Constructor
     public DetailRestaurantFragment() {
         // Required empty public constructor
     }
@@ -87,24 +93,39 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View result = inflater.inflate(R.layout.fragment_detail_restaurant, container, false);
-        //Set onClickListener to selection fab
-        result.findViewById(R.id.selection_fab).setOnClickListener(this);
 
-        //Set onClickListener to buttons
+        //Set onClickListener to selection fab
+        binding = FragmentDetailRestaurantBinding.bind(result);
+        binding.selectionFab.setOnClickListener(this);
+        /*  // TODO : to be deleted cause replaced with ViewBinding
+        result.findViewById(R.id.selection_fab).setOnClickListener(this);
+        */
+
+        // Set onClickListener to buttons
+        binding.callButton.setOnClickListener(this);
+        binding.likeButton.setOnClickListener(this);
+        binding.websiteButton.setOnClickListener(this);
+
+        mRecyclerView = binding.rvDetailRestaurant;
+        /*  // TODO : to be deleted cause replaced with ViewBinding
         result.findViewById(R.id.callButton).setOnClickListener(this);
         result.findViewById(R.id.likeButton).setOnClickListener(this);
         result.findViewById(R.id.websiteButton).setOnClickListener(this);
 
         mRecyclerView = result.findViewById(R.id.rv_detail_restaurant);
-        configureRecyclerView();
+        */
 
+        configureRecyclerView();
         return result;
     }
 
     @Override
+    /* Spread the click to the parent activity
+    Binding added as an argument to make it available in the activity
+    */
     public void onClick(View v) {
-        // Spread the click to the parent activity
-        mCallback.onButtonClicked(v);
+        // mCallback.onButtonClicked(v);    // TODO : to be deleted
+        mCallback.onButtonClicked(v, binding);
     }
 
     @Override
@@ -115,9 +136,13 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     }
 
 
-    // Declare an interface that will be implemented by any container activity for callback
+    /*
+    Declare an interface that will be implemented by any container activity for callback
+    Binding added as an argument to make it available in the activity
+    */
     public interface OnButtonClickedListener {
-        public void onButtonClicked(View view);
+        // public void onButtonClicked(View view);  // TODO : to be deleted
+        public void onButtonClicked(View view, FragmentDetailRestaurantBinding binding);
     }
 
     // Create callback to parent activity
@@ -140,6 +165,5 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
     }
-
 
 }

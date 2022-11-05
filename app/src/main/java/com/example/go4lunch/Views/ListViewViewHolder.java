@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.databinding.RestaurantListItemBinding;
 
 
 import java.util.Arrays;
@@ -30,6 +31,18 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
 
     public ListViewViewHolder(@NonNull View itemView) {
         super(itemView);
+        RestaurantListItemBinding binding = RestaurantListItemBinding.bind(itemView);
+        tvTitle = binding.restaurantItemTitle;
+        tvDistance = binding.restaurantItemDistance;
+        tvCountry = binding.restaurantItemCountry;
+        tvAddress = binding.restaurantItemAddress;
+        ivWorkmateLogo = binding.restaurantItemWorkmateLogo;
+        tvWorkmatesCount = binding.restaurantItemWorkmatesCount;
+        tvOpenTime = binding.restaurantItemOpenTime;
+        mRatingBar = binding.restaurantItemRatingBar;
+        ivPicture = binding.restaurantItemPicture;
+
+        /*  // TODO : to be deleted cause replaced with ViewBinding
         tvTitle = itemView.findViewById(R.id.restaurant_item_title);
         tvDistance = itemView.findViewById(R.id.restaurant_item_distance);
         tvCountry = itemView.findViewById(R.id.restaurant_item_country);
@@ -39,6 +52,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         tvOpenTime = itemView.findViewById(R.id.restaurant_item_openTime);
         mRatingBar = itemView.findViewById(R.id.restaurant_item_rating_bar);
         ivPicture = itemView.findViewById(R.id.restaurant_item_picture);
+        */
     }
 
     public void updateWithRestaurants() {

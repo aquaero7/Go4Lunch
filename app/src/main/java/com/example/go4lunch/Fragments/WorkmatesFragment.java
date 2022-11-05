@@ -1,10 +1,7 @@
 package com.example.go4lunch.Fragments;
 
-import android.app.Activity;
-import android.app.Application;
 import android.os.Bundle;
 
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,10 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Toolbar;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.Views.DetailRestaurantWorkmateAdapter;
 import com.example.go4lunch.Views.WorkmateAdapter;
-import com.example.go4lunch.databinding.ActivityMainBinding;
-import com.example.go4lunch.databinding.ActivityMainToolbarBinding;
+import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,6 +35,7 @@ public class WorkmatesFragment extends Fragment {
 
     // Declare RecyclerView
     private RecyclerView mRecyclerView;
+
 
     // Constructor
     public WorkmatesFragment() {
@@ -88,7 +84,10 @@ public class WorkmatesFragment extends Fragment {
         // Inflate the layout for this fragment
         View result = inflater.inflate(R.layout.fragment_workmates, container, false);
 
-        mRecyclerView = result.findViewById(R.id.rv_workmates);
+        // mRecyclerView = result.findViewById(R.id.rv_workmates);  // TODO : To be deleted cause replaced with ViewBinding
+        FragmentWorkmatesBinding binding = FragmentWorkmatesBinding.bind(result);
+        mRecyclerView = binding.rvWorkmates;
+
         configureRecyclerView();
 
         return result;

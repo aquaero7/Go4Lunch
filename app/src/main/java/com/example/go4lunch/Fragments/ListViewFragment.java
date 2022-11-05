@@ -1,22 +1,18 @@
 package com.example.go4lunch.Fragments;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.Views.ListViewAdapter;
-import com.example.go4lunch.Views.WorkmateAdapter;
+import com.example.go4lunch.databinding.FragmentListViewBinding;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,6 +36,7 @@ public class ListViewFragment extends Fragment {
     private RecyclerView mRecyclerView;
 
 
+    // Constructor
     public ListViewFragment() {
         // Required empty public constructor
     }
@@ -87,7 +84,10 @@ public class ListViewFragment extends Fragment {
         // Inflate the layout for this fragment
         View result = inflater.inflate(R.layout.fragment_list_view, container, false);
 
-        mRecyclerView = result.findViewById(R.id.rv_listView);
+        // mRecyclerView = result.findViewById(R.id.rv_listView);  // TODO : To be deleted cause replaced with ViewBinding
+        FragmentListViewBinding binding = FragmentListViewBinding.bind(result);
+        mRecyclerView = binding.rvListView;
+
         configureRecyclerView();
 
         return result;

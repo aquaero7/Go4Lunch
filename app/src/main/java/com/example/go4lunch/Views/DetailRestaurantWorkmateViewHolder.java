@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.databinding.WorkmateListItemBinding;
 
 public class DetailRestaurantWorkmateViewHolder extends RecyclerView.ViewHolder {
 
@@ -16,8 +17,14 @@ public class DetailRestaurantWorkmateViewHolder extends RecyclerView.ViewHolder 
 
     public DetailRestaurantWorkmateViewHolder(@NonNull View itemView) {
         super(itemView);
+        WorkmateListItemBinding binding = WorkmateListItemBinding.bind(itemView);
+        imageView = binding.workmateItemPicture;
+        textView = binding.workmateItemTitle;
+
+        /*  // TODO : to be deleted cause replaced with ViewBinding
         imageView = itemView.findViewById(R.id.workmate_item_picture);
         textView = itemView.findViewById(R.id.workmate_item_title);
+        */
     }
 
     public void updateWithWorkmate() {

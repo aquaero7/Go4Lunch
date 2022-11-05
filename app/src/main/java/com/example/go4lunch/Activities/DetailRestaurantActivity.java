@@ -1,18 +1,17 @@
 package com.example.go4lunch.Activities;
 
-import static java.lang.String.valueOf;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.go4lunch.Fragments.DetailRestaurantFragment;
 import com.example.go4lunch.R;
+import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
@@ -33,8 +32,9 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
     // CallBack
     // --------------
     @Override
-    public void onButtonClicked(View view) {
-        // Handle the FloatingActionButton click event
+    // Binding added as an argument to make it available here
+    public void onButtonClicked(View view, FragmentDetailRestaurantBinding binding) {
+        // Handle the button click event
         String tag = String.valueOf(view.getTag());
         switch (tag) {
             case "BTN_CALL" :
@@ -50,7 +50,8 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
                 toastText = tag;    // TODO : Delete after action completion
                 break;
             case "FAB" :
-                FloatingActionButton selectionFab = findViewById(R.id.selection_fab);
+                // FloatingActionButton selectionFab = findViewById(R.id.selection_fab);    // TODO : To be deleted cause replaced with ViewBinding
+                FloatingActionButton selectionFab = binding.selectionFab;   // TODO : to be implemented IF WORKING in place of findViewById
                 // Toggle FAB status
                 fabChecked = !fabChecked;
                 // Update toast text

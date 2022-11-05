@@ -129,9 +129,6 @@
 
         </LinearLayout>
 
-
-        <!-- TODO : RecyclerView -->
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_detail_restaurant"
             android:layout_width="match_parent"

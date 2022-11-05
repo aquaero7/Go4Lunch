@@ -5,20 +5,18 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.go4lunch.Fragments.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.example.go4lunch.databinding.ActivityMainToolbarBinding;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -46,7 +44,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);  // Useless with initBinding in BaseActivity ?
+        // setContentView(R.layout.activity_main);  // Useless with initBinding in BaseActivity ?
 
         /*
         this.configureAndShowMapViewFragment();
@@ -101,7 +99,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 break;
         }
         this.drawerLayout.closeDrawer(GravityCompat.START);
-
         return true;
     }
 
@@ -128,16 +125,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
         /*  // Case 1 : Without Navigation Drawer
         // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        // Toolbar toolbar = findViewById(R.id.toolbar);   // TODO : To be deleted cause replaced with ViewBinding
+        Toolbar toolbar = binding.includedToolbar.toolbar;
         */
 
         // // Case 2 : With Navigation Drawer
-        this.toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // this.toolbar = (Toolbar) findViewById(R.id.toolbar); // TODO : To be deleted cause replaced with ViewBinding
+        this.toolbar = (Toolbar) binding.includedToolbar.toolbar;
         //
 
         // Sets the Toolbar
         setSupportActionBar(toolbar);
-
     }
 
     private void configureViewPagerAndTabs(){
@@ -153,13 +151,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         };
 
         // Get ViewPager from layout
-        ViewPager2 pager = (ViewPager2)findViewById(R.id.activity_main_viewpager);
+        // ViewPager2 pager = (ViewPager2)findViewById(R.id.activity_main_viewpager);   // TODO : To be deleted cause replaced with ViewBinding
+        ViewPager2 pager = (ViewPager2) binding.activityMainViewpager;
 
         // Set Adapter PagerAdapter and glue it together
         pager.setAdapter(new PagerAdapter(getSupportFragmentManager(), getLifecycle()));
 
         // Get TabLayout from layout
-        TabLayout tabs= (TabLayout)findViewById(R.id.activity_main_tabs);
+        // TabLayout tabs = (TabLayout)findViewById(R.id.activity_main_tabs);   // TODO : To be deleted cause replaced with ViewBinding
+        TabLayout tabs = (TabLayout) binding.activityMainTabs;
 
         // Glue TabLayout and ViewPager together
         new TabLayoutMediator(tabs, pager, new TabLayoutMediator.TabConfigurationStrategy() {
@@ -174,12 +174,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
         // Design purpose. Tabs have the same width
         tabs.setTabMode(TabLayout.MODE_FIXED);
-
     }
 
     // Configure Drawer Layout
     private void configureDrawerLayout(){
-        this.drawerLayout = (DrawerLayout) findViewById(R.id.activity_main_drawer_layout);
+        // this.drawerLayout = (DrawerLayout) findViewById(R.id.activity_main_drawer_layout);   // TODO : To be deleted cause replaced with ViewBinding
+        this.drawerLayout = (DrawerLayout) binding.activityMainDrawerLayout;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
@@ -187,7 +187,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     // Configure NavigationView
     private void configureNavigationView(){
-        this.navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);
+        // this.navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);   // TODO : To be deleted cause replaced with ViewBinding
+        this.navigationView = (NavigationView) binding.activityMainNavView;
         navigationView.setNavigationItemSelectedListener(this);
     }
 

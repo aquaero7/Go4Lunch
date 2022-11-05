@@ -43,6 +43,7 @@
 
         <!-- If using a specific layout for the toolbar and tag 'include' -->
         <include
+            android:id="@+id/includedToolbar"
             layout="@layout/activity_main_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
