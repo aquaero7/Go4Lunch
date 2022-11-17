@@ -8,18 +8,28 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.Fragments.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
-import com.example.go4lunch.databinding.ActivityMainToolbarBinding;
+import com.example.go4lunch.manager.UserManager;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -27,6 +37,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+
+    private ImageView userPicture;
+    private TextView userName;
+    private TextView userEmail;
+
+
+    private final UserManager userManager = UserManager.getInstance();
 
 
     /*
@@ -61,6 +78,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Configure Navigation Drawer views
         this.configureDrawerLayout();
         this.configureNavigationView();
+
+        // Configure progressBar
+        this.configureProgressBar();
 
     }
 
@@ -162,14 +182,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         TabLayout tabs = (TabLayout) binding.activityMainTabs;
 
         // Glue TabLayout and ViewPager together
-        new TabLayoutMediator(tabs, pager, new TabLayoutMediator.TabConfigurationStrategy() {
-            @Override
-            public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
-                // Setup tab title
-                tab.setText(tabTitles[position]);
-                // Setup tab icon
-                tab.setIcon(tabIcons[position]);
-            }
+        new TabLayoutMediator(tabs, pager, (tab, position) -> {
+            // Setup tab title
+            tab.setText(tabTitles[position]);
+            // Setup tab icon
+            tab.setIcon(tabIcons[position]);
         }).attach();
 
         // Design purpose. Tabs have the same width
@@ -183,6 +200,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+
     }
 
     // Configure NavigationView
@@ -190,6 +208,19 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // this.navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);   // TODO : To be deleted cause replaced with ViewBinding
         this.navigationView = (NavigationView) binding.activityMainNavView;
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Call user information update
+        userPicture = navigationView.getHeaderView(0).findViewById(R.id.user_picture);
+        userName = navigationView.getHeaderView(0).findViewById(R.id.user_name);
+        userEmail = navigationView.getHeaderView(0).findViewById(R.id.user_email);
+        updateUIWithUserData();
+
+    }
+
+    // Configure progressBar
+    private void configureProgressBar() {
+        ProgressBar progressBar = (ProgressBar) binding.progressBarMain.progressBar;
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
 
@@ -260,10 +291,43 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
 
     private void logout(){
-        // TODO
-        Toast.makeText(this, "Logout", Toast.LENGTH_SHORT).show();
+        userManager.signOut(this).addOnSuccessListener(aVoid -> {
+            Snackbar.make(binding.getRoot(), "Logout", Snackbar.LENGTH_LONG).show();
+            finish();
+        });
     }
 
+    // Update user information
+    private void updateUIWithUserData(){
+        if(userManager.isCurrentUserLogged()){
+            FirebaseUser user = userManager.getCurrentUser();
+            if(user.getPhotoUrl() != null){
+                setProfilePicture(user.getPhotoUrl());
+            }
+            setTextUserData(user);
+        }
+    }
+
+    // Update user picture
+    private void setProfilePicture(Uri profilePictureUrl){
+
+        Glide.with(this)
+                .load(profilePictureUrl)
+                .apply(RequestOptions.circleCropTransform())
+                .into(userPicture);
+
+        userPicture.setImageTintList(null);
+    }
+
+    // Update user name and email
+    private void setTextUserData(FirebaseUser user){
+        //Get email & username from User
+        String email = TextUtils.isEmpty(user.getEmail()) ? getString(R.string.info_no_email_found) : user.getEmail();
+        String username = TextUtils.isEmpty(user.getDisplayName()) ? getString(R.string.info_no_username_found) : user.getDisplayName();
+        //Update views with data
+        userName.setText(username);
+        userEmail.setText(email);
+    }
 
 
 }

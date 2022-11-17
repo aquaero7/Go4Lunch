@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.AuthActivity"
+    android:theme="@style/AuthTheme"
+    android:id="@+id/sign_in_layout">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/im_restaurant_3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/im_restaurant_auth"/>
+
+    <include
+        android:id="@+id/progressBar_sign"
+        layout="@layout/progressbar"/>
+
+    <include
+        android:id="@+id/logo_full_sign"
+        layout="@layout/logo_full"/>
+
+    <Button
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button_facebook"
+        android:layout_width="280dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginBottom="16dp"
+        style="@style/FirebaseUI.Button.AccountChooser.TwitterButton"
+        android:paddingHorizontal="20dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:text="@string/sign_in_button_twitter"
+        android:id="@+id/button_twitter"/>
+
+    <Button
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button_google"
+        android:layout_width="280dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginBottom="16dp"
+        style="@style/FirebaseUI.Button.AccountChooser.FacebookButton"
+        android:paddingHorizontal="20dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:text="@string/sign_in_button_facebook"
+        android:id="@+id/button_facebook"/>
+
+    <Button
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="280dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginBottom="80dp"
+        style="@style/FirebaseUI.Button.AccountChooser.GoogleButton"
+        android:paddingHorizontal="20dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:text="@string/sign_in_button_google"
+        android:id="@+id/button_google"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

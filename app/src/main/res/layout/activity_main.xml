@@ -12,6 +12,7 @@
 
     <!-- 1 | MainActivity RootView -->
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".Activities.MainActivity">
@@ -46,7 +47,7 @@
             android:id="@+id/includedToolbar"
             layout="@layout/activity_main_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"/>
 
         <!-- If the toolbar is defined in this layout -->
         <!--
@@ -63,6 +64,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
         -->
+
+        <include
+            android:id="@+id/progressBar_main"
+            layout="@layout/progressbar"
+            />
 
         <!-- FrameLayout for drawer fragments !!!! ACFM !!!-->
         <FrameLayout
@@ -90,7 +96,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_go4lunch"
             android:layout_gravity="center|bottom"
-            android:contentDescription="TODO"/>
+            android:contentDescription="@string/ic_app_logo"/>
 
     </com.google.android.material.navigation.NavigationView>
 

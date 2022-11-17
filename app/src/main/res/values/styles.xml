@@ -10,13 +10,13 @@
 
         <!-- Customize color of Nav Drawer button -->
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
-
     </style>
 
     <!-- NO ACTIONBAR THEME -->
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="colorControlActivated">@color/white</item>  <!-- progressBar -->
     </style>
 
     <!-- TOOLBAR THEME -->
@@ -36,6 +36,24 @@
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <!-- Color of the Nav Drawer button in the Toolbar -->
         <item name="color">@color/white</item>
+    </style>
+
+    <!-- SIGN-IN ACTIVITY THEME -->
+    <style name="AuthTheme" parent="FirebaseUI">
+        <item name="colorPrimary">@color/app_background</item>
+        <item name="colorPrimaryDark">@color/dark_grey</item>   <!-- AppBar -->
+        <item name="colorAccent">@color/app_background</item>
+        <item name="colorButtonNormal">@color/app_background</item>
+        <item name="colorControlNormal">@android:color/darker_gray</item>
+        <item name="colorControlActivated">@color/white</item>  <!-- progressBar -->
+        <item name="colorControlHighlight">@android:color/darker_gray</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/darker_gray</item>
+        <item name="android:textColorSecondary">@android:color/darker_gray</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:textColorHint">@android:color/darker_gray</item>
     </style>
 
 </resources>

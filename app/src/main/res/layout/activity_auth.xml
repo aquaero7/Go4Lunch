@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.AuthActivity"
+    android:id="@+id/auth_layout">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/im_restaurant_3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/im_restaurant_auth"/>
+
+    <include
+        android:id="@+id/progressBar_auth"
+        layout="@layout/progressbar"/>
+
+    <include
+        android:id="@+id/logo_full_auth"
+        layout="@layout/logo_full"/>
+
+    <LinearLayout
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="80dp"
+        android:layout_marginStart="56dp">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@drawable/bt_login_bg"
+            android:backgroundTint="@color/app_background"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="@string/login_button"
+            style="@style/FirebaseUI.AuthMethodPicker.ButtonHolder"
+            android:id="@+id/button_login"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
