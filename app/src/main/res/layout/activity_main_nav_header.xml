@@ -49,7 +49,7 @@
                 android:layout_gravity="center"
                 android:src="@drawable/ic_baseline_account_circle_white_24"
                 app:tint="@color/blue_ic"
-                android:background="@drawable/round_corner_bg"
+                android:background="@drawable/ic_user_bg"
                 android:scaleX="1"
                 android:scaleY="1"
                 android:contentDescription="@string/im_user_picture"/>

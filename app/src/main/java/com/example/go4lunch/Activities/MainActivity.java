@@ -7,6 +7,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -292,8 +293,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     private void logout(){
         userManager.signOut(this).addOnSuccessListener(aVoid -> {
-            Snackbar.make(binding.getRoot(), "Logout", Snackbar.LENGTH_LONG).show();
-            finish();
+            closeActivity();
         });
     }
 
@@ -329,5 +329,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         userEmail.setText(email);
     }
 
+    private void closeActivity() {
+        Intent intent = new Intent();
+        setResult(Activity.RESULT_OK, intent);
+        finish();
+    }
 
 }

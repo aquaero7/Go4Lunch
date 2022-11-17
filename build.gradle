@@ -4,7 +4,7 @@ buildscript {
     repositories {
         // FIREBASE
         google()    // Google's Maven repository
-        mavenCentral()  // Maven Central repository
+        mavenCentral()  // Maven Central repository for Facebook Login
     }
 
     dependencies {
@@ -19,16 +19,6 @@ plugins {
     id 'com.android.library' version '7.3.1' apply false
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin' version '2.0.1' apply false
 }
-
-/*  // Deprecated cause set in settings.gradle
-allprojects {
-    repositories {
-        // FIREBASE
-        google()    // Google's Maven repository
-        mavenCentral()  // Maven Central repository
-    }
-}
-*/
 
 task clean(type: Delete) {
     delete rootProject.buildDir

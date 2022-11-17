@@ -2,11 +2,8 @@ plugins {
     id 'com.android.application'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     // FIREBASE
-    id 'com.google.gms.google-services' // According to Firebase doc. Useless ? Deprecated ?
+    id 'com.google.gms.google-services'
 }
-
-// FIREBASE
-apply plugin: 'com.google.gms.google-services'  // According to course. Useless ? Deprecated ?
 
 android {
     compileSdk 32

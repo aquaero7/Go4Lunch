@@ -58,10 +58,16 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         });
     }
 
-    // Receive and handle response (receiver)
+    // Receive and handle response of sign in activity (receiver)
     ActivityResultLauncher<Intent> authActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             this::handleResponseAfterSignIn
+    );
+
+    // Receive and handle response of main activity
+    ActivityResultLauncher<Intent> mainActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            this::handleSnackBarAfterLogout
     );
 
     private void startSignInActivity() {
@@ -97,7 +103,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
     }
 
-    // Method that handles response after SignIn Activity close
+    // Method that handles response after sign in activity close
     private void handleResponseAfterSignIn(ActivityResult result){
         // Show progressBar
         progressBar.setVisibility(View.VISIBLE);
@@ -125,6 +131,13 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         }
     }
 
+    // Method that handles response after main activity close
+    private void handleSnackBarAfterLogout(ActivityResult result) {
+        if (result.getResultCode() == RESULT_OK) {
+            showSnackBar(getString(R.string.disconnection_succeed));
+        }
+    }
+
     // Show Snack Bar with a message
     private void showSnackBar(String message){
         // Snackbar.make(binding.authLayout, message, Snackbar.LENGTH_LONG).show();
@@ -137,7 +150,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         progressBar.setVisibility(View.VISIBLE);
 
         Intent intent = new Intent(this,MainActivity.class);
-        startActivity(intent);
+        // startActivity(intent);
+        mainActivityResultLauncher.launch(intent);
 
         // Hide progressBar
         progressBar.setVisibility(View.INVISIBLE);
