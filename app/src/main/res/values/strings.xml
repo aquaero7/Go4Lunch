@@ -63,11 +63,12 @@
     <string name="start_button">Start the application</string>
     <string name="sign_in_button_google">Sign in with Google</string>
     <string name="sign_in_button_facebook">Sign in with Facebook</string>
-    <string name="sign_in_button_twitter">Sign in with eMail</string>
+    <string name="sign_in_button_twitter">Sign in with Twitter</string>
 
     <!-- FACEBOOK LOGIN -->
     <string name="facebook_application_id" translatable="false">496015622306135</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb496015622306135</string>
     <string name="facebook_client_token" translatable="false">2609d935aee8add048f2579fa8fa698f</string>
+
 
 </resources>

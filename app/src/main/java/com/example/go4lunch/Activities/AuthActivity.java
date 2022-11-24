@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -75,9 +76,9 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         // Custom sign in layout instead of default one
         AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
                 .Builder(R.layout.layout_sign_in)
-                .setEmailButtonId(R.id.button_twitter)
-                .setFacebookButtonId(R.id.button_facebook)
                 .setGoogleButtonId(R.id.button_google)
+                .setFacebookButtonId(R.id.button_facebook)
+                .setTwitterButtonId(R.id.button_twitter)
                 .build();
 
         // Choose authentication providers
@@ -85,7 +86,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 Arrays.asList(
                         new AuthUI.IdpConfig.GoogleBuilder().build(),
                         new AuthUI.IdpConfig.FacebookBuilder().build(),
-                        new AuthUI.IdpConfig.EmailBuilder().build());
+                        new AuthUI.IdpConfig.TwitterBuilder().build());
 
         // Launch the activity
         Intent data = AuthUI.getInstance()

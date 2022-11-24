@@ -5,6 +5,7 @@ buildscript {
         // FIREBASE
         google()    // Google's Maven repository
         mavenCentral()  // Maven Central repository for Facebook Login
+        // mavenLocal()
     }
 
     dependencies {

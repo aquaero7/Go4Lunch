@@ -26,10 +26,12 @@ import com.example.go4lunch.Fragments.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.manager.UserManager;
+import com.facebook.AccessToken;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
@@ -292,9 +294,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
 
     private void logout(){
-        userManager.signOut(this).addOnSuccessListener(aVoid -> {
-            closeActivity();
-        });
+        userManager.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
     }
 
     // Update user information
@@ -311,12 +311,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     // Update user picture
     private void setProfilePicture(Uri profilePictureUrl){
 
+        userPicture.setImageTintList(null);
+
         Glide.with(this)
                 .load(profilePictureUrl)
                 .apply(RequestOptions.circleCropTransform())
                 .into(userPicture);
-
-        userPicture.setImageTintList(null);
     }
 
     // Update user name and email
