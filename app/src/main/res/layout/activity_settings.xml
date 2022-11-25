@@ -9,8 +9,8 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/frameLayoutDetailRestaurant"
-        android:name="com.example.go4lunch.Fragments.DetailRestaurantFragment">
+        android:id="@+id/frameLayoutSettings"
+        android:name="com.example.go4lunch.Fragments.SettingsFragment">
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

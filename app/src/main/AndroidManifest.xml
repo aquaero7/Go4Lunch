@@ -34,7 +34,7 @@
         </activity>
 
         <activity
-            android:name=".Activities.SettingActivity"
+            android:name=".Activities.SettingsActivity"
             android:exported="false"
             android:theme="@style/AppTheme.NoActionBar" />
 

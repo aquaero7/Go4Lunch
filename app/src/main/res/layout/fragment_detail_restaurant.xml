@@ -6,6 +6,7 @@
     android:id="@+id/fragment_detail_restaurant_rootview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".Fragments.DetailRestaurantFragment"
     >
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

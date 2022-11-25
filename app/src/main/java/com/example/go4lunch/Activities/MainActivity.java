@@ -26,12 +26,9 @@ import com.example.go4lunch.Fragments.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.manager.UserManager;
-import com.facebook.AccessToken;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
@@ -154,7 +151,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
         // // Case 2 : With Navigation Drawer
         // this.toolbar = (Toolbar) findViewById(R.id.toolbar); // TODO : To be deleted cause replaced with ViewBinding
-        this.toolbar = (Toolbar) binding.includedToolbar.toolbar;
+        this.toolbar = binding.includedToolbar.toolbar;
         //
 
         // Sets the Toolbar
@@ -175,14 +172,14 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
         // Get ViewPager from layout
         // ViewPager2 pager = (ViewPager2)findViewById(R.id.activity_main_viewpager);   // TODO : To be deleted cause replaced with ViewBinding
-        ViewPager2 pager = (ViewPager2) binding.activityMainViewpager;
+        ViewPager2 pager = binding.activityMainViewpager;
 
         // Set Adapter PagerAdapter and glue it together
         pager.setAdapter(new PagerAdapter(getSupportFragmentManager(), getLifecycle()));
 
         // Get TabLayout from layout
         // TabLayout tabs = (TabLayout)findViewById(R.id.activity_main_tabs);   // TODO : To be deleted cause replaced with ViewBinding
-        TabLayout tabs = (TabLayout) binding.activityMainTabs;
+        TabLayout tabs = binding.activityMainTabs;
 
         // Glue TabLayout and ViewPager together
         new TabLayoutMediator(tabs, pager, (tab, position) -> {
@@ -199,7 +196,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     // Configure Drawer Layout
     private void configureDrawerLayout(){
         // this.drawerLayout = (DrawerLayout) findViewById(R.id.activity_main_drawer_layout);   // TODO : To be deleted cause replaced with ViewBinding
-        this.drawerLayout = (DrawerLayout) binding.activityMainDrawerLayout;
+        this.drawerLayout = binding.activityMainDrawerLayout;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
@@ -209,7 +206,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     // Configure NavigationView
     private void configureNavigationView(){
         // this.navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);   // TODO : To be deleted cause replaced with ViewBinding
-        this.navigationView = (NavigationView) binding.activityMainNavView;
+        this.navigationView = binding.activityMainNavView;
         navigationView.setNavigationItemSelectedListener(this);
 
         // Call user information update
@@ -222,7 +219,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     // Configure progressBar
     private void configureProgressBar() {
-        ProgressBar progressBar = (ProgressBar) binding.progressBarMain.progressBar;
+        ProgressBar progressBar = binding.progressBarMain.progressBar;
         progressBar.setVisibility(View.INVISIBLE);
     }
 
@@ -289,7 +286,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
 
     private void launchSettingActivity() {
-        Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(intent);
     }
 

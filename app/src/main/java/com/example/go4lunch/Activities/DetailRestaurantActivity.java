@@ -7,10 +7,12 @@ import androidx.viewbinding.ViewBinding;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.go4lunch.Fragments.DetailRestaurantFragment;
 import com.example.go4lunch.R;
+import com.example.go4lunch.databinding.ActivityDetailRestaurantBinding;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -26,6 +28,7 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_restaurant);
 
+        configureAndShowDetailRestaurantFragment();
     }
 
     // --------------
@@ -33,25 +36,25 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
     // --------------
     @Override
     // Binding added as an argument to make it available here
-    public void onButtonClicked(View view, FragmentDetailRestaurantBinding binding) {
+    public void onButtonClicked(View view, FragmentDetailRestaurantBinding fragmentBinding) {
         // Handle the button click event
         String tag = String.valueOf(view.getTag());
         switch (tag) {
-            case "BTN_CALL" :
+            case "BTN_CALL":
                 callRestaurant();
                 toastText = tag;    // TODO : Delete after action completion
                 break;
-            case "BTN_LIKE" :
+            case "BTN_LIKE":
                 likeRestaurant();
                 toastText = tag;    // TODO : Delete after action completion
                 break;
-            case "BTN_WEBSITE" :
+            case "BTN_WEBSITE":
                 displayRestaurantWebsite();
                 toastText = tag;    // TODO : Delete after action completion
                 break;
-            case "FAB" :
+            case "FAB":
                 // FloatingActionButton selectionFab = findViewById(R.id.selection_fab);    // TODO : To be deleted cause replaced with ViewBinding
-                FloatingActionButton selectionFab = binding.selectionFab;   // TODO : to be implemented IF WORKING in place of findViewById
+                FloatingActionButton selectionFab = fragmentBinding.selectionFab;   // TODO : to be implemented IF WORKING in place of findViewById
                 // Toggle FAB status
                 fabChecked = !fabChecked;
                 // Update toast text
@@ -61,9 +64,20 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
                 updateDatabase();
                 break;
         }
-
         displayToast();
+    }
 
+    private void configureAndShowDetailRestaurantFragment() {
+        // Get FragmentManager (Support) and try to find existing instance of fragment in FrameLayout container
+        DetailRestaurantFragment detailRestaurantFragment = (DetailRestaurantFragment) getSupportFragmentManager().findFragmentById(R.id.frameLayoutDetailRestaurant);
+        if (detailRestaurantFragment == null) {
+            // Create new detail restaurant fragment
+            detailRestaurantFragment = new DetailRestaurantFragment();
+            // Add it to FrameLayout container
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.frameLayoutDetailRestaurant, detailRestaurantFragment)
+                    .commit();
+        }
     }
 
     private void toggleSelectionFabDisplay(FloatingActionButton fab) {

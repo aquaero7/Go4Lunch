@@ -5,7 +5,7 @@
     android:id="@+id/fragment_setting_rootview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.SettingFragment">
+    tools:context=".Fragments.SettingsFragment">
 
     <TextView
         android:id="@+id/fragment_setting_title"
