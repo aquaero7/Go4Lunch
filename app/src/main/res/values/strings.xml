@@ -64,6 +64,7 @@
     <string name="sign_in_button_google">Sign in with Google</string>
     <string name="sign_in_button_facebook">Sign in with Facebook</string>
     <string name="sign_in_button_twitter">Sign in with Twitter</string>
+    <string name="sign_in_button_email">Sign in with eMail</string>
 
     <!-- FACEBOOK LOGIN -->
     <string name="facebook_application_id" translatable="false">496015622306135</string>

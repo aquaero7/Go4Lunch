@@ -79,6 +79,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 .setGoogleButtonId(R.id.button_google)
                 .setFacebookButtonId(R.id.button_facebook)
                 .setTwitterButtonId(R.id.button_twitter)
+                .setEmailButtonId(R.id.button_email)
                 .build();
 
         // Choose authentication providers
@@ -86,7 +87,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 Arrays.asList(
                         new AuthUI.IdpConfig.GoogleBuilder().build(),
                         new AuthUI.IdpConfig.FacebookBuilder().build(),
-                        new AuthUI.IdpConfig.TwitterBuilder().build());
+                        new AuthUI.IdpConfig.TwitterBuilder().build(),
+                        new AuthUI.IdpConfig.EmailBuilder().build());
 
         // Launch the activity
         Intent data = AuthUI.getInstance()

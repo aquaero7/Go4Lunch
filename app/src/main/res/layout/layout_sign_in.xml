@@ -28,6 +28,20 @@
 
     <Button
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button_twitter"
+        android:layout_width="280dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginBottom="16dp"
+        style="@style/FirebaseUI.Button.AccountChooser.EmailButton"
+        android:paddingHorizontal="20dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:text="@string/sign_in_button_email"
+        android:id="@+id/button_email"/>
+
+    <Button
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/button_facebook"
         android:layout_width="280dp"
         android:layout_height="64dp"
@@ -60,7 +74,7 @@
         android:layout_width="280dp"
         android:layout_height="64dp"
         android:layout_marginStart="56dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="40dp"
         style="@style/FirebaseUI.Button.AccountChooser.GoogleButton"
         android:paddingHorizontal="20dp"
         android:gravity="center"
