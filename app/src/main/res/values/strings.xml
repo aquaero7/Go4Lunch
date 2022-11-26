@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Go4Lunch</string>
     <string name="app_desc">Find a nice restaurant and invite your co-workers for lunch!</string>
     <string name="mapView_toolbar_title">I\'m Hungry!</string>
@@ -67,9 +67,7 @@
     <string name="sign_in_button_email">Sign in with eMail</string>
 
     <!-- FACEBOOK LOGIN -->
-    <string name="facebook_application_id" translatable="false">496015622306135</string>
-    <string name="fb_login_protocol_scheme" translatable="false">fb496015622306135</string>
-    <string name="facebook_client_token" translatable="false">2609d935aee8add048f2579fa8fa698f</string>
-
+    <string name="facebook_application_id" translatable="false">@string/fb_id</string>
+    <string name="facebook_client_token" translatable="false">@string/fb_token</string>
 
 </resources>

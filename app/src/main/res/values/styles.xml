@@ -16,7 +16,7 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="colorControlActivated">@color/white</item>  <!-- progressBar -->
+        <item name="colorControlActivated">@color/blue_pb</item>  <!-- progressBar -->
     </style>
 
     <!-- TOOLBAR THEME -->

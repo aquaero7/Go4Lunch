@@ -16,6 +16,7 @@
     <color name="blue">#FF2266AA</color>
     <color name="light_blue">#FF00BBFF</color>
     <color name="red">#FFFF0000</color>
+    <color name="blue_pb">#003377</color>
 
     <color name="app_background">#F35F5F</color>
     <color name="app_background_dark">#BE4141</color>

@@ -22,8 +22,27 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            // To keep keys and secrets hidden
+            resValue "string", "fb_id", (project.findProperty("fb_id"))
+            resValue "string", "fb_token", (project.findProperty("fb_token"))
+            /*
+            buildConfigField "String", "fb_id", project.findProperty("fb_id")
+            buildConfigField "String", "fb_token", project.findProperty("fb_token")
+            */
+        }
+
+        debug {
+            // To keep keys and secrets hidden
+            resValue "string", "fb_id", (project.findProperty("fb_id"))
+            resValue "string", "fb_token", (project.findProperty("fb_token"))
+            /*
+            buildConfigField "String", "fb_id", project.findProperty("fb_id")
+            buildConfigField "String", "fb_token", project.findProperty("fb_token")
+            */
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
