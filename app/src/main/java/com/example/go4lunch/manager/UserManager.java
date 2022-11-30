@@ -2,6 +2,7 @@ package com.example.go4lunch.manager;
 
 import android.content.Context;
 
+import com.example.go4lunch.models.User;
 import com.example.go4lunch.repository.UserRepository;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,6 +39,15 @@ public class UserManager {
 
     public Task<Void> signOut(Context context){
         return userRepository.signOut(context);
+    }
+
+    public void createUser(){
+        userRepository.createUser();
+    }
+
+    public Task<User> getUserData(){
+        // Get the user from Firestore and cast it to a User model Object
+        return userRepository.getUserData().continueWith(task -> task.getResult().toObject(User.class)) ;
     }
 
 }

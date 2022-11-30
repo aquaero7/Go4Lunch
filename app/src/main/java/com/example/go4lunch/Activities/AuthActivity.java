@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityAuthBinding;
+import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
@@ -115,7 +116,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         // SUCCESS
         if (result.getResultCode() == RESULT_OK) {
             showSnackBar(getString(R.string.connection_succeed));
-            // userManager.createUser();
+            // Create user into Firestore
+            userManager.createUser();
             startApp();
         } else {
             // ERRORS

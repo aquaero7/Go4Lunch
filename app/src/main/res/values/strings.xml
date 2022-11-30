@@ -16,9 +16,6 @@
     <string name="info_no_username_found">No user name found</string>
     <string name="info_no_email_found">No email found</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <!-- contentDescriptions -->
     <string name="selection_fab">Selection FAB</string>
     <string name="im_detail_restaurant">Restaurant image</string>
@@ -30,18 +27,17 @@
     <string name="im_user_picture">User picture</string>
 
 
-    <!-- FAB actions -->
+    <!-- FAB ACTIONS -->
     <string name="fabChecked">Restaurant selected</string>
     <string name="fabUnchecked">Restaurant unselected</string>
 
-    <!-- tags -->
+    <!-- TAGS -->
     <string name="fab">FAB</string>
     <string name="call">BTN_CALL</string>
     <string name="like">BTN_LIKE</string>
     <string name="website">BTN_WEBSITE</string>
 
-    <!-- separators -->
-    <string name="hyphen">-</string>
+    <!-- SEPARATORS -->
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -66,8 +62,16 @@
     <string name="sign_in_button_twitter">Sign in with Twitter</string>
     <string name="sign_in_button_email">Sign in with eMail</string>
 
+    <!-- NOT TRANSLATABLE -->
+
+    <!-- SEPARATORS -->
+    <string name="hyphen">-</string>
+
     <!-- FACEBOOK LOGIN -->
     <string name="facebook_application_id" translatable="false">@string/fb_id</string>
     <string name="facebook_client_token" translatable="false">@string/fb_token</string>
+
+    <!-- GOOGLE MAPS -->
+    <string name="MAPS_API_KEY" translatable="false">@string/maps_api_key</string>
 
 </resources>

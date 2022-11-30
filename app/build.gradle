@@ -26,9 +26,11 @@ android {
             // To keep keys and secrets hidden
             resValue "string", "fb_id", (project.findProperty("fb_id"))
             resValue "string", "fb_token", (project.findProperty("fb_token"))
+            resValue "string", "maps_api_key", (project.findProperty("maps_api_key"))
             /*
-            buildConfigField "String", "fb_id", project.findProperty("fb_id")
-            buildConfigField "String", "fb_token", project.findProperty("fb_token")
+            buildConfigField "String", "FB_ID", project.findProperty("fb_id")
+            buildConfigField "String", "FB_TOKEN", project.findProperty("fb_token")
+            buildConfigField "String", "MAPS_API_KEY", project.findProperty("maps_aoi_key")
             */
         }
 
@@ -36,9 +38,11 @@ android {
             // To keep keys and secrets hidden
             resValue "string", "fb_id", (project.findProperty("fb_id"))
             resValue "string", "fb_token", (project.findProperty("fb_token"))
+            resValue "string", "maps_api_key", (project.findProperty("maps_api_key"))
             /*
-            buildConfigField "String", "fb_id", project.findProperty("fb_id")
-            buildConfigField "String", "fb_token", project.findProperty("fb_token")
+            buildConfigField "String", "FB_ID", project.findProperty("fb_id")
+            buildConfigField "String", "FB_TOKEN", project.findProperty("fb_token")
+            buildConfigField "String", "MAPS_API_KEY", project.findProperty("maps_aoi_key")
             */
         }
     }
@@ -69,6 +73,8 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:latest.release')  // currently 30.3.1
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation 'com.google.firebase:firebase-analytics'
+    // Firestore
+    implementation 'com.google.firebase:firebase-firestore'
 
     // FIREBASE-UI for authentication
     implementation 'com.firebaseui:firebase-ui-auth:latest.release'             // currently 8.0.2
@@ -83,6 +89,9 @@ dependencies {
     // GLIDE
     implementation 'com.github.bumptech.glide:glide:4.13.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'
+
+    // GOOGLE MAPS
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
 
 
     testImplementation 'junit:junit:4.13.2'

@@ -29,6 +29,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.Fragments.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
@@ -131,7 +132,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Handle actions on menu items
         switch (item.getItemId()) {
             case R.id.menu_activity_main_search:
-                Toast.makeText(this, "Recherche indisponible, demandez plutôt l'avis de Google, c'est mieux et plus rapide.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Click on search button", Toast.LENGTH_LONG).show();
+                createRestaurantForTest1();                                 // TODO : Test to delete
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -334,6 +336,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         Intent intent = new Intent();
         setResult(Activity.RESULT_OK, intent);
         finish();
+    }
+
+    //                                                                         TODO : Test to delete
+    private void createRestaurantForTest1() {
+        RestaurantManager.getInstance().createRestaurant();
     }
 
 }
