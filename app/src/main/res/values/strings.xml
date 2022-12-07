@@ -15,6 +15,7 @@
     <string name="empty_list">No workmate currently interested</string>
     <string name="info_no_username_found">No user name found</string>
     <string name="info_no_email_found">No email found</string>
+    <string name="info_no_permission">Features requiring permissions that you have denied are unavailable</string>
 
     <!-- contentDescriptions -->
     <string name="selection_fab">Selection FAB</string>

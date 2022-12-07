@@ -3,9 +3,11 @@ package com.example.go4lunch.Fragments;
 
 import static android.content.Context.LOCATION_SERVICE;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
@@ -38,7 +40,9 @@ public class MapViewFragment extends Fragment {
     private LatLng home;
     private double latitude;
     private double longitude;
-    private static final int PERMS_CALL_ID = 1234;
+    private boolean permissionsGranted;
+    private static final double defaultLatitude = 48.8566;
+    private static final double defaultLongitude = 2.3522;
     private static final int DEFAULT_ZOOM = 15;
 
 
@@ -62,6 +66,7 @@ public class MapViewFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         // Get a handle to the fragment and register the callback.
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+
         mContext = requireContext();
         checkPermissionsAndLoadMap();
     }
@@ -77,48 +82,59 @@ public class MapViewFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        // Disconnect listener from system updates
         if (mLocationManager != null) {
             mLocationManager.removeUpdates(mLocationListener);
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMS_CALL_ID) {
+    private final ActivityResultLauncher<String> requestPermissionLauncher
+            = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+        if (isGranted) {
+            permissionsGranted = true;
             checkPermissionsAndLoadMap();
+        } else {
+            latitude = defaultLatitude;
+            longitude = defaultLongitude;
+            permissionsGranted = false;
+            loadMap();
         }
-    }
-
+    });
 
     // Listen to locations changes and get current position
     private final LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(@NonNull Location location) {
+            // Update location metrics
             latitude = location.getLatitude();
             longitude = location.getLongitude();
-            Toast.makeText(mContext, "Location : " + latitude + " / " + longitude, Toast.LENGTH_LONG).show();   // TODO : Test to be deleted
+            /*
+            // Toast.makeText(mContext, "Location : " + latitude + " / " + longitude, Toast.LENGTH_LONG).show();   // TODO : Test to be deleted
             if (mGoogleMap != null) {
                 home = new LatLng(latitude, longitude);
                 mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(home));
             }
+            */
         }
     };
 
     private void checkPermissionsAndLoadMap() {
-
         // Check and require missing permissions
-        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO : See the documentation for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(requireActivity(), new String[] {
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, PERMS_CALL_ID);
-
+        if ((ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION);
             return;
         }
+        // Get updated position from system and send it to listeners
+        getUpdatedPosition();
+        // Customize and load the map
+        loadMap();
+    }
 
+    @SuppressWarnings("MissingPermission")
+    // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method
+    private void getUpdatedPosition() {
         // Get updated position from system and send it to listeners
         mLocationManager = (LocationManager) requireActivity().getSystemService(LOCATION_SERVICE);
         if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -130,34 +146,36 @@ public class MapViewFragment extends Fragment {
         if (mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 0, mLocationListener);
         }
-
-        loadMap();
     }
 
     @SuppressWarnings("MissingPermission")
     // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method
     private void loadMap() {
         if (mapFragment != null) {
-            mapFragment.getMapAsync(googleMap -> {
-                /* Manipulates the map once available.
+            /* Manipulates the map once available.
                 This callback is triggered when the map is ready to be used.
                 This is where we can add markers or lines, add listeners or move the camera. */
+            mapFragment.getMapAsync(googleMap -> {
 
                 // Set position on map
                 mGoogleMap = googleMap;
                 home = new LatLng(latitude, longitude);
-                mGoogleMap.setMyLocationEnabled(true);
+                if (permissionsGranted) {
+                    mGoogleMap.setMyLocationEnabled(true);
+                } else {
+                    Toast.makeText(mContext, R.string.info_no_permission, Toast.LENGTH_LONG).show();
+                }
+                // mGoogleMap.moveCamera(CameraUpdateFactory.zoomBy(DEFAULT_ZOOM));
                 mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
-                // mGoogleMap.moveCamera(CameraUpdateFactory.zoomBy(20));
 
                 // Customize map display
                 mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
                 mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
                 mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(48.7270, 2.1200))
-                        .title("Marker in VLB"));
+                        .title("Marker in VLB"));   // TODO : Test to be deleted
                 mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(43.0900, 5.8400))
-                        .title("Marker in SFLP"));
+                        .title("Marker in SFLP"));  // TODO : Test to be deleted
 
             });
         }
