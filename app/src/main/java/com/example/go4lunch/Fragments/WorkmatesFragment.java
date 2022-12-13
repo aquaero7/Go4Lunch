@@ -2,6 +2,7 @@ package com.example.go4lunch.Fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,25 +80,22 @@ public class WorkmatesFragment extends Fragment {
     */
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View result = inflater.inflate(R.layout.fragment_workmates, container, false);
+        FragmentWorkmatesBinding binding = FragmentWorkmatesBinding.inflate(inflater, container, false);
 
-        // mRecyclerView = result.findViewById(R.id.rv_workmates);  // TODO : To be deleted cause replaced with ViewBinding
-        FragmentWorkmatesBinding binding = FragmentWorkmatesBinding.bind(result);
         mRecyclerView = binding.rvWorkmates;
-
         configureRecyclerView();
 
-        return result;
+        return binding.getRoot();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         // Setup toolbar title (Activity title)
-        getActivity().setTitle(R.string.workmates_toolbar_title);
+        requireActivity().setTitle(R.string.workmates_toolbar_title);
     }
 
     // Configure RecyclerView, Adapter, LayoutManager & glue it together

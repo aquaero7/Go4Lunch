@@ -12,10 +12,11 @@
     <string name="website_button">WEBSITE</string>
 
     <!-- ERROR MSG -->
-    <string name="empty_list">No workmate currently interested</string>
-    <string name="info_no_username_found">No user name found</string>
-    <string name="info_no_email_found">No email found</string>
-    <string name="info_no_permission">Features requiring permissions that you have denied are unavailable</string>
+    <string name="empty_list">No workmate currently interested.</string>
+    <string name="info_no_username_found">No user name found.</string>
+    <string name="info_no_email_found">No email found.</string>
+    <string name="info_no_permission">Features requiring permissions that you have denied are unavailable.</string>
+    <string name="info_no_current_location">Current location is null. Using defaults.</string>
 
     <!-- contentDescriptions -->
     <string name="selection_fab">Selection FAB</string>
@@ -38,22 +39,22 @@
     <string name="like">BTN_LIKE</string>
     <string name="website">BTN_WEBSITE</string>
 
-    <!-- SEPARATORS -->
+    <!-- LOGIN -->
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
+    <string name="welcome">Welcome!</string>
+    <string name="invalid_username">Not a valid username!</string>
+    <string name="invalid_password">Password must be >5 characters!</string>
+    <string name="login_failed">Login failed!</string>
 
     <!-- AUTH ACTIVITY -->
-    <string name="error_not_connected">Please log in first</string>
-    <string name="error_authentication_canceled">Login aborted</string>
-    <string name="error_no_internet">Network unavailable</string>
-    <string name="error_unknown_error">An unknown error occurred</string>
+    <string name="error_not_connected">Please log in first!</string>
+    <string name="error_authentication_canceled">Login aborted!</string>
+    <string name="error_no_internet">Network unavailable!</string>
+    <string name="error_unknown_error">An unknown error occurred!</string>
     <string name="connection_succeed">Login successful!</string>
     <string name="disconnection_succeed">Logout successful!</string>
     <string name="login_button">Log in</string>

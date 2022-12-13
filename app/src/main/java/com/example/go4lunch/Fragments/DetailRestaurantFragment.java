@@ -89,17 +89,13 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     */
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View result = inflater.inflate(R.layout.fragment_detail_restaurant, container, false);
+        binding = FragmentDetailRestaurantBinding.inflate(inflater, container, false);
 
         //Set onClickListener to selection fab
-        binding = FragmentDetailRestaurantBinding.bind(result);
         binding.selectionFab.setOnClickListener(this);
-        /*  // TODO : to be deleted cause replaced with ViewBinding
-        result.findViewById(R.id.selection_fab).setOnClickListener(this);
-        */
 
         // Set onClickListener to buttons
         binding.callButton.setOnClickListener(this);
@@ -107,16 +103,9 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         binding.websiteButton.setOnClickListener(this);
 
         mRecyclerView = binding.rvDetailRestaurant;
-        /*  // TODO : to be deleted cause replaced with ViewBinding
-        result.findViewById(R.id.callButton).setOnClickListener(this);
-        result.findViewById(R.id.likeButton).setOnClickListener(this);
-        result.findViewById(R.id.websiteButton).setOnClickListener(this);
-
-        mRecyclerView = result.findViewById(R.id.rv_detail_restaurant);
-        */
-
         configureRecyclerView();
-        return result;
+
+        return binding.getRoot();
     }
 
     @Override
@@ -142,7 +131,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     */
     public interface OnButtonClickedListener {
         // public void onButtonClicked(View view);  // TODO : to be deleted
-        public void onButtonClicked(View view, FragmentDetailRestaurantBinding binding);
+        void onButtonClicked(View view, FragmentDetailRestaurantBinding binding);
     }
 
     // Create callback to parent activity
@@ -151,7 +140,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
             //Parent activity will automatically subscribe to callback
             mCallback = (OnButtonClickedListener) getActivity();
         } catch (ClassCastException e) {
-            throw new ClassCastException(e.toString()+ " must implement OnButtonClickedListener");
+            throw new ClassCastException(e + " must implement OnButtonClickedListener");
         }
     }
 
