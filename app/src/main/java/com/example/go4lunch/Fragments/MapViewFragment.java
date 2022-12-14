@@ -34,7 +34,6 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -59,7 +58,7 @@ public class MapViewFragment extends Fragment {
     private static final double defaultLongitude = 2.3522;
     private static final int DEFAULT_ZOOM = 15;
     private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-    private ActivityResultLauncher<String> requestPermissionsLauncher;
+    private ActivityResultLauncher<String[]> requestPermissionsLauncher;
 
     public MapViewFragment() {
     }
@@ -87,7 +86,7 @@ public class MapViewFragment extends Fragment {
         mContext = requireContext();
 
         // Require latest version of map renderer
-        getLatestRenderer();
+        // getLatestRenderer();    // TODO : Useless because not working : Legacy version is used anyway !
 
         // Initialize SDK Places
         Places.initialize(mContext, getString(R.string.MAPS_API_KEY));
@@ -121,7 +120,7 @@ public class MapViewFragment extends Fragment {
 
         // Initialize and load the map
         /** SOLUTION 1. Doesn't focus on current location at first display */   // getDeviceLocation();
-        /** SOLUTION 2. Focus ok on current location at first display */        getUpdatedPosition();
+        /** SOLUTION 2. Focus ok on current location at first display */        getUpdatedLocation();
         loadMap();
     }
 
@@ -137,24 +136,29 @@ public class MapViewFragment extends Fragment {
         MapsInitializer.initialize(mContext, MapsInitializer.Renderer.LATEST, renderer -> {
             switch (renderer) {
                 case LATEST:
-                    Log.d("MapsDemo", "The latest version of the renderer is used.");
+                    Log.w("MapsDemo", "The latest version of the renderer is used.");
                     break;
                 case LEGACY:
-                    Log.d("MapsDemo", "The legacy version of the renderer is used.");
+                    Log.w("MapsDemo", "The legacy version of the renderer is used.");
                     break;
             }
         });
     }
 
     private void registerPermissionsCallback() {
-        ActivityResultContracts.RequestPermission permissionsContract = new ActivityResultContracts.RequestPermission();
-        requestPermissionsLauncher = registerForActivityResult(permissionsContract, isGranted -> {
-            if (isGranted) {
+        ActivityResultContracts.RequestMultiplePermissions permissionsContract = new ActivityResultContracts.RequestMultiplePermissions();
+        requestPermissionsLauncher = registerForActivityResult(permissionsContract, result -> {
+            Boolean fineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
+            Boolean coarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION,false);
+            if (fineLocationGranted != null && fineLocationGranted) {
                 locationPermissionsGranted = true;
-                Log.w("ActivityResultLauncher", "At least one permission was granted");
+                Log.w("ActivityResultLauncher", "Fine location permission was granted");
+            } else if (coarseLocationGranted != null && coarseLocationGranted) {
+                locationPermissionsGranted = true;
+                Log.w("ActivityResultLauncher", "Only coarse location permission was granted");
             } else {
                 // locationPermissionsGranted = false;
-                Log.w("ActivityResultLauncher", "No permission was granted");
+                Log.w("ActivityResultLauncher", "No location permission was granted");
             }
         });
     }
@@ -165,9 +169,7 @@ public class MapViewFragment extends Fragment {
             && (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             Log.w("checkPermissions", "Permissions not granted");
             // The registered ActivityResultCallback gets the result of this(these) request(s).
-            for (String permission : PERMISSIONS) {
-                requestPermissionsLauncher.launch(permission);
-            }
+            requestPermissionsLauncher.launch(PERMISSIONS);
         } else {
             Log.w("checkPermissions", "Permissions granted");
             locationPermissionsGranted = true;
@@ -202,7 +204,7 @@ public class MapViewFragment extends Fragment {
                 Log.w("getDeviceLocation", "Permissions not granted");
             }
         } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage(), e);
+            Log.w("Exception: %s", e.getMessage(), e);
         }
     }
 
@@ -251,19 +253,28 @@ public class MapViewFragment extends Fragment {
 
     @SuppressWarnings("MissingPermission")
     // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method
-    private void getUpdatedPosition() {
+    private void getUpdatedLocation() {
         if (locationPermissionsGranted) {
-            // Get updated position from system and send it to listeners
+            // Get updated location from system and send it to listeners
             mLocationManager = (LocationManager) requireActivity().getSystemService(LOCATION_SERVICE);
-            if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, mLocationListener);
-            }
-            if (mLocationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)) {
-                mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 10000, 0, mLocationListener);
-            }
+            String bestProvider = null;
             if (mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                bestProvider = LocationManager.NETWORK_PROVIDER;
                 mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 0, mLocationListener);
             }
+            if (mLocationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)) {
+                bestProvider = LocationManager.PASSIVE_PROVIDER;
+                mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 10000, 0, mLocationListener);
+            }
+            if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                bestProvider = LocationManager.GPS_PROVIDER;
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, mLocationListener);
+            }
+
+            latitude = mLocationManager.getLastKnownLocation(bestProvider).getLatitude();
+            longitude = mLocationManager.getLastKnownLocation(bestProvider).getLongitude();
+            Log.w("getDeviceLocation", "Best Provider found: " + bestProvider);
+
         } else {
             latitude = defaultLatitude;
             longitude = defaultLongitude;
