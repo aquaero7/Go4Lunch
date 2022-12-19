@@ -1,4 +1,4 @@
-package com.example.go4lunch.Activities;
+package com.example.go4lunch.activity;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -6,13 +6,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityAuthBinding;
-import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;

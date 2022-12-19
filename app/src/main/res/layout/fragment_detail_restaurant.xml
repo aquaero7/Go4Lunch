@@ -6,7 +6,7 @@
     android:id="@+id/fragment_detail_restaurant_rootview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.DetailRestaurantFragment"
+    tools:context=".fragment.DetailRestaurantFragment"
     >
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -27,7 +27,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".Fragments.DetailRestaurantFragment"
+        tools:context=".fragment.DetailRestaurantFragment"
         android:orientation="vertical">
 
         <ImageView

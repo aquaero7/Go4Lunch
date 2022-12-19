@@ -1,4 +1,4 @@
-package com.example.go4lunch.Fragments;
+package com.example.go4lunch.fragment;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -25,7 +25,7 @@ public class PagerAdapter extends FragmentStateAdapter {
             case 2: //Page number 3
                 return WorkmatesFragment.newInstance();
             default:
-                return null;
+
         }
     }
 

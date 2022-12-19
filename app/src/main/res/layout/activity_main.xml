@@ -8,14 +8,14 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:openDrawer="start"
-    tools:context="com.example.go4lunch.Activities.MainActivity">
+    tools:context="com.example.go4lunch.activity.MainActivity">
 
     <!-- 1 | MainActivity RootView -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".Activities.MainActivity">
+        tools:context=".activity.MainActivity">
 
         <!-- Add ViewPager to handle views -->
         <androidx.viewpager2.widget.ViewPager2

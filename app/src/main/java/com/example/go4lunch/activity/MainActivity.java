@@ -1,21 +1,17 @@
-package com.example.go4lunch.Activities;
+package com.example.go4lunch.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.TintableBackgroundView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.style.BackgroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,15 +22,23 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.go4lunch.Fragments.PagerAdapter;
-import com.example.go4lunch.R;
+import com.example.go4lunch.api.GmapsApiPojoResponseModel;
+import com.example.go4lunch.api.GmapsApiClient;
 import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.example.go4lunch.fragment.PagerAdapter;
+import com.example.go4lunch.R;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -342,5 +346,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void createRestaurantForTest1() {
         RestaurantManager.getInstance().createRestaurant();
     }
+
+
 
 }

@@ -12,6 +12,7 @@
     <string name="website_button">WEBSITE</string>
 
     <!-- ERROR MSG -->
+    <string name="unknown_error">An error has occurred.</string>
     <string name="empty_list">No workmate currently interested.</string>
     <string name="info_no_username_found">No user name found.</string>
     <string name="info_no_email_found">No email found.</string>

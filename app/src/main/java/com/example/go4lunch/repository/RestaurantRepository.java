@@ -1,9 +1,7 @@
 package com.example.go4lunch.repository;
 
-import com.example.go4lunch.models.Restaurant;
-import com.google.android.gms.tasks.Task;
+import com.example.go4lunch.model.Restaurant;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class RestaurantRepository {
@@ -46,7 +44,7 @@ public class RestaurantRepository {
         String address = "";  // TODO : Get data from API
         int favRating = 0;  // TODO : Get data from API
         String openingTime = "";  // TODO : Get data from API
-        int likesCount = 0;  // TODO : Get data from API
+        int likesCount = 0;  // TODO : Get data from database
         String phoneNumber = "";  // TODO : Get data from API
         String website = "";  // TODO : Get data from API
 
@@ -79,5 +77,26 @@ public class RestaurantRepository {
         }
     }
     */
+
+    public void createRestaurant(String name) {
+
+        String id = "ID1";  // TODO : Get data from API
+        // String name = "";  // TODO : Get data from API
+        int distance = 0;  // TODO : Get data from API
+        String urlImage = "";  // TODO : Get data from API
+        String nationality = "";  // TODO : Get data from API
+        String address = "";  // TODO : Get data from API
+        int favRating = 0;  // TODO : Get data from API
+        String openingTime = "";  // TODO : Get data from API
+        int likesCount = 0;  // TODO : Get data from database
+        String phoneNumber = "";  // TODO : Get data from API
+        String website = "";  // TODO : Get data from API
+
+        Restaurant restaurantToCreate = new Restaurant(id, name, distance, urlImage, nationality,
+                address, favRating, openingTime, likesCount, phoneNumber, website);
+
+        getRestaurantsCollection().document(id).set(restaurantToCreate);    // Create or update a document with given ID
+
+    }
 
 }

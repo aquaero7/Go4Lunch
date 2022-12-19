@@ -94,8 +94,14 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation "com.google.android.gms:play-services-location:21.0.1"   // TODO : Useful ? No !
 
-    // FOR PLACES
+    // GOOGLE PLACES
     implementation 'com.google.android.libraries.places:places:3.0.0'
+
+    // RETROFIT
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    // JSON PARSING
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
 
     testImplementation 'junit:junit:4.13.2'

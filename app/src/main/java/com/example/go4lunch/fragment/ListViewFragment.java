@@ -1,4 +1,4 @@
-package com.example.go4lunch.Fragments;
+package com.example.go4lunch.fragment;
 
 import android.os.Bundle;
 
@@ -12,8 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.Views.ListViewAdapter;
 import com.example.go4lunch.databinding.FragmentListViewBinding;
+import com.example.go4lunch.view.ListViewAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -100,7 +100,7 @@ public class ListViewFragment extends Fragment {
 
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
-        // 3.2 - Declare and create adapter (TODO : Pass the list of workmates)
+        // 3.2 - Declare and create adapter (TODO : Pass the list of restaurants)
         ListViewAdapter listViewAdapter = new ListViewAdapter();
         // 3.3 - Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(listViewAdapter);

@@ -4,7 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 
-import com.example.go4lunch.models.User;
+import com.example.go4lunch.model.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;

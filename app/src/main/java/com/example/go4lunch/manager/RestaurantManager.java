@@ -1,10 +1,6 @@
 package com.example.go4lunch.manager;
 
-import com.example.go4lunch.models.Restaurant;
-import com.example.go4lunch.models.User;
 import com.example.go4lunch.repository.RestaurantRepository;
-import com.example.go4lunch.repository.UserRepository;
-import com.google.android.gms.tasks.Task;
 
 public class RestaurantManager {
 
@@ -30,6 +26,10 @@ public class RestaurantManager {
 
     public void createRestaurant(){
         restaurantRepository.createRestaurant();
+    }
+
+    public void createRestaurant(String name) {
+        restaurantRepository.createRestaurant(name);
     }
 
     /*

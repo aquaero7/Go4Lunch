@@ -1,4 +1,4 @@
-package com.example.go4lunch.Fragments;
+package com.example.go4lunch.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -7,15 +7,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewbinding.ViewBinding;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.go4lunch.R;
-import com.example.go4lunch.Views.DetailRestaurantWorkmateAdapter;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
+import com.example.go4lunch.view.DetailRestaurantWorkmateAdapter;
 
 /**
  * A simple {@link Fragment} subclass.

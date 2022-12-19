@@ -1,19 +1,16 @@
-package com.example.go4lunch.Activities;
+package com.example.go4lunch.activity;
 
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.viewbinding.ViewBinding;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.example.go4lunch.Fragments.DetailRestaurantFragment;
-import com.example.go4lunch.R;
-import com.example.go4lunch.databinding.ActivityDetailRestaurantBinding;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
+import com.example.go4lunch.fragment.DetailRestaurantFragment;
+import com.example.go4lunch.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 

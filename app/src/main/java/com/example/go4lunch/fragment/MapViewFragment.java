@@ -1,4 +1,4 @@
-package com.example.go4lunch.Fragments;
+package com.example.go4lunch.fragment;
 
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -24,7 +24,10 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.api.GmapsApiClient;
+import com.example.go4lunch.api.GmapsApiPojoResponseModel;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
+import com.example.go4lunch.manager.RestaurantManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
@@ -44,7 +47,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
+import java.util.List;
 import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MapViewFragment extends Fragment {
@@ -60,8 +68,8 @@ public class MapViewFragment extends Fragment {
     private double latitude;
     private double longitude;
     private boolean locationPermissionsGranted = false;
-    private static final double defaultLatitude = 48.8566;
-    private static final double defaultLongitude = 2.3522;
+    private static final double DEF_LATITUDE = 48.8566;
+    private static final double DEF_LONGITUDE = 2.3522;
     private static final int DEFAULT_ZOOM = 15;
     private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private ActivityResultLauncher<String[]> requestPermissionsLauncher;
@@ -90,7 +98,7 @@ public class MapViewFragment extends Fragment {
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
 
         // Require latest version of map renderer
-        // getLatestRenderer();    // TODO : Useless because not working : Legacy version is used anyway !
+        // getLatestRenderer();    // TODO : Not working : Legacy version is used anyway !
 
         // Initialize SDK Places
         Places.initialize(requireContext(), getString(R.string.MAPS_API_KEY));
@@ -109,6 +117,7 @@ public class MapViewFragment extends Fragment {
         /** SOLUTION 2. Doesn't focus on current location at first display */   // requestDeviceLocation();
         /** SOLUTION 3. Doesn't focus on current location at first display */   // startLocationUpdates();
         /** SOLUTION 4. Focus ok on current location at first display */        // getUpdatedLocation();
+        getRestaurantsFromApi();
         loadMap();
 
         return binding.getRoot();
@@ -134,7 +143,9 @@ public class MapViewFragment extends Fragment {
         /** SOLUTION 2. Doesn't focus on current location at first display */   // requestDeviceLocation();
         /** SOLUTION 3. Doesn't focus on current location at first display */   // startLocationUpdates();
         /** SOLUTION 4. Focus ok on current location at first display */        // getUpdatedLocation();
+        getRestaurantsFromApi();
         loadMap();
+
     }
 
     @Override
@@ -206,8 +217,8 @@ public class MapViewFragment extends Fragment {
                             latitude = lastKnownLocation.getLatitude();
                             longitude = lastKnownLocation.getLongitude();
                         } else {
-                            latitude = defaultLatitude;
-                            longitude = defaultLongitude;
+                            latitude = DEF_LATITUDE;
+                            longitude = DEF_LONGITUDE;
                             Toast.makeText(requireActivity(), R.string.info_no_current_location, Toast.LENGTH_SHORT).show();
                             Log.w("getDeviceLocation", "Exception: %s", task.getException());
                         }
@@ -217,8 +228,8 @@ public class MapViewFragment extends Fragment {
                     }
                 });
             } else {
-                latitude = defaultLatitude;
-                longitude = defaultLongitude;
+                latitude = DEF_LATITUDE;
+                longitude = DEF_LONGITUDE;
                 Toast.makeText(requireActivity(), R.string.info_no_permission, Toast.LENGTH_SHORT).show();
                 Log.w("getDeviceLocation", "Permissions not granted");
             }
@@ -254,6 +265,33 @@ public class MapViewFragment extends Fragment {
                         .title("Marker in VLB"));   // TODO : Test to be deleted
                 mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(43.0900, 5.8400))
                         .title("Marker in SFLP"));  // TODO : Test to be deleted
+
+
+
+            });
+        }
+    }
+
+    // Get restaurants list from API
+    private void getRestaurantsFromApi() {
+        // final String API_KEY = getString(R.string.MAPS_API_KEY);
+        if (locationPermissionsGranted) {
+            Call<List<GmapsApiPojoResponseModel>> listCall = GmapsApiClient.getApiClient().getPlaces("restaurant", latitude + "," + longitude, 5000, getString(R.string.MAPS_API_KEY));
+            listCall.enqueue(new Callback<List<GmapsApiPojoResponseModel>>() {
+                @Override
+                public void onResponse(@NonNull Call<List<GmapsApiPojoResponseModel>> call, @NonNull Response<List<GmapsApiPojoResponseModel>> response) {
+                    List<GmapsApiPojoResponseModel> restaurantsList = response.body();
+                    String[] restaurant = new String[restaurantsList.size()];
+                    for (int i = 0; i < restaurantsList.size(); i++) {
+                        restaurant[i] = restaurantsList.get(i).getName();
+                        RestaurantManager.getInstance().createRestaurant(restaurant[i]);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<List<GmapsApiPojoResponseModel>> call, @NonNull Throwable t) {
+                    Toast.makeText(requireContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
+                }
             });
         }
     }
@@ -296,15 +334,15 @@ public class MapViewFragment extends Fragment {
                         latitude = Objects.requireNonNull(locationResult.getLastLocation()).getLatitude();
                         longitude = Objects.requireNonNull(locationResult.getLastLocation()).getLongitude();
                     } else {
-                        latitude = defaultLatitude;
-                        longitude = defaultLongitude;
+                        latitude = DEF_LATITUDE;
+                        longitude = DEF_LONGITUDE;
                     }
                 }
             };
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
         } else {
-            latitude = defaultLatitude;
-            longitude = defaultLongitude;
+            latitude = DEF_LATITUDE;
+            longitude = DEF_LONGITUDE;
         }
     }
 
@@ -335,15 +373,15 @@ public class MapViewFragment extends Fragment {
             // new Google API SDK v11 uses getFusedLocationProviderClient(this)
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                 @Override
-                public void onLocationResult(LocationResult locationResult) {
+                public void onLocationResult(@NonNull LocationResult locationResult) {
                     // do work here
-                    onLocationChanged(locationResult.getLastLocation());
+                    onLocationChanged(Objects.requireNonNull(locationResult.getLastLocation()));
                 }
             },
             Looper.myLooper());
         } else {
-            latitude = defaultLatitude;
-            longitude = defaultLongitude;
+            latitude = DEF_LATITUDE;
+            longitude = DEF_LONGITUDE;
         }
     }
 
@@ -393,8 +431,8 @@ public class MapViewFragment extends Fragment {
             Log.w("getDeviceLocation", "Best Provider found: " + bestProvider);
 
         } else {
-            latitude = defaultLatitude;
-            longitude = defaultLongitude;
+            latitude = DEF_LATITUDE;
+            longitude = DEF_LONGITUDE;
             Toast.makeText(requireActivity(), R.string.info_no_permission, Toast.LENGTH_SHORT).show();
             Log.w("getDeviceLocation", "Permissions not granted");
         }

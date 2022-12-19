@@ -22,7 +22,7 @@
         tools:targetApi="31">
 
         <activity
-            android:name=".Activities.AuthActivity"
+            android:name=".activity.AuthActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
 
@@ -39,12 +39,12 @@
         </activity>
 
         <activity
-            android:name=".Activities.SettingsActivity"
+            android:name=".activity.SettingsActivity"
             android:exported="false"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".Activities.DetailRestaurantActivity"
+            android:name=".activity.DetailRestaurantActivity"
             android:exported="false"
             android:theme="@style/AppTheme.NoActionBar" />
 
@@ -58,7 +58,7 @@
         <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
 
         <activity
-            android:name=".Activities.MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <!-- intent-filter to be deleted cause this is not the activity launched at start -->

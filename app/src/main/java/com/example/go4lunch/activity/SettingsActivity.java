@@ -1,10 +1,10 @@
-package com.example.go4lunch.Activities;
+package com.example.go4lunch.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.example.go4lunch.Fragments.SettingsFragment;
+import com.example.go4lunch.fragment.SettingsFragment;
 import com.example.go4lunch.R;
 
 public class SettingsActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package com.example.go4lunch.Fragments;
+package com.example.go4lunch.fragment;
 
 import android.os.Bundle;
 
@@ -10,11 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toolbar;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.Views.WorkmateAdapter;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
+import com.example.go4lunch.view.WorkmateAdapter;
 
 /**
  * A simple {@link Fragment} subclass.

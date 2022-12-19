@@ -1,7 +1,6 @@
-package com.example.go4lunch.Views;
+package com.example.go4lunch.view;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
