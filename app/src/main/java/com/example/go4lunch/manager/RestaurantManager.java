@@ -1,6 +1,10 @@
 package com.example.go4lunch.manager;
 
+import com.example.go4lunch.model.User;
+import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.repository.RestaurantRepository;
+
+import java.util.List;
 
 public class RestaurantManager {
 
@@ -24,12 +28,33 @@ public class RestaurantManager {
         }
     }
 
+    // Method for database constructor
+    public void createRestaurant(String id, String name, int distance, String imageUrl, String nationality,
+                                 String address, double rating, OpeningHours openingHours, int likesCount,
+                                 String phoneNumber, String website, List<User> selectors) {
+
+        restaurantRepository.createRestaurant(id, name, distance, imageUrl, nationality, address, rating,
+                                                openingHours, likesCount, phoneNumber, website, selectors);
+    }
+
+    // Method for API constructor
+    public void createRestaurant(String id, String name, int distance, String imageUrl, String nationality,
+                                 String address, double rating, OpeningHours openingHours,
+                                 String phoneNumber, String website) {
+
+        restaurantRepository.createRestaurant(id, name, distance, imageUrl, nationality, address, rating,
+                openingHours, phoneNumber, website);
+    }
+
+
+    // TODO : For test. To be deleted
     public void createRestaurant(){
         restaurantRepository.createRestaurant();
     }
 
-    public void createRestaurant(String name) {
-        restaurantRepository.createRestaurant(name);
+    // TODO : For test. To be deleted
+    public void createRestaurant(String id, String name) {
+        restaurantRepository.createRestaurant(id, name);
     }
 
     /*

@@ -22,8 +22,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.go4lunch.api.GmapsApiPojoResponseModel;
-import com.example.go4lunch.api.GmapsApiClient;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
@@ -33,12 +31,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
 

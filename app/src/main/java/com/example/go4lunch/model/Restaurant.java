@@ -2,83 +2,97 @@ package com.example.go4lunch.model;
 
 import androidx.annotation.Nullable;
 
+import com.example.go4lunch.model.api.OpeningHours;
+import com.example.go4lunch.model.api.Photo;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Restaurant {
+public class Restaurant implements Serializable {
 
+    @SerializedName("place_id")
+    @Expose
     private String id;
+
+    @SerializedName("name")
+    @Expose
     private String name;
+
     private int distance;
-    @Nullable private String urlImage;
+
+    @SerializedName("photos")
+    @Expose
+    @Nullable private List<Photo> photos;
+
+    @Nullable private String imageUrl;
+
     @Nullable private String nationality;
+
+    @SerializedName("formatted_address")
+    @Expose
     private String address;
-    private int favRating;
-    @Nullable private String openingTime;
+
+    @SerializedName("rating")
+    @Expose
+    private double rating;
+
+    @SerializedName("opening_hours")
+    @Expose
+    @Nullable private OpeningHours openingHours;
+
     private int likesCount;
+
+    @SerializedName("formatted_phone_number")
+    @Expose
     @Nullable private String phoneNumber;
+
+    @SerializedName("website")
+    @Expose
     @Nullable private String website;
-    private List<String> selectors;
 
-    /*
-    public Restaurant(String name, int distance, @Nullable String urlImage,
-                      @Nullable String nationality, String address, int favRating,
-                      @Nullable String openingTime, int likesCount, @Nullable String phoneNumber,
-                      @Nullable String website) {
-        this.name = name;
-        this.distance = distance;
-        this.urlImage = urlImage;
-        this.nationality = nationality;
-        this.address = address;
-        this.favRating = favRating;
-        this.openingTime = openingTime;
-        this.likesCount = likesCount;
-        this.phoneNumber = phoneNumber;
-        this.website = website;
-        this.selectors = new ArrayList<>();
-    }
-    */
+    @Nullable private List<User> selectors;
 
-    public Restaurant(String id, String name, int distance, @Nullable String urlImage,
-                      @Nullable String nationality, String address, int favRating,
-                      @Nullable String openingTime, int likesCount, @Nullable String phoneNumber,
-                      @Nullable String website) {
+    // Database constructor (full attributes)
+    public Restaurant(String id, String name, int distance, @Nullable String imageUrl,
+                      @Nullable String nationality, String address, double rating,
+                      @Nullable OpeningHours openingHours, int likesCount, @Nullable String phoneNumber,
+                      @Nullable String website, @Nullable List<User> selectors) {
         this.id = id;
         this.name = name;
         this.distance = distance;
-        this.urlImage = urlImage;
+        this.imageUrl = imageUrl;
         this.nationality = nationality;
         this.address = address;
-        this.favRating = favRating;
-        this.openingTime = openingTime;
-        this.likesCount = likesCount;
-        this.phoneNumber = phoneNumber;
-        this.website = website;
-        this.selectors = new ArrayList<>();
-    }
-
-    /*
-    public Restaurant(String id, String name, int distance, @Nullable String urlImage,
-                      @Nullable String nationality, String address, int favRating,
-                      @Nullable String openingTime, int likesCount, @Nullable String phoneNumber,
-                      @Nullable String website, List<String> selectors) {
-        this.id = id;
-        this.name = name;
-        this.distance = distance;
-        this.urlImage = urlImage;
-        this.nationality = nationality;
-        this.address = address;
-        this.favRating = favRating;
-        this.openingTime = openingTime;
+        this.rating = rating;
+        this.openingHours = openingHours;
         this.likesCount = likesCount;
         this.phoneNumber = phoneNumber;
         this.website = website;
         this.selectors = selectors;
     }
-    */
+
+    // API constructor
+    public Restaurant(String id, String name, int distance, @Nullable String imageUrl,
+                      @Nullable String nationality, String address, double rating,
+                      @Nullable OpeningHours openingHours, @Nullable String phoneNumber,
+                      @Nullable String website) {
+        this.id = id;
+        this.name = name;
+        this.distance = distance;
+        this.imageUrl = imageUrl;
+        this.nationality = nationality;
+        this.address = address;
+        this.rating = rating;
+        this.openingHours = openingHours;
+        this.phoneNumber = phoneNumber;
+        this.website = website;
+    }
+
 
     // GETTERS
-
 
     public String getId() {
         return id;
@@ -90,8 +104,15 @@ public class Restaurant {
         return distance;
     }
     @Nullable
-    public String getUrlImage() {
-        return urlImage;
+    public List<Photo> getPhotos() {
+        return photos;
+    }
+    @Nullable
+    public String getImageUrl() {
+        // return imageUrl;
+        if (getPhotos() != null) {
+            return getPhotos().get(0).getPhotoUrl();
+        } else return "";
     }
     @Nullable
     public String getNationality() {
@@ -100,12 +121,12 @@ public class Restaurant {
     public String getAddress() {
         return address;
     }
-    public int getFavRating() {
-        return favRating;
+    public double getRating() {
+        return rating;
     }
     @Nullable
-    public String getOpeningTime() {
-        return openingTime;
+    public OpeningHours getOpeningHours() {
+        return openingHours;
     }
     public int getLikesCount() {
         return likesCount;
@@ -118,7 +139,7 @@ public class Restaurant {
     public String getWebsite() {
         return website;
     }
-    public List<String> getSelectors() {
+    public List<User> getSelectors() {
         return selectors;
     }
 
@@ -133,8 +154,11 @@ public class Restaurant {
     public void setDistance(int distance) {
         this.distance = distance;
     }
-    public void setUrlImage(@Nullable String urlImage) {
-        this.urlImage = urlImage;
+    public void setPhotos(@Nullable List<Photo> photos) {
+        this.photos = photos;
+    }
+    public void setImageUrl(@Nullable String imageUrl) {
+        this.imageUrl = imageUrl;
     }
     public void setNationality(@Nullable String nationality) {
         this.nationality = nationality;
@@ -142,11 +166,11 @@ public class Restaurant {
     public void setAddress(String address) {
         this.address = address;
     }
-    public void setFavRating(int favRating) {
-        this.favRating = favRating;
+    public void setRating(double rating) {
+        this.rating = rating;
     }
-    public void setOpeningTime(@Nullable String openingTime) {
-        this.openingTime = openingTime;
+    public void setOpeningHours(@Nullable OpeningHours openingHours) {
+        this.openingHours = openingHours;
     }
     public void setLikesCount(int likesCount) {
         this.likesCount = likesCount;
@@ -157,7 +181,7 @@ public class Restaurant {
     public void setWebsite(@Nullable String website) {
         this.website = website;
     }
-    public void setSelectors(List<String> selectors) {
+    public void setSelectors(@Nullable List<User> selectors) {
         this.selectors = selectors;
     }
 
