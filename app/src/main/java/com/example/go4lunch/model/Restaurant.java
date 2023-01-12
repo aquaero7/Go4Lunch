@@ -2,13 +2,13 @@ package com.example.go4lunch.model;
 
 import androidx.annotation.Nullable;
 
+import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Restaurant implements Serializable {
@@ -26,8 +26,6 @@ public class Restaurant implements Serializable {
     @SerializedName("photos")
     @Expose
     @Nullable private List<Photo> photos;
-
-    @Nullable private String imageUrl;
 
     @Nullable private String nationality;
 
@@ -53,17 +51,25 @@ public class Restaurant implements Serializable {
     @Expose
     @Nullable private String website;
 
+    @SerializedName("geometry")
+    @Expose
+    private Geometry geometry;
+
+    private double latitude;
+    private double longitude;
+
     @Nullable private List<User> selectors;
 
     // Database constructor (full attributes)
-    public Restaurant(String id, String name, int distance, @Nullable String imageUrl,
+    public Restaurant(String id, String name, int distance, @Nullable List<Photo> photos,
                       @Nullable String nationality, String address, double rating,
                       @Nullable OpeningHours openingHours, int likesCount, @Nullable String phoneNumber,
-                      @Nullable String website, @Nullable List<User> selectors) {
+                      @Nullable String website, Geometry geometry, @Nullable List<User> selectors) {
         this.id = id;
         this.name = name;
         this.distance = distance;
-        this.imageUrl = imageUrl;
+        // this.imageUrl = imageUrl;
+        this.photos = photos;
         this.nationality = nationality;
         this.address = address;
         this.rating = rating;
@@ -71,24 +77,26 @@ public class Restaurant implements Serializable {
         this.likesCount = likesCount;
         this.phoneNumber = phoneNumber;
         this.website = website;
+        this.geometry = geometry;
         this.selectors = selectors;
     }
 
     // API constructor
-    public Restaurant(String id, String name, int distance, @Nullable String imageUrl,
+    public Restaurant(String id, String name, int distance, @Nullable List<Photo> photos,
                       @Nullable String nationality, String address, double rating,
                       @Nullable OpeningHours openingHours, @Nullable String phoneNumber,
-                      @Nullable String website) {
+                      @Nullable String website, Geometry geometry) {
         this.id = id;
         this.name = name;
         this.distance = distance;
-        this.imageUrl = imageUrl;
+        this.photos = photos;
         this.nationality = nationality;
         this.address = address;
         this.rating = rating;
         this.openingHours = openingHours;
         this.phoneNumber = phoneNumber;
         this.website = website;
+        this.geometry = geometry;
     }
 
 
@@ -106,13 +114,6 @@ public class Restaurant implements Serializable {
     @Nullable
     public List<Photo> getPhotos() {
         return photos;
-    }
-    @Nullable
-    public String getImageUrl() {
-        // return imageUrl;
-        if (getPhotos() != null) {
-            return getPhotos().get(0).getPhotoUrl();
-        } else return "";
     }
     @Nullable
     public String getNationality() {
@@ -139,6 +140,9 @@ public class Restaurant implements Serializable {
     public String getWebsite() {
         return website;
     }
+    public Geometry getGeometry() {
+        return geometry;
+    }
     public List<User> getSelectors() {
         return selectors;
     }
@@ -156,9 +160,6 @@ public class Restaurant implements Serializable {
     }
     public void setPhotos(@Nullable List<Photo> photos) {
         this.photos = photos;
-    }
-    public void setImageUrl(@Nullable String imageUrl) {
-        this.imageUrl = imageUrl;
     }
     public void setNationality(@Nullable String nationality) {
         this.nationality = nationality;
@@ -180,6 +181,9 @@ public class Restaurant implements Serializable {
     }
     public void setWebsite(@Nullable String website) {
         this.website = website;
+    }
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
     }
     public void setSelectors(@Nullable List<User> selectors) {
         this.selectors = selectors;

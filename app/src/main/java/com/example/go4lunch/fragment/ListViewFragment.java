@@ -7,13 +7,24 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentListViewBinding;
+import com.example.go4lunch.manager.RestaurantManager;
+import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.User;
+import com.example.go4lunch.model.api.Geometry;
+import com.example.go4lunch.model.api.OpeningHours;
+import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.view.ListViewAdapter;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,6 +46,9 @@ public class ListViewFragment extends Fragment {
 
     // Declare RecyclerView
     private RecyclerView mRecyclerView;
+
+    private Restaurant restaurantFromData;
+    private Restaurant restaurantToAdd;
 
 
     // Constructor
@@ -101,12 +115,61 @@ public class ListViewFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter (TODO : Pass the list of restaurants)
-        ListViewAdapter listViewAdapter = new ListViewAdapter();
+        List<Restaurant> restaurantsList = getRestaurantsList();
+        ListViewAdapter listViewAdapter = new ListViewAdapter(restaurantsList, getString(R.string.MAPS_API_KEY));
         // 3.3 - Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(listViewAdapter);
         // 3.4 - Set layout manager to position the items
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+    }
+
+    private List<Restaurant> getRestaurantsList() {
+        List<Restaurant> restaurantsList = new ArrayList<>();
+        RestaurantManager.getRestaurantsList(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String documentId = document.getId();
+                    // Map<String, Object> myData = restaurant.getData();                          //
+                    // Restaurant myRestaurant = restaurant.toObject(Restaurant.class);            //
+
+                    restaurantToAdd = getRestaurantData(documentId);
+                    if (restaurantToAdd != null) {
+                        restaurantsList.add(restaurantToAdd);
+                    }
+                }
+            } else {
+                Log.d("ListViewFragment", "Error getting documents: ", task.getException());
+            }
+
+        });
+        return restaurantsList;
+
+    }
+
+    private Restaurant getRestaurantData(String id){
+        RestaurantManager.getRestaurantData(id).addOnSuccessListener(restaurant -> {
+            String rId = restaurant.getId();
+            String rName = restaurant.getName();
+            int rDistance = restaurant.getDistance();
+            List<Photo> rPhoto = restaurant.getPhotos();
+            String rNationality = restaurant.getNationality();
+            String rAddress = restaurant.getAddress();
+            double rRating = restaurant.getRating();
+            OpeningHours rOpeningHours = restaurant.getOpeningHours();
+            int rLikesCount = restaurant.getLikesCount();
+            String rPhoneNumber = restaurant.getPhoneNumber();
+            String rWebsite = restaurant.getWebsite();
+            Geometry rGeometry = restaurant.getGeometry();
+            List<User> rSelectors = restaurant.getSelectors();
+
+            restaurantFromData = new Restaurant(rId, rName, rDistance, rPhoto, rNationality, rAddress,
+                    rRating, rOpeningHours, rLikesCount, rPhoneNumber, rWebsite, rGeometry, rSelectors);
+
+
+        });
+
+        return restaurantFromData;
     }
 
 }

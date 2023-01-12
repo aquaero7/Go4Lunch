@@ -9,12 +9,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.model.Restaurant;
+
+import java.util.List;
 
 public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
 
-    // Constructor
-    public ListViewAdapter() {
+    private final String KEY;
+    private List<Restaurant> restaurantsList;
 
+    // Constructor
+    public ListViewAdapter(List<Restaurant> restaurantsList, String KEY) {
+        this.restaurantsList = restaurantsList;
+        this.KEY = KEY;
     }
 
     @NonNull
@@ -32,14 +39,14 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     // Update view holder with restaurants
     @Override
     public void onBindViewHolder(@NonNull ListViewViewHolder viewHolder, int position) {
-        viewHolder.updateWithRestaurants();
+        viewHolder.updateWithRestaurants(this.restaurantsList.get(position), this.KEY);
 
     }
 
-    // Return the total count of workmates
+    // Return the total count of restaurants
     @Override
     public int getItemCount() {
-        return 15;
+        return this.restaurantsList.size();
     }
 
 }

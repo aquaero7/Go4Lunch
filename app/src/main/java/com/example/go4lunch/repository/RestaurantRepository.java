@@ -1,10 +1,21 @@
 package com.example.go4lunch.repository;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
+import com.example.go4lunch.model.api.Photo;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
 
@@ -33,35 +44,36 @@ public class RestaurantRepository {
     }
 
     // Get the Collection Reference
-    private CollectionReference getRestaurantsCollection(){
+    private static CollectionReference getRestaurantsCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_RESTAURANTS);
     }
 
     // Create restaurant in Firestore
 
     // Method for database constructor
-    public void createRestaurant(String id, String name, int distance, String imageUrl, String nationality,
+    public void createRestaurant(String id, String name, int distance, List<Photo> photos, String nationality,
                                  String address, double rating, OpeningHours openingHours, int likesCount,
-                                 String phoneNumber, String website, List<User> selectors) {
+                                 String phoneNumber, String website, Geometry geometry, List<User> selectors) {
 
-        Restaurant restaurantToCreate = new Restaurant(id, name, distance, imageUrl, nationality,
-                address, rating, openingHours, likesCount, phoneNumber, website, selectors);
+        Restaurant restaurantToCreate = new Restaurant(id, name, distance, photos, nationality,
+                address, rating, openingHours, likesCount, phoneNumber, website, geometry, selectors);
 
         getRestaurantsCollection().document(id).set(restaurantToCreate);
 
     }
 
     // Method for API constructor
-    public void createRestaurant(String id, String name, int distance, String imageUrl, String nationality,
+    public void createRestaurant(String id, String name, int distance, List<Photo> photos, String nationality,
                                  String address, double rating, OpeningHours openingHours,
-                                 String phoneNumber, String website) {
+                                 String phoneNumber, String website, Geometry geometry) {
 
-        Restaurant restaurantToCreate = new Restaurant(id, name, distance, imageUrl, nationality,
-                address, rating, openingHours, phoneNumber, website);
+        Restaurant restaurantToCreate = new Restaurant(id, name, distance, photos, nationality,
+                address, rating, openingHours, phoneNumber, website, geometry);
 
         getRestaurantsCollection().document(id).set(restaurantToCreate);
 
     }
+
 
     // TODO : For test. To be deleted
     public void createRestaurant() {
@@ -69,7 +81,7 @@ public class RestaurantRepository {
         String id = "ID1";  // TODO : Get data from API
         String name = "Name for test";  // TODO : Get data from API
         int distance = 0;  // TODO : Get data from API
-        String urlImage = "";  // TODO : Get data from API
+        List<Photo> photos = null;  // TODO : Get data from API
         String nationality = "";  // TODO : Get data from API
         String address = "";  // TODO : Get data from API
         double rating = 0.0;  // TODO : Get data from API
@@ -77,10 +89,11 @@ public class RestaurantRepository {
         int likesCount = 0;  // TODO : Get data from database
         String phoneNumber = "";  // TODO : Get data from API
         String website = "";  // TODO : Get data from API
+        Geometry geometry = null; // TODO : Get data from API
         List<User> selectors = null;    // TODO : Get data from database
 
-        Restaurant restaurantToCreate = new Restaurant(id, name, distance, urlImage, nationality,
-                address, rating, openingHours, likesCount, phoneNumber, website, selectors);
+        Restaurant restaurantToCreate = new Restaurant(id, name, distance, photos, nationality,
+                address, rating, openingHours, likesCount, phoneNumber, website, geometry, selectors);
 
         getRestaurantsCollection().document(id).set(restaurantToCreate);    // Create ou update a document with nothing given
 
@@ -105,7 +118,7 @@ public class RestaurantRepository {
         // String id = "ID1";  // TODO : Get data from API
         // String name = "";  // TODO : Get data from API
         int distance = 0;  // TODO : Get data from API
-        String urlImage = "";  // TODO : Get data from API
+        List<Photo> photos = null;  // TODO : Get data from API
         String nationality = "";  // TODO : Get data from API
         String address = "";  // TODO : Get data from API
         double rating = 0.0;  // TODO : Get data from API
@@ -113,25 +126,31 @@ public class RestaurantRepository {
         int likesCount = 0;  // TODO : Get data from database
         String phoneNumber = "";  // TODO : Get data from API
         String website = "";  // TODO : Get data from API
+        Geometry geometry = null; // TODO : Get data from API
         List<User> selectors = null;    // TODO : Get data from database
 
-        Restaurant restaurantToCreate = new Restaurant(id, name, distance, urlImage, nationality,
-                address, rating, openingHours, likesCount, phoneNumber, website, selectors);
+        Restaurant restaurantToCreate = new Restaurant(id, name, distance, photos, nationality,
+                address, rating, openingHours, likesCount, phoneNumber, website, geometry, selectors);
 
         getRestaurantsCollection().document(id).set(restaurantToCreate);    // Create or update a document with given ID and nane
 
     }
 
 
-    /* Get Restaurant Data from Firestore
-    public Task<DocumentSnapshot> getRestaurantData(){
-        String id = "ID1";  // TODO : To be defined
+    // Get Restaurant Data from Firestore
+    public static Task<DocumentSnapshot> getRestaurantData(String id) {
+        // String id = "ID1";  // TODO : To be defined
         if(id != null){
-            return this.getRestaurantsCollection().document(id).get();
+            return getRestaurantsCollection().document(id).get();
         }else{
             return null;
         }
     }
-    */
+
+    public static void getRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
+        getRestaurantsCollection().get().addOnCompleteListener(listener);
+        // FirebaseFirestore.getInstance().collection(COLLECTION_RESTAURANTS).get().addOnCompleteListener(listener);
+    }
+
 
 }

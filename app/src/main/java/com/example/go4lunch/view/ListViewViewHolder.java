@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.RestaurantListItemBinding;
+import com.example.go4lunch.model.Restaurant;
 
 
 import java.util.Arrays;
@@ -55,25 +56,27 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         */
     }
 
-    public void updateWithRestaurants() {
+    public void updateWithRestaurants(Restaurant restaurant, String KEY) {
         // Display restaurant name
-        tvTitle.setText("This restaurant");
+        tvTitle.setText(restaurant.getName());
         // Display restaurant distance
-        tvDistance.setText("700m");
+        tvDistance.setText(restaurant.getDistance());
         // Display restaurant country
-        tvCountry.setText("Frenchy");
+        tvCountry.setText(restaurant.getNationality());
         // Display restaurant address
-        tvAddress.setText("7 rue de la Petite Faim 69069 Trifouillis les Oies");
+        tvAddress.setText(restaurant.getAddress());
         // Display workmate logo
         ivWorkmateLogo.setImageResource(R.drawable.ic_baseline_account_circle_white_24);
+        // ivWorkmateLogo.setImageResource(restaurant.getLogo);
         // Display workmates count
-        tvWorkmatesCount.setText("("+"3"+")");
+        tvWorkmatesCount.setText(restaurant.getLikesCount());
         // Display restaurant opening time
-        tvOpenTime.setText("Open 24/7");
+        tvOpenTime.setText(restaurant.getOpeningHours().isOpenNow()? R.string.status_open:R.string.status_closed);
         // Display restaurant rating
-        mRatingBar.setRating(3);
+        mRatingBar.setRating((float) restaurant.getRating());
         // Display restaurant picture
         ivPicture.setImageResource(R.drawable.im_detail_restaurant);
+        // ivPicture.setImageResource(restaurant.getPhotos().get(0).getPhotoUrl(KEY));
 
         // Set text scrolling and adapt fields max size in line 2
         ResizeAndScroll();

@@ -65,6 +65,10 @@
     <string name="sign_in_button_twitter">Sign in with Twitter</string>
     <string name="sign_in_button_email">Sign in with eMail</string>
 
+    <!-- RESTAURANT -->
+    <string name="status_open">Open</string>
+    <string name="status_closed">Closed</string>
+
     <!-- NOT TRANSLATABLE -->
 
     <!-- SEPARATORS -->

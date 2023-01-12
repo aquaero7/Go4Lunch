@@ -25,12 +25,15 @@ import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.api.GmapsApiClient;
+import com.example.go4lunch.api.GmapsRestaurantDetailsPojo;
 import com.example.go4lunch.api.GmapsRestaurantPojo;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
+import com.example.go4lunch.model.api.Photo;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
@@ -49,6 +52,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.gson.Gson;
 
 import java.util.List;
 import java.util.Objects;
@@ -71,8 +75,8 @@ public class MapViewFragment extends Fragment {
     private double latitude;
     private double longitude;
     private boolean locationPermissionsGranted = false;
-    private static final double DEF_LATITUDE = 48.5959; // 48.8566
-    private static final double DEF_LONGITUDE = 2.5810; // 2.3522
+    private static final double DEF_LATITUDE = 48.7258;//VLB  // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
+    private static final double DEF_LONGITUDE = 2.1252;//VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
     private static final int DEFAULT_ZOOM = 15;
     private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private ActivityResultLauncher<String[]> requestPermissionsLauncher;
@@ -279,56 +283,87 @@ public class MapViewFragment extends Fragment {
     // Get restaurants list from API
     private void getRestaurantsFromApi() {
         if (locationPermissionsGranted) {
-            Call<GmapsRestaurantPojo> call = GmapsApiClient.getApiClient().getPlaces("restaurant", latitude + "," + longitude, 3000, getString(R.string.MAPS_API_KEY));
-            call.enqueue(new Callback<GmapsRestaurantPojo>() {
+            // Call Place Nearby Search API
+            Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient().getPlaces("restaurant", latitude + "," + longitude, 1000, getString(R.string.MAPS_API_KEY));
+            call1.enqueue(new Callback<GmapsRestaurantPojo>() {
                 @Override
-                public void onResponse(@NonNull Call<GmapsRestaurantPojo> call, @NonNull Response<GmapsRestaurantPojo> response) {
-                    GmapsRestaurantPojo nearPlaces = response.body();
+                public void onResponse(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Response<GmapsRestaurantPojo> response1) {
+                    GmapsRestaurantPojo nearPlaces = response1.body();
                     List<Restaurant> restaurantsList = nearPlaces.getNearRestaurants();
 
-                    /*
-                    int nbRestaurants = restaurantsList.size();
-                    Restaurant[] restaurant = new Restaurant[nbRestaurants];
-                    String[] id = new String[nbRestaurants];
-                    String[] name = new String[nbRestaurants];
-                    for (int i = 0; i < nbRestaurants; i++) {
-                        restaurant[i] = restaurantsList.get(i);
-                        // id[i] = restaurantsList.get(i).getId();
-                        id[i] = restaurant[i].getId();
-                        // name[i] = restaurantsList.get(i).getName();
-                        name[i] = restaurant[i].getName();
-                        // RestaurantManager.getInstance().createRestaurant("ID"+(i+1), name[i]);
-                        RestaurantManager.getInstance().createRestaurant(id[i], name[i]);
+                    // For each restaurant, get basic information and ask for detailed information
+                    if (restaurantsList.size() != 0) {
+                        Log.w("MAPViewFragment", "Nearby restaurants list not empty");
+                        for (Restaurant nearbyRestaurant : restaurantsList) {
+                            getRestaurantDetailsFromApi(nearbyRestaurant);
+                        }
+                    } else {
+                        Log.w("MAPViewFragment", "Empty nearby restaurants list");
                     }
-                    */
-                    //
-                    for (Restaurant restaurant : restaurantsList) {
-                        String id = restaurant.getId();
-                        String name = restaurant.getName();
-                        int distance = 0;   // TODO : To be calculated ?
-                        String imageUrl = restaurant.getImageUrl();
-                        String nationality = "";    // TODO : To get from Places API ?
-                        String address = restaurant.getAddress();
-                        double rating = restaurant.getRating();
-                        OpeningHours openingHours = restaurant.getOpeningHours();
-                        String phoneNumber = restaurant.getPhoneNumber();
-                        String website = restaurant.getWebsite();
 
-                        RestaurantManager.getInstance().createRestaurant(id, name, distance, imageUrl,
-                                                                        nationality, address, rating, openingHours,
-                                                                        phoneNumber, website);
-                    }
-                    //
 
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<GmapsRestaurantPojo> call, @NonNull Throwable t) {
+                public void onFailure(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Throwable t) {
                     Toast.makeText(requireContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
                     Log.w("MAPViewFragment", t.getMessage(), t);
                 }
             });
         }
+    }
+
+    private void getRestaurantDetailsFromApi(Restaurant nearbyRestaurant) {
+
+        String id = nearbyRestaurant.getId();
+        String name = nearbyRestaurant.getName();
+        double rating = nearbyRestaurant.getRating();
+        OpeningHours openingHours = nearbyRestaurant.getOpeningHours();
+        List<Photo> photos = nearbyRestaurant.getPhotos();
+        /*
+        if (photos.size() != 0) {
+            String imageUrl = photos.get(0).getPhotoUrl(getString(R.string.MAPS_API_KEY));
+        }
+        */
+        Geometry geometry = nearbyRestaurant.getGeometry();
+        // double latitude = geometry.getLocation().getLat();
+        // double longitude = geometry.getLocation().getLng();
+
+        int distance = 0;   // TODO : To be calculated ?
+
+        // Call Place Details API
+        Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(id,
+                "formatted_address,formatted_phone_number,website",
+                getString(R.string.MAPS_API_KEY)
+        );
+        call2.enqueue(new Callback<GmapsRestaurantDetailsPojo>() {
+            @Override
+            public void onResponse(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Response<GmapsRestaurantDetailsPojo> response2) {
+                // Gson gson = new Gson();
+                // String res = gson.toJson(response2.body());
+                GmapsRestaurantDetailsPojo placeDetails = response2.body();
+                Restaurant restaurantDetails = placeDetails.getRestaurantDetails();
+
+                String nationality = "";    // TODO : Where to get this information ?
+                String address = restaurantDetails.getAddress();
+                String phoneNumber = restaurantDetails.getPhoneNumber();
+                String website = restaurantDetails.getWebsite();
+
+                // Create ou update restaurant in Firebase
+                RestaurantManager.getInstance().createRestaurant(id, name, distance, photos,
+                        nationality, address, rating, openingHours, phoneNumber, website, geometry);
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Throwable t) {
+                Toast.makeText(requireContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
+                Log.w("MAPViewFragment", t.getMessage(), t);
+            }
+        });
+
+
+
     }
 
 

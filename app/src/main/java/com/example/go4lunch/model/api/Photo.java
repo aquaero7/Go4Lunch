@@ -1,5 +1,6 @@
 package com.example.go4lunch.model.api;
 
+import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -43,9 +44,10 @@ public class Photo implements Serializable {
         return width;
     }
 
-    public String getPhotoUrl() {
+    public String getPhotoUrl(String key) {
         String rootUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=";
-        return rootUrl + photoReference + "&key=" + R.string.MAPS_API_KEY;
+        String photoUrl = rootUrl + photoReference + "&key=" + key; // getString(R.string.MAPS_API_KEY)
+        return photoUrl;
     }
 
 
