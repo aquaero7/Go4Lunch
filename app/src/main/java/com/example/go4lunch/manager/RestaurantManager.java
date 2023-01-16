@@ -1,13 +1,18 @@
 package com.example.go4lunch.manager;
 
+import androidx.annotation.NonNull;
+
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.repository.RestaurantRepository;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -64,14 +69,16 @@ public class RestaurantManager {
         restaurantRepository.createRestaurant(id, name);
     }
 
-    //
-    public static Task<Restaurant> getRestaurantData(String id){
-        // Get the restaurant from Firestore and cast it to a User model Object
-        return RestaurantRepository.getRestaurantData(id).continueWith(task -> task.getResult().toObject(Restaurant.class)) ;
-    }
 
     public static void getRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
+        // Get the restaurants list from Firestore
         RestaurantRepository.getRestaurantsList(listener);
+    }
+
+
+    public static Task<Restaurant> getRestaurantData(String id){
+        // Get the restaurant data from Firestore and cast it to a User model Object
+        return RestaurantRepository.getRestaurantData(id).continueWith(task -> task.getResult().toObject(Restaurant.class));
     }
 
 }

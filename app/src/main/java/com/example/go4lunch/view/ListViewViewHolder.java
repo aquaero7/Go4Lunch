@@ -60,21 +60,24 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         // Display restaurant name
         tvTitle.setText(restaurant.getName());
         // Display restaurant distance
-        tvDistance.setText(restaurant.getDistance());
-        // Display restaurant country
-        tvCountry.setText(restaurant.getNationality());
+        String distance = restaurant.getDistance() + " m";
+        tvDistance.setText(distance);
+        // Display restaurant country                                                       // TODO
+        // tvCountry.setText(restaurant.getNationality());
+        tvCountry.setText("Frenchy");
         // Display restaurant address
         tvAddress.setText(restaurant.getAddress());
         // Display workmate logo
-        ivWorkmateLogo.setImageResource(R.drawable.ic_baseline_account_circle_white_24);
-        // ivWorkmateLogo.setImageResource(restaurant.getLogo);
+        ivWorkmateLogo.setImageResource(R.drawable.ic_outline_person_black_24);
         // Display workmates count
-        tvWorkmatesCount.setText(restaurant.getLikesCount());
-        // Display restaurant opening time
-        tvOpenTime.setText(restaurant.getOpeningHours().isOpenNow()? R.string.status_open:R.string.status_closed);
+        String workmatesCount = "(" + restaurant.getLikesCount() + ")";
+        tvWorkmatesCount.setText(workmatesCount);
+        // Display restaurant opening time                                                  // TODO
+        //tvOpenTime.setText(restaurant.getOpeningHours().isOpenNow()? R.string.status_open:R.string.status_closed);
+        tvOpenTime.setText("It may be open... or not !");
         // Display restaurant rating
         mRatingBar.setRating((float) restaurant.getRating());
-        // Display restaurant picture
+        // Display restaurant picture                                                       // TODO
         ivPicture.setImageResource(R.drawable.im_detail_restaurant);
         // ivPicture.setImageResource(restaurant.getPhotos().get(0).getPhotoUrl(KEY));
 

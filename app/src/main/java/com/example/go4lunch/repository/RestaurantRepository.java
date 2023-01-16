@@ -137,20 +137,19 @@ public class RestaurantRepository {
     }
 
 
-    // Get Restaurant Data from Firestore
+    // Get restaurants list from Firestore
+    public static void getRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
+        getRestaurantsCollection().get().addOnCompleteListener(listener);
+    }
+
+
+    // Get restaurant data from Firestore
     public static Task<DocumentSnapshot> getRestaurantData(String id) {
-        // String id = "ID1";  // TODO : To be defined
         if(id != null){
             return getRestaurantsCollection().document(id).get();
         }else{
             return null;
         }
     }
-
-    public static void getRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
-        getRestaurantsCollection().get().addOnCompleteListener(listener);
-        // FirebaseFirestore.getInstance().collection(COLLECTION_RESTAURANTS).get().addOnCompleteListener(listener);
-    }
-
 
 }
