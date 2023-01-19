@@ -56,7 +56,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         */
     }
 
-    public void updateWithRestaurants(Restaurant restaurant, String KEY) {
+    public void updateWithRestaurants(Restaurant restaurant, String KEY, String STATUS_OPEN, String STATUS_CLOSED) {
         // Display restaurant name
         tvTitle.setText(restaurant.getName());
         // Display restaurant distance
@@ -72,11 +72,19 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         // Display workmates count
         String workmatesCount = "(" + restaurant.getLikesCount() + ")";
         tvWorkmatesCount.setText(workmatesCount);
-        // Display restaurant opening time                                                  // TODO
-        //tvOpenTime.setText(restaurant.getOpeningHours().isOpenNow()? R.string.status_open:R.string.status_closed);
-        tvOpenTime.setText("It may be open... or not !");
+
+        // Display restaurant opening info
+        if (restaurant.getOpeningInformation().equals("open")) {
+            tvOpenTime.setText(STATUS_OPEN);
+        } else if (restaurant.getOpeningInformation().equals("closed")) {
+            tvOpenTime.setText(STATUS_CLOSED);
+        } else {
+            tvOpenTime.setText(restaurant.getOpeningInformation());
+        }
+
         // Display restaurant rating
         mRatingBar.setRating((float) restaurant.getRating());
+
         // Display restaurant picture                                                       // TODO
         ivPicture.setImageResource(R.drawable.im_detail_restaurant);
         // ivPicture.setImageResource(restaurant.getPhotos().get(0).getPhotoUrl(KEY));

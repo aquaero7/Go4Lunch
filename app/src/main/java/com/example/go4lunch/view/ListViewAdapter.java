@@ -16,12 +16,16 @@ import java.util.List;
 public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
 
     private final String KEY;
+    private final String STATUS_OPEN;
+    private final String STATUS_CLOSED;
     private List<Restaurant> restaurantsList;
 
     // Constructor
-    public ListViewAdapter(List<Restaurant> restaurantsList, String KEY) {
+    public ListViewAdapter(List<Restaurant> restaurantsList, String KEY, String STATUS_OPEN, String STATUS_CLOSED) {
         this.restaurantsList = restaurantsList;
         this.KEY = KEY;
+        this.STATUS_OPEN = STATUS_OPEN;
+        this.STATUS_CLOSED = STATUS_CLOSED;
     }
 
     @NonNull
@@ -39,8 +43,8 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     // Update view holder with restaurants
     @Override
     public void onBindViewHolder(@NonNull ListViewViewHolder viewHolder, int position) {
-        viewHolder.updateWithRestaurants(this.restaurantsList.get(position), this.KEY);
-
+        viewHolder.updateWithRestaurants(this.restaurantsList.get(position), this.KEY, this.STATUS_OPEN,
+                                                                                    this.STATUS_CLOSED);
     }
 
     // Return the total count of restaurants

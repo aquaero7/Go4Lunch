@@ -51,7 +51,7 @@ public class RestaurantRepository {
     // Create restaurant in Firestore
 
     // Method for database constructor
-    public void createRestaurant(String id, String name, int distance, List<Photo> photos, String nationality,
+    public void createRestaurant(String id, String name, long distance, List<Photo> photos, String nationality,
                                  String address, double rating, OpeningHours openingHours, int likesCount,
                                  String phoneNumber, String website, Geometry geometry, List<User> selectors) {
 
@@ -63,7 +63,7 @@ public class RestaurantRepository {
     }
 
     // Method for API constructor
-    public void createRestaurant(String id, String name, int distance, List<Photo> photos, String nationality,
+    public void createRestaurant(String id, String name, long distance, List<Photo> photos, String nationality,
                                  String address, double rating, OpeningHours openingHours,
                                  String phoneNumber, String website, Geometry geometry) {
 
@@ -80,7 +80,7 @@ public class RestaurantRepository {
 
         String id = "ID1";  // TODO : Get data from API
         String name = "Name for test";  // TODO : Get data from API
-        int distance = 0;  // TODO : Get data from API
+        long distance = 0;  // TODO : Get data from API
         List<Photo> photos = null;  // TODO : Get data from API
         String nationality = "";  // TODO : Get data from API
         String address = "";  // TODO : Get data from API
@@ -117,7 +117,7 @@ public class RestaurantRepository {
 
         // String id = "ID1";  // TODO : Get data from API
         // String name = "";  // TODO : Get data from API
-        int distance = 0;  // TODO : Get data from API
+        long distance = 0;  // TODO : Get data from API
         List<Photo> photos = null;  // TODO : Get data from API
         String nationality = "";  // TODO : Get data from API
         String address = "";  // TODO : Get data from API

@@ -17,14 +17,15 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentListViewBinding;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.model.User;
-import com.example.go4lunch.model.api.Geometry;
-import com.example.go4lunch.model.api.OpeningHours;
-import com.example.go4lunch.model.api.Photo;
+import com.example.go4lunch.utils.CalendarUtils;
+import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.view.ListViewAdapter;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -121,7 +122,9 @@ public class ListViewFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
-        ListViewAdapter listViewAdapter = new ListViewAdapter(restaurantsList, getString(R.string.MAPS_API_KEY));
+        ListViewAdapter listViewAdapter = new ListViewAdapter(restaurantsList, getString(R.string.MAPS_API_KEY),
+                                                                            getString(R.string.status_open),
+                                                                            getString(R.string.status_closed));
         // 3.3 - Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(listViewAdapter);
         // 3.4 - Set layout manager to position the items
@@ -129,49 +132,16 @@ public class ListViewFragment extends Fragment {
 
     }
 
-
-    private Restaurant getRestaurantData(QueryDocumentSnapshot document) {
-        String breakPointVar1  = "";                                            // TODO : For debug
-        String rId = document.getData().get("id").toString();
-        String rName = document.getData().get("name").toString();
-        int rDistance = Integer.parseInt(document.getData().get("distance").toString());
-        // List<Photo> rPhoto = (List<Photo>) document.getData().get("photos");             // TODO
-        List<Photo> rPhoto = null;
-        String rNationality = document.getData().get("nationality").toString();
-        String rAddress = document.getData().get("address").toString();
-        double rRating = Double.parseDouble(document.getData().get("rating").toString());
-        // OpeningHours rOpeningHours = (OpeningHours) document.getData().get("openingHours");   // TODO
-        OpeningHours rOpeningHours = null;
-        int rLikesCount = Integer.parseInt(document.getData().get("likesCount").toString());
-        String rPhoneNumber = document.getData().get("phoneNumber").toString();
-        String rWebsite = document.getData().get("website").toString();
-        // Geometry rGeometry = (Geometry) document.getData().get("geometry");
-        Geometry rGeometry = null;
-        // List<User> rSelectors = (List<User>) document.getData().get("selectors");
-        List<User> rSelectors = null;
-
-        restaurantFromData = new Restaurant(rId, rName, rDistance, rPhoto, rNationality, rAddress,
-                rRating, rOpeningHours, rLikesCount, rPhoneNumber, rWebsite, rGeometry, rSelectors);
-
-        String breakPointVar2  = "";                                            // TODO : For debug
-
-        return restaurantFromData;
-    }
-
-
     private void getRestaurantsListAndConfigureRecyclerView() {
         restaurantsList = new ArrayList<>();
         RestaurantManager.getRestaurantsList(task -> {
             if (task.isSuccessful()) {
                 // Get restaurants list
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    String documentId = document.getId();
                     Map<String, Object> restaurantData = document.getData(); // TODO : Map data for debug
-                    restaurantToAdd = getRestaurantData(document);
-                    if (restaurantToAdd != null) {
-                        restaurantsList.add(restaurantToAdd);
-                        String breakPointVar3  = "";                            // TODO : For debug
-                    }
+
+                    restaurantToAdd = FirestoreUtils.getRestaurantFromDatabaseDocument(document, getString(R.string.MAPS_API_KEY));
+                    restaurantsList.add(restaurantToAdd);
                 }
             } else {
                 Log.d("ListViewFragment", "Error getting documents: ", task.getException());
@@ -181,11 +151,7 @@ public class ListViewFragment extends Fragment {
             configureRecyclerView();
 
         });
-        String breakPointVar4  = "";                                            // TODO : For debug
     }
-
-
-
 
 
 }

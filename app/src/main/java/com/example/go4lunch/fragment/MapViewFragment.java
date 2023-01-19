@@ -75,9 +75,10 @@ public class MapViewFragment extends Fragment {
     private double latitude;
     private double longitude;
     private boolean locationPermissionsGranted = false;
-    private static final double DEF_LATITUDE = 48.7258;//VLB  // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
-    private static final double DEF_LONGITUDE = 2.1252;//VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
+    private static final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
+    private static final double DEF_LONGITUDE = 0;  //VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
     private static final int DEFAULT_ZOOM = 15;
+    private static final int DEFAULT_RADIUS = 1000;
     private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private ActivityResultLauncher<String[]> requestPermissionsLauncher;
     private LocationRequest locationRequest;
@@ -284,7 +285,7 @@ public class MapViewFragment extends Fragment {
     private void getRestaurantsFromApi() {
         if (locationPermissionsGranted) {
             // Call Place Nearby Search API
-            Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient().getPlaces("restaurant", latitude + "," + longitude, 1000, getString(R.string.MAPS_API_KEY));
+            Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient().getPlaces("restaurant", latitude + "," + longitude, DEFAULT_RADIUS, getString(R.string.MAPS_API_KEY));
             call1.enqueue(new Callback<GmapsRestaurantPojo>() {
                 @Override
                 public void onResponse(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Response<GmapsRestaurantPojo> response1) {
@@ -318,6 +319,7 @@ public class MapViewFragment extends Fragment {
         String id = nearbyRestaurant.getId();
         String name = nearbyRestaurant.getName();
         double rating = nearbyRestaurant.getRating();
+        /* Next line can be commented if openingHours come from nearby api */
         OpeningHours openingHours = nearbyRestaurant.getOpeningHours();
         List<Photo> photos = nearbyRestaurant.getPhotos();
         /*
@@ -329,11 +331,11 @@ public class MapViewFragment extends Fragment {
         // double latitude = geometry.getLocation().getLat();
         // double longitude = geometry.getLocation().getLng();
 
-        int distance = 0;   // TODO : To be calculated ?
+        long distance = 0;   // TODO : To be calculated ?
 
         // Call Place Details API
         Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(id,
-                "formatted_address,formatted_phone_number,website",
+                "formatted_address,formatted_phone_number,website,opening_hours",
                 getString(R.string.MAPS_API_KEY)
         );
         call2.enqueue(new Callback<GmapsRestaurantDetailsPojo>() {
@@ -348,6 +350,8 @@ public class MapViewFragment extends Fragment {
                 String address = restaurantDetails.getAddress();
                 String phoneNumber = restaurantDetails.getPhoneNumber();
                 String website = restaurantDetails.getWebsite();
+                /* Comment next line to make openingHours come from nearby api */
+                OpeningHours openingHours = restaurantDetails.getOpeningHours();
 
                 // Create ou update restaurant in Firebase
                 RestaurantManager.getInstance().createRestaurant(id, name, distance, photos,

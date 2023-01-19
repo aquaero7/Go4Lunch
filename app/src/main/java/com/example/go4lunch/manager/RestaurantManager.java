@@ -41,7 +41,7 @@ public class RestaurantManager {
     }
 
     // Method for database constructor
-    public void createRestaurant(String id, String name, int distance, List<Photo> photos, String nationality,
+    public void createRestaurant(String id, String name, long distance, List<Photo> photos, String nationality,
                                  String address, double rating, OpeningHours openingHours, int likesCount,
                                  String phoneNumber, String website, Geometry geometry, List<User> selectors) {
 
@@ -50,7 +50,7 @@ public class RestaurantManager {
     }
 
     // Method for API constructor
-    public void createRestaurant(String id, String name, int distance, List<Photo> photos, String nationality,
+    public void createRestaurant(String id, String name, long distance, List<Photo> photos, String nationality,
                                  String address, double rating, OpeningHours openingHours,
                                  String phoneNumber, String website, Geometry geometry) {
 

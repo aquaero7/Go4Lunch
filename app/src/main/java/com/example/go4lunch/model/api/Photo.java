@@ -50,6 +50,12 @@ public class Photo implements Serializable {
         return photoUrl;
     }
 
+    public static String getPhotoUrl(String photoReference, String key) {
+        String rootUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=";
+        String photoUrl = rootUrl + photoReference + "&key=" + key; // getString(R.string.MAPS_API_KEY)
+        return photoUrl;
+    }
+
 
     // SETTERS
 

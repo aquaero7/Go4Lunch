@@ -2,6 +2,7 @@ package com.example.go4lunch.model;
 
 import androidx.annotation.Nullable;
 
+import com.example.go4lunch.R;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
@@ -21,7 +22,7 @@ public class Restaurant implements Serializable {
     @Expose
     private String name;
 
-    private int distance;
+    private long distance;
 
     @SerializedName("photos")
     @Expose
@@ -40,6 +41,8 @@ public class Restaurant implements Serializable {
     @SerializedName("opening_hours")
     @Expose
     @Nullable private OpeningHours openingHours;
+
+    private String openingInformation;
 
     private int likesCount;
 
@@ -61,7 +64,7 @@ public class Restaurant implements Serializable {
     @Nullable private List<User> selectors;
 
     // Database constructor (full attributes)
-    public Restaurant(String id, String name, int distance, @Nullable List<Photo> photos,
+    public Restaurant(String id, String name, long distance, @Nullable List<Photo> photos,
                       @Nullable String nationality, String address, double rating,
                       @Nullable OpeningHours openingHours, int likesCount, @Nullable String phoneNumber,
                       @Nullable String website, Geometry geometry, @Nullable List<User> selectors) {
@@ -82,7 +85,7 @@ public class Restaurant implements Serializable {
     }
 
     // API constructor
-    public Restaurant(String id, String name, int distance, @Nullable List<Photo> photos,
+    public Restaurant(String id, String name, long distance, @Nullable List<Photo> photos,
                       @Nullable String nationality, String address, double rating,
                       @Nullable OpeningHours openingHours, @Nullable String phoneNumber,
                       @Nullable String website, Geometry geometry) {
@@ -99,6 +102,27 @@ public class Restaurant implements Serializable {
         this.geometry = geometry;
     }
 
+    // Display constructor (full attributes)
+    public Restaurant(String id, String name, long distance, @Nullable List<Photo> photos,
+                      @Nullable String nationality, String address, double rating,
+                      String openingInformation, int likesCount, @Nullable String phoneNumber,
+                      @Nullable String website, Geometry geometry, @Nullable List<User> selectors) {
+        this.id = id;
+        this.name = name;
+        this.distance = distance;
+        // this.imageUrl = imageUrl;
+        this.photos = photos;
+        this.nationality = nationality;
+        this.address = address;
+        this.rating = rating;
+        this.openingInformation = openingInformation;
+        this.likesCount = likesCount;
+        this.phoneNumber = phoneNumber;
+        this.website = website;
+        this.geometry = geometry;
+        this.selectors = selectors;
+    }
+
 
     // GETTERS
 
@@ -108,7 +132,7 @@ public class Restaurant implements Serializable {
     public String getName() {
         return name;
     }
-    public int getDistance() {
+    public long getDistance() {
         return distance;
     }
     @Nullable
@@ -128,6 +152,9 @@ public class Restaurant implements Serializable {
     @Nullable
     public OpeningHours getOpeningHours() {
         return openingHours;
+    }
+    public String getOpeningInformation() {
+        return openingInformation;
     }
     public int getLikesCount() {
         return likesCount;
@@ -155,7 +182,7 @@ public class Restaurant implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-    public void setDistance(int distance) {
+    public void setDistance(long distance) {
         this.distance = distance;
     }
     public void setPhotos(@Nullable List<Photo> photos) {
@@ -172,6 +199,9 @@ public class Restaurant implements Serializable {
     }
     public void setOpeningHours(@Nullable OpeningHours openingHours) {
         this.openingHours = openingHours;
+    }
+    public void setOpeningInformation(String openingInformation) {
+        this.openingInformation = openingInformation;
     }
     public void setLikesCount(int likesCount) {
         this.likesCount = likesCount;
