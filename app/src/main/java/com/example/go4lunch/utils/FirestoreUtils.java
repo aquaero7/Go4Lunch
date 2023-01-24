@@ -14,17 +14,11 @@ import java.util.Objects;
 public class FirestoreUtils {
 
     // Get restaurant data from firestore with given document and create restaurant
-    public static Restaurant getRestaurantFromDatabaseDocument(QueryDocumentSnapshot document, String KEY) {
+    public static Restaurant getRestaurantFromDatabaseDocument(QueryDocumentSnapshot document) {
         String rId = Objects.requireNonNull(document.getData().get("id")).toString();
         String rName = Objects.requireNonNull(document.getData().get("name")).toString();
         long rDistance = (long) document.getData().get("distance");
-
-        List<Photo> rPhoto = (List<Photo>) document.getData().get("photos");             // TODO : To analyse and complete for display
-        Map<Photo, Object> myPhoto = (Map<Photo, Object>) rPhoto.get(0);
-        String photoRef = myPhoto.get("photoReference").toString();
-        String photoUrl = Photo.getPhotoUrl(photoRef, KEY);
-        // List<Photo> rPhoto = null;
-
+        List<Photo> rPhotos = getPhotos(document);
         String rNationality = Objects.requireNonNull(document.getData().get("nationality")).toString();
         String rAddress = Objects.requireNonNull(document.getData().get("address")).toString();
         double rRating = (double) document.getData().get("rating");
@@ -37,14 +31,15 @@ public class FirestoreUtils {
         // List<User> rSelectors = (List<User>) document.getData().get("selectors");
         List<User> rSelectors = null;
 
-        Restaurant restaurantFromData = new Restaurant(rId, rName, rDistance, rPhoto, rNationality, rAddress,
+        Restaurant restaurantFromData = new Restaurant(rId, rName, rDistance, rPhotos, rNationality, rAddress,
                 rRating, rOpeningInformation, rLikesCount, rPhoneNumber, rWebsite, rGeometry, rSelectors);
 
         return restaurantFromData;
     }
 
-    public static String getOpeningInformation(QueryDocumentSnapshot document) {
 
+    public static String getOpeningInformation(QueryDocumentSnapshot document) {
+        // Possibility of 2 opening and closing periods in a day
         String openingInformation = "";
         String closingTime1 = "";
         String openingTime1 = "";
@@ -53,7 +48,7 @@ public class FirestoreUtils {
 
         boolean openNow = (boolean) ((Map<String, Object>) document.getData().get("openingHours")).get("openNow");
 
-        // TODO : To be replaced by method below
+        // TODO : To be deleted and replaced by method below
         openingInformation = openNow ? "open" : "closed";
         //
 
@@ -61,39 +56,28 @@ public class FirestoreUtils {
         long currentDayOfWeek = CalendarUtils.getCurrentDayOfWeek();
         String currentTime = CalendarUtils.getCurrentTime();
 
+        // Get the list of opening periods
         ArrayList periodsList = (ArrayList) ((Map<String, Object>) document.getData().get("openingHours")).get("periods");
 
-        /*
-        int nbOfPeriods = periodsList.size();
-
-        Map<String, Object> period0 = (Map<String, Object>) periodsList.get(0);
-        Map<String, Object> period0ClosingInfo = (Map<String, Object>) period0.get("close");
-        String period0ClosingDay = period0ClosingInfo.get("day").toString();
-        String period0ClosingTime = period0ClosingInfo.get("time").toString();
-        Map<String, Object> period0OpeningInfo = (Map<String, Object>) period0.get("open");
-        String period0OpeningDay = period0OpeningInfo.get("day").toString();
-        String period0OpeningTime = period0OpeningInfo.get("time").toString();
-
-        String p0ClosingDay = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(0)).get("close")).get("day").toString();
-        String p0ClosingTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(0)).get("close")).get("time").toString();
-        String p0OpeningDay = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(0)).get("open")).get("day").toString();
-        String p0OpeningTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(0)).get("open")).get("time").toString();
-        */
-
+        // Get details for each period p
         for (int i = 0 ; i < periodsList.size() ; i++) {
             long pClosingDay = (long) ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("close")).get("day");
             String pClosingTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("close")).get("time").toString();
             long pOpeningDay = (long) ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("open")).get("day");
             String pOpeningTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("open")).get("time").toString();
 
+            // If period day matches with current day
             if (pClosingDay == currentDayOfWeek && pOpeningDay == currentDayOfWeek) {
+                // Get information for period 1 first...
                 if ((closingTime1.isEmpty()) && (openingTime1.isEmpty())) {
                     closingTime1 = pClosingTime;
                     openingTime1 = pOpeningTime;
+                // ...then for period 2
                 } else {
                     closingTime2 = pClosingTime;
                     openingTime2 = pOpeningTime;
 
+                    // Sort periods in ascending chronological order
                     if (closingTime1.compareTo(closingTime2) > 0) {
                         String cTmp = closingTime1;
                         closingTime1 = closingTime2;
@@ -109,22 +93,24 @@ public class FirestoreUtils {
             }
         }
 
+        /*  Define information to display
+            Information must be either 3 char (code) or 7 char (code+schedule) length   */
         if (openNow) {
             if (closingTime1.equals("0000") || closingTime2.equals("0000"))  {
-                openingInformation = "open";
+                openingInformation = "OP*";                     // Open 24/7
             }else if (currentTime.compareTo(closingTime1) < 0) {
-                openingInformation = "Open until " + closingTime1;
+                openingInformation = "OPU" + closingTime1;      // Open until...
             } else {
-                openingInformation = "Open until " + closingTime2;
+                openingInformation = "OPU" + closingTime2;      // Open until...
             }
         } else {
             if(!closingTime1.isEmpty() || !closingTime2.isEmpty()) {
                 if (currentTime.compareTo(openingTime1) < 0) {
-                    openingInformation = "Open at " + openingTime1;
+                    openingInformation = "OPA" + openingTime1;  // Open at
                 } else if (currentTime.compareTo(openingTime2) < 0) {
-                    openingInformation = "Open at " + openingTime2;
+                    openingInformation = "OPA" + openingTime2;  // Open at
                 } else {
-                    openingInformation = "closed";
+                    openingInformation = "CLO";                 // Closed
                 }
             }
         }
@@ -132,5 +118,33 @@ public class FirestoreUtils {
         return openingInformation;
     }
 
+
+    public static List<Photo> getPhotos(QueryDocumentSnapshot document) {
+        List<Photo> photosList = null;
+
+        // Get photos from document
+        ArrayList photos = (ArrayList) document.getData().get("photos");
+        if (photos.size() != 0) {
+            photosList = new ArrayList<>();
+            for (int i = 0; i < photos.size(); i++) {
+                // Get information for each photo
+                long pHeight = (long) ((Map<Photo, Object>) photos.get(i)).get("height");
+                long pWidth = (long) ((Map<Photo, Object>) photos.get(i)).get("width");
+                String pPhotoReference = ((Map<Photo, Object>) photos.get(i)).get("photoReference").toString();
+                List<String> htmlAttributions = new ArrayList<>();
+                ArrayList pHtmlAttributions = (ArrayList) ((Map<Photo, Object>) photos.get(i)).get("htmlAttributions");
+                if (pHtmlAttributions.size() != 0) {
+                    for (int j = 0; j < pHtmlAttributions.size(); j++) {
+                        htmlAttributions.add(pHtmlAttributions.get(j).toString());
+                    }
+                }
+                // Create photo object and add it to the list
+                Photo photoToAdd = new Photo(pPhotoReference, pHtmlAttributions, pHeight, pWidth);
+                photosList.add(photoToAdd);
+            }
+        }
+
+        return photosList;
+    }
 
 }

@@ -20,11 +20,22 @@ public class Photo implements Serializable {
 
     @SerializedName("height")
     @Expose
-    private Integer height;
+    private long height;
 
     @SerializedName("width")
     @Expose
-    private Integer width;
+    private long width;
+
+
+    // CONSTRUCTOR
+
+    public Photo(String photoReference, List<String> htmlAttributions, long height, long width) {
+        this.photoReference = photoReference;
+        this.htmlAttributions = htmlAttributions;
+        this.height = height;
+        this.width = width;
+    }
+
 
     // GETTERS
 
@@ -36,11 +47,11 @@ public class Photo implements Serializable {
         return htmlAttributions;
     }
 
-    public Integer getHeight() {
+    public long getHeight() {
         return height;
     }
 
-    public Integer getWidth() {
+    public long getWidth() {
         return width;
     }
 
@@ -67,11 +78,11 @@ public class Photo implements Serializable {
         this.htmlAttributions = htmlAttributions;
     }
 
-    public void setHeight(Integer height) {
+    public void setHeight(long height) {
         this.height = height;
     }
 
-    public void setWidth(Integer width) {
+    public void setWidth(long width) {
         this.width = width;
     }
 

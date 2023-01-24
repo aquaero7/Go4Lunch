@@ -68,6 +68,9 @@
     <!-- RESTAURANT -->
     <string name="status_open">Open</string>
     <string name="status_closed">Closed</string>
+    <string name="status_open247">Open 24/7</string>
+    <string name="status_open_until">Open until\ </string>
+    <string name="status_open_at">Open at\ </string>
 
     <!-- NOT TRANSLATABLE -->
 

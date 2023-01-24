@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.RestaurantListItemBinding;
 import com.example.go4lunch.model.Restaurant;
+import com.squareup.picasso.Picasso;
 
 
 import java.util.Arrays;
@@ -56,7 +57,9 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         */
     }
 
-    public void updateWithRestaurants(Restaurant restaurant, String KEY, String STATUS_OPEN, String STATUS_CLOSED) {
+    public void updateWithRestaurants(Restaurant restaurant, String KEY, String STATUS_OPEN, String STATUS_CLOSED,
+                                      String STATUS_OPEN247, String STATUS_OPEN_UNTIL, String STATUS_OPEN_AT) {
+
         // Display restaurant name
         tvTitle.setText(restaurant.getName());
         // Display restaurant distance
@@ -72,23 +75,39 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         // Display workmates count
         String workmatesCount = "(" + restaurant.getLikesCount() + ")";
         tvWorkmatesCount.setText(workmatesCount);
-
         // Display restaurant opening info
-        if (restaurant.getOpeningInformation().equals("open")) {
-            tvOpenTime.setText(STATUS_OPEN);
-        } else if (restaurant.getOpeningInformation().equals("closed")) {
-            tvOpenTime.setText(STATUS_CLOSED);
-        } else {
-            tvOpenTime.setText(restaurant.getOpeningInformation());
+        String information = restaurant.getOpeningInformation();
+        int lim = 7;    // Information must be 7 char length max
+        int sep = 3;    // Position of separator between code and schedule
+        String infoStart = information.substring(0,sep);
+        String infoEnd = information.substring(sep);
+        String infoToDisplay = "";
+        if (information.length() == lim) infoToDisplay = infoEnd.substring(0, 2) + "h" + infoEnd.substring(2);
+        switch (infoStart) {
+            case "OPE":
+                tvOpenTime.setText(STATUS_OPEN);
+                break;
+            case "CLO":
+                tvOpenTime.setText(STATUS_CLOSED);
+                break;
+            case "OP*":
+                tvOpenTime.setText(STATUS_OPEN247);
+                break;
+            case "OPU":
+                tvOpenTime.setText(STATUS_OPEN_UNTIL + infoToDisplay);
+                break;
+            case "OPA":
+                tvOpenTime.setText(STATUS_OPEN_AT + infoToDisplay);
+                break;
+            default:
+                tvOpenTime.setText(restaurant.getOpeningInformation());
+                break;
         }
-
         // Display restaurant rating
         mRatingBar.setRating((float) restaurant.getRating());
-
-        // Display restaurant picture                                                       // TODO
-        ivPicture.setImageResource(R.drawable.im_detail_restaurant);
-        // ivPicture.setImageResource(restaurant.getPhotos().get(0).getPhotoUrl(KEY));
-
+        // Display restaurant picture
+        // ivPicture.setImageResource(R.drawable.im_detail_restaurant);
+        if (restaurant.getPhotos() != null) Picasso.get().load(restaurant.getPhotos().get(0).getPhotoUrl(KEY)).into(ivPicture);
         // Set text scrolling and adapt fields max size in line 2
         ResizeAndScroll();
     }
