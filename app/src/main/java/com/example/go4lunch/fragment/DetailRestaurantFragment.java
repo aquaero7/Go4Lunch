@@ -1,6 +1,7 @@
 package com.example.go4lunch.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,12 +9,22 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RatingBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
+import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.DetailRestaurantWorkmateAdapter;
+import com.squareup.picasso.Picasso;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,11 +48,21 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     // Declare callback
     private OnButtonClickedListener mCallback;
 
-    // Declare RecyclerView
-    private RecyclerView mRecyclerView;
-
     // Declare ViewBinding
     private FragmentDetailRestaurantBinding binding;
+
+    // Declare View items
+    private RecyclerView mRecyclerView;
+    private ImageView mImageView;
+    private TextView mTextView1;
+    private RatingBar mRatingBar;
+    private TextView mTextView2;
+
+    // Declare restaurant
+    private Restaurant restaurant;
+
+    // Initialize Google Maps API key
+    private String KEY;
 
 
     // Constructor
@@ -76,13 +97,14 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        //
 
+        getIntentData();
+        if (restaurant != null) displayRestaurantData();
     }
     */
 
@@ -92,6 +114,17 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         // Inflate the layout for this fragment
         binding = FragmentDetailRestaurantBinding.inflate(inflater, container, false);
 
+        // Initialize View items
+        mRecyclerView = binding.rvDetailRestaurant;
+        mImageView = binding.restaurantIv;
+        mTextView1 = binding.restaurantTv1;
+        mTextView2 = binding.restaurantTv2;
+        mRatingBar = binding.restaurantRatingBar;
+
+        // Get restaurant from calling activity
+        getIntentData();
+        if (restaurant != null) displayRestaurantData();
+
         //Set onClickListener to selection fab
         binding.selectionFab.setOnClickListener(this);
 
@@ -100,8 +133,8 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         binding.likeButton.setOnClickListener(this);
         binding.websiteButton.setOnClickListener(this);
 
-        mRecyclerView = binding.rvDetailRestaurant;
         configureRecyclerView();
+        configureOnClickRecyclerView();
 
         return binding.getRoot();
     }
@@ -120,6 +153,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         super.onAttach(context);
         // Call the method creating callback after being attached to parent activity
         this.createCallbackToParentActivity();
+        KEY  = getString(R.string.MAPS_API_KEY);
     }
 
 
@@ -150,7 +184,39 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         mRecyclerView.setAdapter(detailRestaurantWorkmateAdapter);
         // 3.4 - Set layout manager to position the items
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
     }
+
+    // Configure item click on RecyclerView
+    private void configureOnClickRecyclerView(){
+        ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_detail_restaurant)
+                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        Log.w("TAG", "Position : "+position);
+                    }
+                });
+    }
+
+    // Get restaurant from calling activity
+    private void getIntentData() {
+        Intent intent = requireActivity().getIntent();
+        if (intent != null) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                restaurant = (Restaurant) bundle.getSerializable("RESTAURANT");
+                Log.w("DetailRestaurantFragment", "Name of this restaurant : " + restaurant.getName());    // TODO : For debug. To be deleted
+                Toast.makeText(requireContext(), restaurant.getName(), Toast.LENGTH_SHORT).show();  // TODO : For debug. To be deleted
+            }
+        }
+    }
+
+    private void displayRestaurantData() {
+        if (restaurant.getPhotos() != null) Picasso.get().load(restaurant.getPhotos().get(0).getPhotoUrl(KEY)).into(mImageView);
+        mTextView1.setText(restaurant.getName());
+        mTextView2.setText(restaurant.getAddress());
+        mRatingBar.setRating((float) restaurant.getRating());
+    }
+
+
 
 }

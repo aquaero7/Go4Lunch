@@ -1,5 +1,6 @@
 package com.example.go4lunch.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,18 +15,16 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentListViewBinding;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
+import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.ListViewAdapter;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +52,6 @@ public class ListViewFragment extends Fragment {
     private RecyclerView mRecyclerView;
 
     private List<Restaurant> restaurantsList;
-    private Restaurant restaurantFromData;
     private Restaurant restaurantToAdd;
 
 
@@ -116,6 +114,7 @@ public class ListViewFragment extends Fragment {
         requireActivity().setTitle(R.string.listView_toolbar_title);
 
         getRestaurantsListAndConfigureRecyclerView();
+        configureOnClickRecyclerView();
 
     }
 
@@ -129,7 +128,17 @@ public class ListViewFragment extends Fragment {
         mRecyclerView.setAdapter(listViewAdapter);
         // 3.4 - Set layout manager to position the items
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
 
+    // Configure item click on RecyclerView
+    private void configureOnClickRecyclerView(){
+        ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_detail_restaurant)
+                .setOnItemClickListener((recyclerView, position, v) -> {
+                    Log.w("TAG", "Position : "+position);       // TODO : To be deleted
+                    Restaurant mRestaurant = restaurantsList.get(position);
+
+                    launchDetailRestaurantActivity(mRestaurant);
+                });
     }
 
     private void getRestaurantsListAndConfigureRecyclerView() {
@@ -138,8 +147,7 @@ public class ListViewFragment extends Fragment {
             if (task.isSuccessful()) {
                 // Get restaurants list
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    Map<String, Object> restaurantData = document.getData(); // TODO : Map data for debug
-
+                    Map<String, Object> restaurantData = document.getData(); // TODO : Map data for debug. To be deleted
                     restaurantToAdd = FirestoreUtils.getRestaurantFromDatabaseDocument(document);
                     restaurantsList.add(restaurantToAdd);
                 }
@@ -152,6 +160,15 @@ public class ListViewFragment extends Fragment {
 
         });
     }
+
+    private void launchDetailRestaurantActivity(Restaurant restaurant) {
+        Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("RESTAURANT", restaurant);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
 
 
 }

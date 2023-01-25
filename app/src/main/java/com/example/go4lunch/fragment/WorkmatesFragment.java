@@ -7,12 +7,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
+import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.WorkmateAdapter;
 
 /**
@@ -86,6 +88,7 @@ public class WorkmatesFragment extends Fragment {
 
         mRecyclerView = binding.rvWorkmates;
         configureRecyclerView();
+        configureOnClickRecyclerView();
 
         return binding.getRoot();
     }
@@ -105,7 +108,17 @@ public class WorkmatesFragment extends Fragment {
         mRecyclerView.setAdapter(workmateAdapter);
         // 3.4 - Set layout manager to position the items
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
 
+    // Configure item click on RecyclerView
+    private void configureOnClickRecyclerView(){
+        ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_detail_restaurant)
+                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        Log.w("TAG", "Position : "+position);
+                    }
+                });
     }
 
 }

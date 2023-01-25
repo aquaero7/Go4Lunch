@@ -31,6 +31,7 @@
         android:orientation="vertical">
 
         <ImageView
+            android:id="@+id/restaurant_iv"
             android:layout_width="match_parent"
             android:layout_height="256dp"
             android:src="@drawable/im_detail_restaurant"
@@ -44,6 +45,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/restaurant_tv1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
@@ -63,7 +65,7 @@
                 style="@style/Widget.AppCompat.RatingBar.Small"
                 android:progressTint="@color/yellow_ic"
                 android:progressBackgroundTint="@color/app_background"
-                android:numStars="3"
+                android:numStars="5"
                 android:rating="2"
                 android:stepSize="0.1"
                 android:isIndicator="true"
@@ -72,6 +74,7 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/restaurant_tv2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
