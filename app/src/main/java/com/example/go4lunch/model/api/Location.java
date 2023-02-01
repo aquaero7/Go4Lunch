@@ -15,6 +15,12 @@ public class Location implements Serializable {
     @Expose
     private double lng;
 
+    public Location(double lat, double lng) {
+        this.lat = lat;
+        this.lng = lng;
+    }
+
+
     public double getLat() {
         return lat;
     }
@@ -23,6 +29,7 @@ public class Location implements Serializable {
         this.lat = lat;
     }
 
+
     public double getLng() {
         return lng;
     }
@@ -30,4 +37,6 @@ public class Location implements Serializable {
     public void setLng(double lng) {
         this.lng = lng;
     }
+
+
 }

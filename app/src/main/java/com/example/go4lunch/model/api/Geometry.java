@@ -11,6 +11,10 @@ public class Geometry implements Serializable {
     @Expose
     private Location location;
 
+    public Geometry(Location location) {
+        this.location = location;
+    }
+
     public Location getLocation() {
         return location;
     }

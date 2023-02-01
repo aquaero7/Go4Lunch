@@ -3,8 +3,11 @@ package com.example.go4lunch.utils;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
+import com.example.go4lunch.model.api.Location;
 import com.example.go4lunch.model.api.Photo;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +29,11 @@ public class FirestoreUtils {
         int rLikesCount = Integer.parseInt(Objects.requireNonNull(document.getData().get("likesCount")).toString());
         String rPhoneNumber = document.getData().get("phoneNumber") != null ? document.getData().get("phoneNumber").toString() : "";
         String rWebsite = document.getData().get("website") != null ?  document.getData().get("website").toString() : "";
+
         // Geometry rGeometry = (Geometry) document.getData().get("geometry");
-        Geometry rGeometry = null;
+        // Geometry rGeometry = null;
+        Geometry rGeometry = getGeometry(document);
+
         // List<User> rSelectors = (List<User>) document.getData().get("selectors");
         List<User> rSelectors = null;
 
@@ -39,82 +45,83 @@ public class FirestoreUtils {
 
 
     public static String getOpeningInformation(QueryDocumentSnapshot document) {
-        // Possibility of 2 opening and closing periods in a day
         String openingInformation = "";
-        String closingTime1 = "";
-        String openingTime1 = "";
-        String closingTime2 = "";
-        String openingTime2 = "";
+        if (document.getData().get("openingHours") != null) {
+            // Possibility of 2 opening and closing periods in a day
+            String closingTime1 = "";
+            String openingTime1 = "";
+            String closingTime2 = "";
+            String openingTime2 = "";
 
-        boolean openNow = (boolean) ((Map<String, Object>) document.getData().get("openingHours")).get("openNow");
+            boolean openNow = (boolean) ((Map<String, Object>) document.getData().get("openingHours")).get("openNow");
 
-        // TODO : To be deleted and replaced by method below
-        openingInformation = openNow ? "open" : "closed";
-        //
+            // TODO : To be deleted and replaced by method below
+            openingInformation = openNow ? "open" : "closed";
+            //
 
-        // TODO : Replacement getting and displaying more info from API
-        long currentDayOfWeek = CalendarUtils.getCurrentDayOfWeek();
-        String currentTime = CalendarUtils.getCurrentTime();
+            // TODO : Replacement getting and displaying more info from API
+            long currentDayOfWeek = CalendarUtils.getCurrentDayOfWeek();
+            String currentTime = CalendarUtils.getCurrentTime();
 
-        // Get the list of opening periods
-        ArrayList periodsList = (ArrayList) ((Map<String, Object>) document.getData().get("openingHours")).get("periods");
+            // Get the list of opening periods
+            ArrayList periodsList = (ArrayList) ((Map<String, Object>) document.getData().get("openingHours")).get("periods");
 
-        // Get details for each period p
-        for (int i = 0 ; i < periodsList.size() ; i++) {
-            long pClosingDay = (long) ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("close")).get("day");
-            String pClosingTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("close")).get("time").toString();
-            long pOpeningDay = (long) ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("open")).get("day");
-            String pOpeningTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("open")).get("time").toString();
+            // Get details for each period p
+            for (int i = 0; i < periodsList.size(); i++) {
+                long pClosingDay = (long) ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("close")).get("day");
+                String pClosingTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("close")).get("time").toString();
+                long pOpeningDay = (long) ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("open")).get("day");
+                String pOpeningTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("open")).get("time").toString();
 
-            // If period day matches with current day
-            if (pClosingDay == currentDayOfWeek && pOpeningDay == currentDayOfWeek) {
-                // Get information for period 1 first...
-                if ((closingTime1.isEmpty()) && (openingTime1.isEmpty())) {
-                    closingTime1 = pClosingTime;
-                    openingTime1 = pOpeningTime;
-                // ...then for period 2
-                } else {
-                    closingTime2 = pClosingTime;
-                    openingTime2 = pOpeningTime;
+                // If period day matches with current day
+                if (pClosingDay == currentDayOfWeek && pOpeningDay == currentDayOfWeek) {
+                    // Get information for period 1 first...
+                    if ((closingTime1.isEmpty()) && (openingTime1.isEmpty())) {
+                        closingTime1 = pClosingTime;
+                        openingTime1 = pOpeningTime;
+                        // ...then for period 2
+                    } else {
+                        closingTime2 = pClosingTime;
+                        openingTime2 = pOpeningTime;
 
-                    // Sort periods in ascending chronological order
-                    if (closingTime1.compareTo(closingTime2) > 0) {
-                        String cTmp = closingTime1;
-                        closingTime1 = closingTime2;
-                        closingTime2 = cTmp;
+                        // Sort periods in ascending chronological order
+                        if (closingTime1.compareTo(closingTime2) > 0) {
+                            String cTmp = closingTime1;
+                            closingTime1 = closingTime2;
+                            closingTime2 = cTmp;
+                        }
+                        if (openingTime1.compareTo(openingTime2) > 0) {
+                            String oTmp = openingTime1;
+                            openingTime1 = openingTime2;
+                            openingTime2 = oTmp;
+                        }
+                        break;
                     }
-                    if (openingTime1.compareTo(openingTime2) > 0) {
-                        String oTmp = openingTime1;
-                        openingTime1 = openingTime2;
-                        openingTime2 = oTmp;
-                    }
-                    break;
                 }
             }
-        }
 
-        /*  Define information to display
-            Information must be either 3 char (code) or 7 char (code+schedule) length   */
-        if (openNow) {
-            if (closingTime1.equals("0000") || closingTime2.equals("0000"))  {
-                openingInformation = "OP*";                     // Open 24/7
-            }else if (currentTime.compareTo(closingTime1) < 0) {
-                openingInformation = "OPU" + closingTime1;      // Open until...
+            /*  Define information to display
+                Information must be either 3 char (code) or 7 char (code+schedule) length   */
+            if (openNow) {
+                if (closingTime1.equals("0000") || closingTime2.equals("0000")) {
+                    openingInformation = "OP*";                     // Open 24/7
+                } else if (currentTime.compareTo(closingTime1) < 0) {
+                    openingInformation = "OPU" + closingTime1;      // Open until...
+                } else {
+                    openingInformation = "OPU" + closingTime2;      // Open until...
+                }
             } else {
-                openingInformation = "OPU" + closingTime2;      // Open until...
-            }
-        } else {
-            if(!closingTime1.isEmpty() || !closingTime2.isEmpty()) {
-                if (currentTime.compareTo(openingTime1) < 0) {
-                    openingInformation = "OPA" + openingTime1;  // Open at
-                } else if (currentTime.compareTo(openingTime2) < 0) {
-                    openingInformation = "OPA" + openingTime2;  // Open at
-                } else {
-                    openingInformation = "CLO";                 // Closed
+                if (!closingTime1.isEmpty() || !closingTime2.isEmpty()) {
+                    if (currentTime.compareTo(openingTime1) < 0) {
+                        openingInformation = "OPA" + openingTime1;  // Open at
+                    } else if (currentTime.compareTo(openingTime2) < 0) {
+                        openingInformation = "OPA" + openingTime2;  // Open at
+                    } else {
+                        openingInformation = "CLO";                 // Closed
+                    }
                 }
             }
         }
-
         return openingInformation;
     }
 
@@ -124,7 +131,7 @@ public class FirestoreUtils {
 
         // Get photos from document
         ArrayList photos = (ArrayList) document.getData().get("photos");
-        if (photos.size() != 0) {
+        if (photos != null) {
             photosList = new ArrayList<>();
             for (int i = 0; i < photos.size(); i++) {
                 // Get information for each photo
@@ -145,6 +152,29 @@ public class FirestoreUtils {
         }
 
         return photosList;
+    }
+
+    public static Geometry getGeometry(QueryDocumentSnapshot document) {
+        // Get lat and lng from document
+        double lat = (double) ((Map<String, Object>) (Objects.requireNonNull(((Map<String, Object>) Objects.requireNonNull(document.getData().get("geometry"))).get("location")))).get("lat");
+        double lng = (double) ((Map<String, Object>) (((Map<String, Object>) document.getData().get("geometry")).get("location"))).get("lng");
+        // Create location
+        Location location = new Location(lat, lng);
+        // Create and return geometry
+        return new Geometry(location);
+    }
+
+    public static int calculateRestaurantDistance(Restaurant restaurant, LatLng latLng) {
+        double restaurantLat = restaurant.getGeometry().getLocation().getLat();
+        double restaurantLng = restaurant.getGeometry().getLocation().getLng();
+        LatLng restaurantLatLng = new LatLng(restaurantLat, restaurantLng);
+        // double currentLat = latLng.latitude;
+        // double currentLng = latLng.longitude;
+
+        // Distance in meters
+        double distance = SphericalUtil.computeDistanceBetween(latLng, restaurantLatLng);
+
+        return (int) distance;
     }
 
 }

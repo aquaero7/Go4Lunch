@@ -93,6 +93,8 @@ dependencies {
     // GOOGLE MAPS
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation "com.google.android.gms:play-services-location:21.0.1"   // TODO : Useful ? No !
+    // For distance calculation between 2 places
+    implementation 'com.google.maps.android:android-maps-utils:latest.release'
 
     // GOOGLE PLACES
     implementation 'com.google.android.libraries.places:places:3.0.0'

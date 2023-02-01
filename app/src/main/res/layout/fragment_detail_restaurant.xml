@@ -65,7 +65,7 @@
                 style="@style/Widget.AppCompat.RatingBar.Small"
                 android:progressTint="@color/yellow_ic"
                 android:progressBackgroundTint="@color/app_background"
-                android:numStars="5"
+                android:numStars="3"
                 android:rating="2"
                 android:stepSize="0.1"
                 android:isIndicator="true"

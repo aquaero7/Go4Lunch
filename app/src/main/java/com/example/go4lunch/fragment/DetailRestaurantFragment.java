@@ -214,7 +214,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         if (restaurant.getPhotos() != null) Picasso.get().load(restaurant.getPhotos().get(0).getPhotoUrl(KEY)).into(mImageView);
         mTextView1.setText(restaurant.getName());
         mTextView2.setText(restaurant.getAddress());
-        mRatingBar.setRating((float) restaurant.getRating());
+        mRatingBar.setRating((float) (restaurant.getRating() * 3/5));
     }
 
 

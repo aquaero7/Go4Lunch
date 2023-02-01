@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
+import android.app.Application;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -34,6 +35,7 @@ import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
+import com.example.go4lunch.utils.FirestoreUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
@@ -296,7 +298,7 @@ public class MapViewFragment extends Fragment {
                     if (restaurantsList.size() != 0) {
                         Log.w("MAPViewFragment", "Nearby restaurants list not empty");
                         for (Restaurant nearbyRestaurant : restaurantsList) {
-                            getRestaurantDetailsFromApi(nearbyRestaurant);
+                            getRestaurantDetailsFromApi(nearbyRestaurant, home);
                         }
                     } else {
                         Log.w("MAPViewFragment", "Empty nearby restaurants list");
@@ -314,24 +316,15 @@ public class MapViewFragment extends Fragment {
         }
     }
 
-    private void getRestaurantDetailsFromApi(Restaurant nearbyRestaurant) {
+    private void getRestaurantDetailsFromApi(Restaurant nearbyRestaurant, LatLng latLng) {
 
         String id = nearbyRestaurant.getId();
         String name = nearbyRestaurant.getName();
         double rating = nearbyRestaurant.getRating();
-        /* Next line can be commented if openingHours come from nearby api */
-        OpeningHours openingHours = nearbyRestaurant.getOpeningHours();
+        OpeningHours openingHours = nearbyRestaurant.getOpeningHours(); // Can be commented if openingHours come from nearby api
         List<Photo> photos = nearbyRestaurant.getPhotos();
-        /*
-        if (photos.size() != 0) {
-            String imageUrl = photos.get(0).getPhotoUrl(getString(R.string.MAPS_API_KEY));
-        }
-        */
         Geometry geometry = nearbyRestaurant.getGeometry();
-        // double latitude = geometry.getLocation().getLat();
-        // double longitude = geometry.getLocation().getLng();
-
-        long distance = 0;   // TODO : To be calculated ?
+        long distance = FirestoreUtils.calculateRestaurantDistance(nearbyRestaurant, latLng);
 
         // Call Place Details API
         Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(id,
@@ -350,8 +343,7 @@ public class MapViewFragment extends Fragment {
                 String address = restaurantDetails.getAddress();
                 String phoneNumber = restaurantDetails.getPhoneNumber();
                 String website = restaurantDetails.getWebsite();
-                /* Comment next line to make openingHours come from nearby api */
-                OpeningHours openingHours = restaurantDetails.getOpeningHours();
+                OpeningHours openingHours = restaurantDetails.getOpeningHours();    // Can be commented to make openingHours come from nearby api
 
                 // Create ou update restaurant in Firebase
                 RestaurantManager.getInstance().createRestaurant(id, name, distance, photos,
