@@ -164,17 +164,16 @@ public class FirestoreUtils {
         return new Geometry(location);
     }
 
-    public static int calculateRestaurantDistance(Restaurant restaurant, LatLng latLng) {
+    /*  // TODO : To be deleted cause transferred to DataProcessingUtils
+    public static int calculateRestaurantDistance(Restaurant restaurant, LatLng currentLatLng) {
         double restaurantLat = restaurant.getGeometry().getLocation().getLat();
         double restaurantLng = restaurant.getGeometry().getLocation().getLng();
         LatLng restaurantLatLng = new LatLng(restaurantLat, restaurantLng);
-        // double currentLat = latLng.latitude;
-        // double currentLng = latLng.longitude;
-
         // Distance in meters
-        double distance = SphericalUtil.computeDistanceBetween(latLng, restaurantLatLng);
+        double distance = SphericalUtil.computeDistanceBetween(currentLatLng, restaurantLatLng);
 
         return (int) distance;
     }
+    */
 
 }

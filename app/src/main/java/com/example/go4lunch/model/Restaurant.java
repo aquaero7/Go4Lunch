@@ -10,6 +10,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.List;
 
 public class Restaurant implements Serializable {
@@ -218,5 +219,26 @@ public class Restaurant implements Serializable {
     public void setSelectors(@Nullable List<User> selectors) {
         this.selectors = selectors;
     }
+
+
+    // SORTS
+
+    // Comparator for sort by distance
+    public static Comparator<Restaurant> comparatorDistance = new Comparator<Restaurant>() {
+        @Override
+        public int compare(Restaurant o1, Restaurant o2) {
+            return (int) (o1.getDistance() - o2.getDistance());
+        }
+    };
+
+    // Comparator for sort by name
+    public static Comparator<Restaurant> comparatorName = new Comparator<Restaurant>() {
+        @Override
+        public int compare(Restaurant o1, Restaurant o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    };
+
+
 
 }

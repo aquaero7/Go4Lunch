@@ -1,6 +1,7 @@
 package com.example.go4lunch.repository;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -9,6 +10,7 @@ import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
+import com.example.go4lunch.utils.FirestoreUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -18,6 +20,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
+import java.util.Map;
 
 public class RestaurantRepository {
 
@@ -77,7 +80,7 @@ public class RestaurantRepository {
 
     // TODO : For test. To be deleted
     public void createRestaurant() {
-
+        /*
         String id = "ID1";  // TODO : Get data from API
         String name = "Name for test";  // TODO : Get data from API
         long distance = 0;  // TODO : Get data from API
@@ -96,6 +99,7 @@ public class RestaurantRepository {
                 address, rating, openingHours, likesCount, phoneNumber, website, geometry, selectors);
 
         getRestaurantsCollection().document(id).set(restaurantToCreate);    // Create ou update a document with nothing given
+        */
 
         // getRestaurantsCollection().add(restaurantToCreate);  // Create a document with new automatic ID
         // getRestaurantsCollection().document(id).update("name", name);    // Update a field of a document with given ID
@@ -109,12 +113,11 @@ public class RestaurantRepository {
             // this.getRestaurantsCollection().document(id).update("name", name);    // Update a field of a document with given ID
         });
         */
-
     }
 
     // TODO : For test. To be deleted
     public void createRestaurant(String id, String name) {
-
+        /*
         // String id = "ID1";  // TODO : Get data from API
         // String name = "";  // TODO : Get data from API
         long distance = 0;  // TODO : Get data from API
@@ -133,7 +136,7 @@ public class RestaurantRepository {
                 address, rating, openingHours, likesCount, phoneNumber, website, geometry, selectors);
 
         getRestaurantsCollection().document(id).set(restaurantToCreate);    // Create or update a document with given ID and nane
-
+        */
     }
 
 
@@ -150,6 +153,20 @@ public class RestaurantRepository {
         }else{
             return null;
         }
+    }
+
+    // Clear the restaurants collection
+    public static void clearRestaurantsCollection() {
+        getRestaurantsList(task -> {
+            if (task.isSuccessful()) {
+                // Get and delete each document in restaurants collection
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    getRestaurantsCollection().document(document.getId()).delete();
+                }
+            } else {
+                Log.d("RestaurantRepository", "Error getting documents: ", task.getException());
+            }
+        });
     }
 
 

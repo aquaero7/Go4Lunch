@@ -11,7 +11,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
-import android.app.Application;
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -25,17 +26,18 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.api.GmapsApiClient;
 import com.example.go4lunch.api.GmapsRestaurantDetailsPojo;
 import com.example.go4lunch.api.GmapsRestaurantPojo;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.FirestoreUtils;
+import com.example.go4lunch.utils.MapsApisUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
@@ -49,12 +51,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.gson.Gson;
 
 import java.util.List;
 import java.util.Objects;
@@ -64,7 +67,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MapViewFragment extends Fragment {
+public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClickListener {
 
     private FragmentMapViewBinding binding;
     private SupportMapFragment mapFragment;
@@ -73,18 +76,21 @@ public class MapViewFragment extends Fragment {
     private LatLng home;
     private PlacesClient placesClient;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private Location lastKnownLocation;
+    private boolean locationPermissionsGranted = false;
+
+    // private Location lastKnownLocation;
     private double latitude;
     private double longitude;
-    private boolean locationPermissionsGranted = false;
     private static final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
     private static final double DEF_LONGITUDE = 0;  //VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
+    // private static final int DEFAULT_RADIUS = 1000;
+
     private static final int DEFAULT_ZOOM = 15;
-    private static final int DEFAULT_RADIUS = 1000;
     private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private ActivityResultLauncher<String[]> requestPermissionsLauncher;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
+    private List<Restaurant> restaurantsList;
 
     public MapViewFragment() {
     }
@@ -122,12 +128,16 @@ public class MapViewFragment extends Fragment {
 
         // Check permissions
         checkPermissions();
+        // Clear restaurants list
+        clearRestaurantsList();
         // Initialize and load the map
-        /** SOLUTION 1. Doesn't focus on current location at first display */   getDeviceLocation();
+        /** SOLUTION 1. Doesn't focus on current location at first display */   // getDeviceLocation();
         /** SOLUTION 2. Doesn't focus on current location at first display */   // requestDeviceLocation();
         /** SOLUTION 3. Doesn't focus on current location at first display */   // startLocationUpdates();
         /** SOLUTION 4. Focus ok on current location at first display */        // getUpdatedLocation();
-        getRestaurantsFromApi();
+        // SOLUTION 1.
+        home = MapsApisUtils.getDeviceLocation(locationPermissionsGranted, fusedLocationProviderClient, requireActivity());
+        if (locationPermissionsGranted) restaurantsList = MapsApisUtils.getRestaurantsFromApi(home, getString(R.string.MAPS_API_KEY), requireContext());
         loadMap();
 
         return binding.getRoot();
@@ -148,12 +158,16 @@ public class MapViewFragment extends Fragment {
         requireActivity().setTitle(R.string.mapView_toolbar_title);
         // Check permissions
         checkPermissions();
+        // Clear restaurants list
+        clearRestaurantsList();
         // Initialize and load the map
-        /** SOLUTION 1. Doesn't focus on current location at first display */   getDeviceLocation();
+        /** SOLUTION 1. Doesn't focus on current location at first display */   // getDeviceLocation();
         /** SOLUTION 2. Doesn't focus on current location at first display */   // requestDeviceLocation();
         /** SOLUTION 3. Doesn't focus on current location at first display */   // startLocationUpdates();
         /** SOLUTION 4. Focus ok on current location at first display */        // getUpdatedLocation();
-        getRestaurantsFromApi();
+        // SOLUTION 1.
+        home = MapsApisUtils.getDeviceLocation(locationPermissionsGranted, fusedLocationProviderClient, requireActivity());
+        if (locationPermissionsGranted) restaurantsList = MapsApisUtils.getRestaurantsFromApi(home, getString(R.string.MAPS_API_KEY), requireContext());
         loadMap();
 
     }
@@ -166,6 +180,18 @@ public class MapViewFragment extends Fragment {
         /** USED WITH SOLUTION 2 */ // if (fusedLocationProviderClient != null && locationCallback != null)
                                         // fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         /** USED WITH SOLUTION 4 */ // if (mLocationManager != null) mLocationManager.removeUpdates(locationListener);
+    }
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        String refId = marker.getTag().toString();
+        for (Restaurant restaurant : restaurantsList) {
+            if(restaurant.getId().equals(refId)) {
+                launchDetailRestaurantActivity(restaurant);
+                break;
+            }
+        }
+        return false;
     }
 
 
@@ -213,42 +239,6 @@ public class MapViewFragment extends Fragment {
         }
     }
 
-    // USED WITH SOLUTION 1 :
-    @SuppressWarnings("MissingPermission")
-    // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method
-    private void getDeviceLocation() {
-        try {
-            if (locationPermissionsGranted) {
-                // Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-                Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);
-                locationResult.addOnCompleteListener(requireActivity(), task -> {
-                    if (task.isSuccessful()) {
-                        lastKnownLocation = task.getResult();
-                        if (lastKnownLocation != null) {
-                            latitude = lastKnownLocation.getLatitude();
-                            longitude = lastKnownLocation.getLongitude();
-                        } else {
-                            latitude = DEF_LATITUDE;
-                            longitude = DEF_LONGITUDE;
-                            Toast.makeText(requireActivity(), R.string.info_no_current_location, Toast.LENGTH_SHORT).show();
-                            Log.w("getDeviceLocation", "Exception: %s", task.getException());
-                        }
-                    }
-                    else {
-                        Log.w("getDeviceLocation", "Exception: %s", task.getException());
-                    }
-                });
-            } else {
-                latitude = DEF_LATITUDE;
-                longitude = DEF_LONGITUDE;
-                Toast.makeText(requireActivity(), R.string.info_no_permission, Toast.LENGTH_SHORT).show();
-                Log.w("getDeviceLocation", "Permissions not granted");
-            }
-        } catch (SecurityException e) {
-            Log.w("Exception: %s", e.getMessage(), e);
-        }
-    }
-
     @SuppressWarnings("MissingPermission")
     // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method
     private void loadMap() {
@@ -260,7 +250,6 @@ public class MapViewFragment extends Fragment {
 
                 // SET POSITION ON MAP
                 mGoogleMap = googleMap;
-                home = new LatLng(latitude, longitude);
 
                 // CUSTOMIZE MAP
                 mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
@@ -272,97 +261,48 @@ public class MapViewFragment extends Fragment {
                 // Other settings
                 mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
+                /*  // TODO : To be deleted
                 mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(48.7270, 2.1200))
                         .title("Marker in VLB"));   // TODO : Test to be deleted
                 mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(43.0900, 5.8400))
                         .title("Marker in SFLP"));  // TODO : Test to be deleted
-
-
+                */
+                displayRestaurantsOnMap(restaurantsList);
 
             });
         }
     }
 
-    // Get restaurants list from API
-    private void getRestaurantsFromApi() {
-        if (locationPermissionsGranted) {
-            // Call Place Nearby Search API
-            Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient().getPlaces("restaurant", latitude + "," + longitude, DEFAULT_RADIUS, getString(R.string.MAPS_API_KEY));
-            call1.enqueue(new Callback<GmapsRestaurantPojo>() {
-                @Override
-                public void onResponse(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Response<GmapsRestaurantPojo> response1) {
-                    GmapsRestaurantPojo nearPlaces = response1.body();
-                    List<Restaurant> restaurantsList = nearPlaces.getNearRestaurants();
+    @SuppressLint("PotentialBehaviorOverride")  // For OnMarkerClickListener
+    private void displayRestaurantsOnMap(List<Restaurant> restaurants) {
+        if (restaurants != null) {
+            for (Restaurant restaurant : restaurants) {
+                double rLat = restaurant.getGeometry().getLocation().getLat();
+                double rLng = restaurant.getGeometry().getLocation().getLng();
+                String rId = restaurant.getId();
 
-                    // For each restaurant, get basic information and ask for detailed information
-                    if (restaurantsList.size() != 0) {
-                        Log.w("MAPViewFragment", "Nearby restaurants list not empty");
-                        for (Restaurant nearbyRestaurant : restaurantsList) {
-                            getRestaurantDetailsFromApi(nearbyRestaurant, home);
-                        }
-                    } else {
-                        Log.w("MAPViewFragment", "Empty nearby restaurants list");
-                    }
-
-
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Throwable t) {
-                    Toast.makeText(requireContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
-                    Log.w("MAPViewFragment", t.getMessage(), t);
-                }
-            });
+                mGoogleMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(rLat, rLng))
+                        .title(restaurant.getName())
+                        // .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)) // TODO : Set color according to selection status
+                        // .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))   // TODO : Set color according to selection status
+                ).setTag(rId);
+            }
+            mGoogleMap.setOnMarkerClickListener(this);
         }
     }
 
-    private void getRestaurantDetailsFromApi(Restaurant nearbyRestaurant, LatLng latLng) {
-
-        String id = nearbyRestaurant.getId();
-        String name = nearbyRestaurant.getName();
-        double rating = nearbyRestaurant.getRating();
-        OpeningHours openingHours = nearbyRestaurant.getOpeningHours(); // Can be commented if openingHours come from nearby api
-        List<Photo> photos = nearbyRestaurant.getPhotos();
-        Geometry geometry = nearbyRestaurant.getGeometry();
-        long distance = FirestoreUtils.calculateRestaurantDistance(nearbyRestaurant, latLng);
-
-        // Call Place Details API
-        Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(id,
-                "formatted_address,formatted_phone_number,website,opening_hours",
-                getString(R.string.MAPS_API_KEY)
-        );
-        call2.enqueue(new Callback<GmapsRestaurantDetailsPojo>() {
-            @Override
-            public void onResponse(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Response<GmapsRestaurantDetailsPojo> response2) {
-                // Gson gson = new Gson();
-                // String res = gson.toJson(response2.body());
-                GmapsRestaurantDetailsPojo placeDetails = response2.body();
-                Restaurant restaurantDetails = placeDetails.getRestaurantDetails();
-
-                String nationality = "";    // TODO : Where to get this information ?
-                String address = restaurantDetails.getAddress();
-                String phoneNumber = restaurantDetails.getPhoneNumber();
-                String website = restaurantDetails.getWebsite();
-                OpeningHours openingHours = restaurantDetails.getOpeningHours();    // Can be commented to make openingHours come from nearby api
-
-                // Create ou update restaurant in Firebase
-                RestaurantManager.getInstance().createRestaurant(id, name, distance, photos,
-                        nationality, address, rating, openingHours, phoneNumber, website, geometry);
-
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
-                Log.w("MAPViewFragment", t.getMessage(), t);
-            }
-        });
-
-
-
+    private void clearRestaurantsList() {
+        RestaurantManager.clearRestaurantsCollection();
     }
 
-
+    private void launchDetailRestaurantActivity(Restaurant restaurant) {
+        Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("RESTAURANT", restaurant);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
 
 
 
@@ -410,6 +350,7 @@ public class MapViewFragment extends Fragment {
             latitude = DEF_LATITUDE;
             longitude = DEF_LONGITUDE;
         }
+        home = new LatLng(latitude, longitude);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -449,6 +390,7 @@ public class MapViewFragment extends Fragment {
             latitude = DEF_LATITUDE;
             longitude = DEF_LONGITUDE;
         }
+        home = new LatLng(latitude, longitude);
     }
 
     public void onLocationChanged(Location location) {
@@ -502,6 +444,7 @@ public class MapViewFragment extends Fragment {
             Toast.makeText(requireActivity(), R.string.info_no_permission, Toast.LENGTH_SHORT).show();
             Log.w("getDeviceLocation", "Permissions not granted");
         }
+        home = new LatLng(latitude, longitude);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

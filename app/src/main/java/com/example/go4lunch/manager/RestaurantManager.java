@@ -96,5 +96,10 @@ public class RestaurantManager {
         */  ////////////////////////////////////////////////////////////////////////////////////////
     }
 
+    // Clear the restaurants collection
+    public static void clearRestaurantsCollection() {
+        RestaurantRepository.clearRestaurantsCollection();
+    }
+
 
 }
