@@ -18,6 +18,7 @@
     <string name="info_no_email_found">No email found.</string>
     <string name="info_no_permission">Features requiring permissions that you have denied are unavailable.</string>
     <string name="info_no_current_location">Current location is null. Using defaults.</string>
+    <string name="choice_error">No restaurants selected.\nPlease choose one before !</string>
 
     <!-- contentDescriptions -->
     <string name="selection_fab">Selection FAB</string>
@@ -71,6 +72,9 @@
     <string name="status_open247">Open 24/7</string>
     <string name="status_open_until">Open until\ </string>
     <string name="status_open_at">Open at\ </string>
+    <string name="choice_text">\ is eating at\ </string>
+    <string name="no_choice_text">\ is probably eating somewhere…</string>
+    <string name="joining_text">\ is joining!</string>
 
     <!-- NOT TRANSLATABLE -->
 

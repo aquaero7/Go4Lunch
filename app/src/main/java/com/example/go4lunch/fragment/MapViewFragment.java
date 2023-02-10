@@ -128,17 +128,6 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
         // Check permissions
         checkPermissions();
-        // Clear restaurants list
-        clearRestaurantsList();
-        // Initialize and load the map
-        /** SOLUTION 1. Doesn't focus on current location at first display */   // getDeviceLocation();
-        /** SOLUTION 2. Doesn't focus on current location at first display */   // requestDeviceLocation();
-        /** SOLUTION 3. Doesn't focus on current location at first display */   // startLocationUpdates();
-        /** SOLUTION 4. Focus ok on current location at first display */        // getUpdatedLocation();
-        // SOLUTION 1.
-        home = MapsApisUtils.getDeviceLocation(locationPermissionsGranted, fusedLocationProviderClient, requireActivity());
-        if (locationPermissionsGranted) restaurantsList = MapsApisUtils.getRestaurantsFromApi(home, getString(R.string.MAPS_API_KEY), requireContext());
-        loadMap();
 
         return binding.getRoot();
     }
@@ -154,12 +143,13 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
     @Override
     public void onResume() {
         super.onResume();
+
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.mapView_toolbar_title);
-        // Check permissions
-        checkPermissions();
+
         // Clear restaurants list
         clearRestaurantsList();
+
         // Initialize and load the map
         /** SOLUTION 1. Doesn't focus on current location at first display */   // getDeviceLocation();
         /** SOLUTION 2. Doesn't focus on current location at first display */   // requestDeviceLocation();
@@ -167,9 +157,9 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         /** SOLUTION 4. Focus ok on current location at first display */        // getUpdatedLocation();
         // SOLUTION 1.
         home = MapsApisUtils.getDeviceLocation(locationPermissionsGranted, fusedLocationProviderClient, requireActivity());
+
         if (locationPermissionsGranted) restaurantsList = MapsApisUtils.getRestaurantsFromApi(home, getString(R.string.MAPS_API_KEY), requireContext());
         loadMap();
-
     }
 
     @Override

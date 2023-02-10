@@ -6,12 +6,14 @@ import androidx.annotation.Nullable;
 
 import com.example.go4lunch.model.User;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class UserRepository {
 
@@ -20,6 +22,8 @@ public class UserRepository {
     // Firestore
     private static final String COLLECTION_USERS = "users";
     private static final String COLLECTION_RESTAURANTS = "restaurants";
+    private static final String SELECTED_RESTAURANT_ID_FIELD = "selectedRestaurantId";
+    private static final String SELECTION_DATE_FIELD = "selectionDate";
 
     private UserRepository() { }
 
@@ -53,7 +57,7 @@ public class UserRepository {
     }
 
     // Get the Collection Reference
-    private CollectionReference getUsersCollection(){
+    private static CollectionReference getUsersCollection(){
         return FirebaseFirestore.getInstance().collection(COLLECTION_USERS);
     }
 
@@ -70,16 +74,50 @@ public class UserRepository {
             User userToCreate = new User(uid, username, userEmail, userUrlPicture);
 
             // If the user already exist in Firestore, we get his data
-            Task<DocumentSnapshot> userData = getUserData();
+            Task<DocumentSnapshot> userData = getCurrentUserData();
             userData.addOnSuccessListener(documentSnapshot -> this.getUsersCollection().document(uid).set(userToCreate));
         }
     }
 
-    // Get User Data from Firestore
-    public Task<DocumentSnapshot> getUserData(){
+    // Get restaurants list from Firestore
+    public static void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
+        getUsersCollection().get().addOnCompleteListener(listener);
+    }
+
+    // Get current User Data from Firestore
+    public Task<DocumentSnapshot> getCurrentUserData(){
         String uid = this.getCurrentUserUID();
         if(uid != null){
             return this.getUsersCollection().document(uid).get();
+        }else{
+            return null;
+        }
+    }
+
+    // Get User Data from Firestore
+    public Task<DocumentSnapshot> getUserData(String uid){
+        if(uid != null){
+            return this.getUsersCollection().document(uid).get();
+        }else{
+            return null;
+        }
+    }
+
+    // Update selected restaurant
+    public Task<Void> updateSelectedRestaurantId(String selectedRestaurantId) {
+        String uid = this.getCurrentUserUID();
+        if(uid != null){
+            return this.getUsersCollection().document(uid).update(SELECTED_RESTAURANT_ID_FIELD, selectedRestaurantId);
+        }else{
+            return null;
+        }
+    }
+
+    // Update selection date
+    public Task<Void> updateSelectionDate(String selectionDate) {
+        String uid = this.getCurrentUserUID();
+        if(uid != null){
+            return this.getUsersCollection().document(uid).update(SELECTION_DATE_FIELD, selectionDate);
         }else{
             return null;
         }

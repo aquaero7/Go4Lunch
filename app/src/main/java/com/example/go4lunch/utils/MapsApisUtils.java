@@ -148,8 +148,8 @@ public class MapsApisUtils {
                 restaurantsList.add(new Restaurant(id, name, distance, photos,
                         nationality, address, rating, openingHours, phoneNumber, website, geometry));
 
-                /** Solution B : Getting data from Firestore in ListViewFragment
-                TODO : To be deleted if replaced by list from API in ListViewFragment */
+                /** For solution B : Getting data from Firestore in ListViewFragment
+                TODO : To be deleted if replaced by list from API in ListViewFragment ??? */
                 // Create ou update restaurant in Firebase
                 RestaurantManager.getInstance().createRestaurant(id, name, distance, photos,
                         nationality, address, rating, openingHours, phoneNumber, website, geometry);
@@ -162,34 +162,5 @@ public class MapsApisUtils {
             }
         });
     }
-
-    /*  // TODO : To be deleted cause transferred to DataProcessingUtils
-    public static List<Restaurant> customizeRestaurantsList(List<Restaurant> restaurantsList) {
-        List<Restaurant> customizedRestaurantsList = new ArrayList<>();
-        for (Restaurant restaurant : restaurantsList) {
-            String rId = restaurant.getId();
-            String rName = restaurant.getName();
-            long rDistance = 0; // TODO
-            List<Photo> rPhotos = restaurant.getPhotos();
-            String rNationality = "Frenchy";   // TODO
-            String rAddress = restaurant.getAddress();
-            double rRating = restaurant.getRating();
-            String rOpeningInformation = "";    // TODO
-            int rLikesCount = 0;    // TODO
-            String rPhoneNumber = restaurant.getPhoneNumber();
-            String rWebsite = restaurant.getWebsite();
-            Geometry rGeometry = restaurant.getGeometry();
-            List<User> rSelectors = null;   // TODO
-
-            customizedRestaurantsList.add(new Restaurant(rId, rName, rDistance, rPhotos, rNationality, rAddress,
-                    rRating, rOpeningInformation, rLikesCount, rPhoneNumber, rWebsite, rGeometry, rSelectors));
-        }
-
-        return customizedRestaurantsList;
-    }
-    */
-
-
-
 
 }

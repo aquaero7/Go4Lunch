@@ -28,4 +28,11 @@ public class CalendarUtils {
         return hod + min;
     }
 
+    public static String getCurrentDate() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        Date date = calendar.getTime();
+        return sdf.format(date);
+    }
+
 }

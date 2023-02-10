@@ -14,32 +14,38 @@ public class User {
     @Nullable private String userUrlPicture;
     private List<String> likedRestaurantsIds;
     private String selectedRestaurantId;
-    @Nullable private Date selectionDate;
+    private String selectedRestaurantName;
+    @Nullable private String selectionDate;
 
+
+    // Empty constructor to allow firebase to cast document to object model
+    public User() {}
 
     public User(String uid, String username, @Nullable String userEmail, @Nullable String userUrlPicture) {
         this.uid = uid;
         this.username = username;
         this.userEmail = userEmail;
         this.userUrlPicture = userUrlPicture;
-        this.likedRestaurantsIds = new ArrayList<>();
         this.selectedRestaurantId = "";
+        this.selectedRestaurantName = "";
         this.selectionDate = null;
+        this.likedRestaurantsIds = new ArrayList<>();
     }
 
-    /*
+    //
     public User(String uid, String username, @Nullable String userEmail, @Nullable String userUrlPicture,
-                List<String> likedRestaurantsIds, String selectedRestaurantId,
-                @Nullable Date selectionDate) {
+                String selectedRestaurantId, String selectedRestaurantName, @Nullable String selectionDate,
+                List<String> likedRestaurantsIds) {
         this.uid = uid;
         this.username = username;
         this.userEmail = userEmail;
         this.userUrlPicture = userUrlPicture;
-        this.likedRestaurantsIds = likedRestaurantsIds;
         this.selectedRestaurantId = selectedRestaurantId;
+        this.selectedRestaurantName = selectedRestaurantName;
         this.selectionDate = selectionDate;
+        this.likedRestaurantsIds = likedRestaurantsIds;
     }
-    */
+    //
 
     // GETTERS
     public String getUid() {
@@ -54,14 +60,17 @@ public class User {
     @Nullable public String getUserUrlPicture() {
         return userUrlPicture;
     }
-    public List<String> getLikedRestaurantsIds() {
-        return likedRestaurantsIds;
-    }
     public String getSelectedRestaurantId() {
         return selectedRestaurantId;
     }
-    @Nullable public Date getSelectionDate() {
+    public String getSelectedRestaurantName() {
+        return selectedRestaurantName;
+    }
+    @Nullable public String getSelectionDate() {
         return selectionDate;
+    }
+    public List<String> getLikedRestaurantsIds() {
+        return likedRestaurantsIds;
     }
 
 
@@ -78,14 +87,17 @@ public class User {
     public void setUserUrlPicture(@Nullable String userUrlPicture) {
         this.userUrlPicture = userUrlPicture;
     }
-    public void setLikedRestaurantsIds(List<String> likedRestaurantsIds) {
-        this.likedRestaurantsIds = likedRestaurantsIds;
-    }
     public void setSelectedRestaurantId(String selectedRestaurantId) {
         this.selectedRestaurantId = selectedRestaurantId;
     }
-    public void setSelectionDate(@Nullable Date selectionDate) {
+    public void setSelectedRestaurantName(String selectedRestaurantName) {
+        this.selectedRestaurantName = selectedRestaurantName;
+    }
+    public void setSelectionDate(@Nullable String selectionDate) {
         this.selectionDate = selectionDate;
+    }
+    public void setLikedRestaurantsIds(List<String> likedRestaurantsIds) {
+        this.likedRestaurantsIds = likedRestaurantsIds;
     }
 
 }

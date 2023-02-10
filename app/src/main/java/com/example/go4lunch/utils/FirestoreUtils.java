@@ -10,11 +10,28 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class FirestoreUtils {
+
+    // Get user data from firestore with given document and create user
+    public static User getUserFromDatabaseDocument(QueryDocumentSnapshot document) {
+        String uId = Objects.requireNonNull(document.getData().get("uid")).toString();
+        String uName = Objects.requireNonNull(document.getData().get("username")).toString();
+        String uEmail = ((document.getData().get("userEmail")) != null) ? document.getData().get("userEmail").toString() : null;
+        String uUrlPicture = ((document.getData().get("userUrlPicture")) != null) ? document.getData().get("userUrlPicture").toString() : null;
+        String selectedRestaurantId = ((document.getData().get("selectedRestaurantId")) != null) ? document.getData().get("selectedRestaurantId").toString() : null;
+        String selectedRestaurantName = ((document.getData().get("selectedRestaurantName")) != null) ? document.getData().get("selectedRestaurantName").toString() : null;
+        String selectionDate = ((document.getData().get("selectionDate")) != null) ? document.getData().get("selectionDate").toString() : null;
+        List<String> likedRestaurantsIds = null;
+
+        User userFromData = new User(uId, uName, uEmail, uUrlPicture, selectedRestaurantId, selectedRestaurantName, selectionDate, likedRestaurantsIds);
+
+        return userFromData;
+    }
 
     // Get restaurant data from firestore with given document and create restaurant
     public static Restaurant getRestaurantFromDatabaseDocument(QueryDocumentSnapshot document) {
@@ -29,9 +46,6 @@ public class FirestoreUtils {
         int rLikesCount = Integer.parseInt(Objects.requireNonNull(document.getData().get("likesCount")).toString());
         String rPhoneNumber = document.getData().get("phoneNumber") != null ? document.getData().get("phoneNumber").toString() : "";
         String rWebsite = document.getData().get("website") != null ?  document.getData().get("website").toString() : "";
-
-        // Geometry rGeometry = (Geometry) document.getData().get("geometry");
-        // Geometry rGeometry = null;
         Geometry rGeometry = getGeometry(document);
 
         // List<User> rSelectors = (List<User>) document.getData().get("selectors");
@@ -163,17 +177,5 @@ public class FirestoreUtils {
         // Create and return geometry
         return new Geometry(location);
     }
-
-    /*  // TODO : To be deleted cause transferred to DataProcessingUtils
-    public static int calculateRestaurantDistance(Restaurant restaurant, LatLng currentLatLng) {
-        double restaurantLat = restaurant.getGeometry().getLocation().getLat();
-        double restaurantLng = restaurant.getGeometry().getLocation().getLng();
-        LatLng restaurantLatLng = new LatLng(restaurantLat, restaurantLng);
-        // Distance in meters
-        double distance = SphericalUtil.computeDistanceBetween(currentLatLng, restaurantLatLng);
-
-        return (int) distance;
-    }
-    */
 
 }

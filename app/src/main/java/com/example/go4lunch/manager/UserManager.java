@@ -4,8 +4,10 @@ import android.content.Context;
 
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.repository.UserRepository;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class UserManager {
 
@@ -33,6 +35,8 @@ public class UserManager {
         return userRepository.getCurrentUser();
     }
 
+    public String getCurrentUserId() { return userRepository.getCurrentUserUID(); }
+
     public Boolean isCurrentUserLogged(){
         return (this.getCurrentUser() != null);
     }
@@ -45,9 +49,27 @@ public class UserManager {
         userRepository.createUser();
     }
 
-    public Task<User> getUserData(){
+    public static void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
+        // Get the users list from Firestore
+        UserRepository.getUsersList(listener);
+    }
+
+    public Task<User> getCurrentUserData() {
+        // Get the current user from Firestore and cast it to a User model Object
+        return userRepository.getCurrentUserData().continueWith(task -> task.getResult().toObject(User.class)) ;
+    }
+
+    public Task<User> getUserData(String id) {
         // Get the user from Firestore and cast it to a User model Object
-        return userRepository.getUserData().continueWith(task -> task.getResult().toObject(User.class)) ;
+        return userRepository.getUserData(id).continueWith(task -> task.getResult().toObject(User.class)) ;
+    }
+
+    public Task<Void> updateSelectedRestaurantId(String selectedRestaurantId) {
+        return userRepository.updateSelectedRestaurantId(selectedRestaurantId);
+    }
+
+    public Task<Void> updateSelectionDate(String selectionDate) {
+        return userRepository.updateSelectionDate(selectionDate);
     }
 
 }

@@ -26,6 +26,8 @@ public class Photo implements Serializable {
     @Expose
     private long width;
 
+    // Empty constructor to allow firebase to cast document to object model
+    public Photo() {}
 
     // CONSTRUCTOR
 

@@ -11,6 +11,9 @@ public class Geometry implements Serializable {
     @Expose
     private Location location;
 
+    // Empty constructor to allow firebase to cast document to object model
+    public Geometry() {}
+
     public Geometry(Location location) {
         this.location = location;
     }

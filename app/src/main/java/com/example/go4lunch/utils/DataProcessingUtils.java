@@ -4,6 +4,7 @@ import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
+import com.example.go4lunch.model.api.Period;
 import com.example.go4lunch.model.api.Photo;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
@@ -69,7 +70,7 @@ public class DataProcessingUtils {
             String currentTime = CalendarUtils.getCurrentTime();
 
             // Get the list of opening periods
-            List<OpeningHours.Period> periodsList = restaurant.getOpeningHours().getPeriods();
+            List<Period> periodsList = restaurant.getOpeningHours().getPeriods();
 
             // Get details for each period p
             for (int i = 0; i < periodsList.size(); i++) {

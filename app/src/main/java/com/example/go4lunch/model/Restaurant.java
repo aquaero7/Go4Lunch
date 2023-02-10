@@ -64,6 +64,10 @@ public class Restaurant implements Serializable {
 
     @Nullable private List<User> selectors;
 
+
+    // Empty constructor to allow firebase to cast document to object model
+    public Restaurant() {}
+
     // Database constructor (full attributes)
     public Restaurant(String id, String name, long distance, @Nullable List<Photo> photos,
                       @Nullable String nationality, String address, double rating,
@@ -72,7 +76,6 @@ public class Restaurant implements Serializable {
         this.id = id;
         this.name = name;
         this.distance = distance;
-        // this.imageUrl = imageUrl;
         this.photos = photos;
         this.nationality = nationality;
         this.address = address;
@@ -111,7 +114,6 @@ public class Restaurant implements Serializable {
         this.id = id;
         this.name = name;
         this.distance = distance;
-        // this.imageUrl = imageUrl;
         this.photos = photos;
         this.nationality = nationality;
         this.address = address;

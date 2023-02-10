@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,9 +21,11 @@ import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
+import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.DetailRestaurantWorkmateAdapter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
 
@@ -57,9 +60,14 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private TextView mTextView1;
     private RatingBar mRatingBar;
     private TextView mTextView2;
+    private FloatingActionButton selectionFab;
+    private Boolean isSelected;
 
     // Declare restaurant
     private Restaurant restaurant;
+
+    // Declare selected restaurant id
+    private String selectionId;
 
     // Initialize Google Maps API key
     private String KEY;
@@ -120,6 +128,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         mTextView1 = binding.restaurantTv1;
         mTextView2 = binding.restaurantTv2;
         mRatingBar = binding.restaurantRatingBar;
+        selectionFab = binding.selectionFab;
 
         // Get restaurant from calling activity
         getIntentData();
@@ -144,8 +153,8 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     Binding added as an argument to make it available in the activity
     */
     public void onClick(View v) {
-        // mCallback.onButtonClicked(v);    // TODO : to be deleted
-        mCallback.onButtonClicked(v, binding);
+        setupSelectionFab();
+        mCallback.onButtonClicked(v, binding, restaurant.getId(), restaurant.getName(), !isSelected);
     }
 
     @Override
@@ -163,7 +172,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     */
     public interface OnButtonClickedListener {
         // public void onButtonClicked(View view);  // TODO : to be deleted
-        void onButtonClicked(View view, FragmentDetailRestaurantBinding binding);
+        void onButtonClicked(View view, FragmentDetailRestaurantBinding binding, String rId, String rName, boolean isSelected);
     }
 
     // Create callback to parent activity
@@ -188,7 +197,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
     // Configure item click on RecyclerView
     private void configureOnClickRecyclerView(){
-        ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_detail_restaurant)
+        ItemClickSupport.addTo(mRecyclerView, R.layout.workmate_list_item)
                 .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
@@ -215,6 +224,23 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         mTextView1.setText(restaurant.getName());
         mTextView2.setText(restaurant.getAddress());
         mRatingBar.setRating((float) (restaurant.getRating() * 3/5));
+        setupSelectionFab();
+    }
+
+    private void setupSelectionFab() {
+        // Get current user selected restaurant id from database
+        UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
+            // Get current user selected restaurant id from database
+            selectionId = user.getSelectedRestaurantId();
+            // Get the id of this restaurant
+            String restaurantId = restaurant.getId();
+            // Update selection status
+            isSelected = (restaurantId.equals(selectionId));
+            // Define the foreground of the selection FAB mipmap, according to the selection status
+            int resId = (isSelected) ? R.mipmap.im_check_green_white : R.mipmap.im_check_grey_white;
+            // Set up the new foreground of the selection FAB
+            selectionFab.setForeground(AppCompatResources.getDrawable(requireContext(),resId));
+        });
     }
 
 

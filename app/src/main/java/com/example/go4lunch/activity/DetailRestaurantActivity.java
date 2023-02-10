@@ -11,12 +11,15 @@ import android.widget.Toast;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.example.go4lunch.fragment.DetailRestaurantFragment;
 import com.example.go4lunch.R;
+import com.example.go4lunch.manager.SelectedRestaurantManager;
+import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.utils.CalendarUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
 public class DetailRestaurantActivity extends AppCompatActivity implements DetailRestaurantFragment.OnButtonClickedListener {
 
-    private Boolean fabChecked = true; // TODO : Update status with information in database
+    // private Boolean isSelected; // TODO : Update status with information in database
     private String toastText;
 
 
@@ -33,7 +36,7 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
     // --------------
     @Override
     // Binding added as an argument to make it available here
-    public void onButtonClicked(View view, FragmentDetailRestaurantBinding fragmentBinding) {
+    public void onButtonClicked(View view, FragmentDetailRestaurantBinding fragmentBinding, String rId, String rName, boolean isSelected) {
         // Handle the button click event
         String tag = String.valueOf(view.getTag());
         switch (tag) {
@@ -50,15 +53,13 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
                 toastText = tag;    // TODO : Delete after action completion
                 break;
             case "FAB":
-                // FloatingActionButton selectionFab = findViewById(R.id.selection_fab);    // TODO : To be deleted cause replaced with ViewBinding
-                FloatingActionButton selectionFab = fragmentBinding.selectionFab;   // TODO : to be implemented IF WORKING in place of findViewById
-                // Toggle FAB status
-                fabChecked = !fabChecked;
-                // Update toast text
-                toastText = (fabChecked) ? getString(R.string.fabChecked) : getString(R.string.fabUnchecked);
-                // Launch actions
-                toggleSelectionFabDisplay(selectionFab);
-                updateDatabase();
+                if (isSelected) {
+                    addSelectionInDatabase(rId, rName);
+                    toastText = getString(R.string.fabChecked);
+                } else {
+                    removeSelectionFromDatabase(rId);
+                    toastText = getString(R.string.fabUnchecked);
+                }
                 break;
         }
         displayToast();
@@ -77,15 +78,22 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
         }
     }
 
-    private void toggleSelectionFabDisplay(FloatingActionButton fab) {
-        // Define the foreground of the mipmap, according to new FAB status
-        int resId = (fabChecked) ? R.mipmap.im_check_green_white : R.mipmap.im_check_grey_white;
-        // Set up the new foreground
-        fab.setForeground(AppCompatResources.getDrawable(this,resId));
+    private void addSelectionInDatabase(String rId, String rName) {
+        // Add restaurant to selected restaurant collection in database
+        SelectedRestaurantManager.getInstance().createSelectedRestaurant(rId, rName);
+        // Add selected restaurant ID to user document in database
+        UserManager.getInstance().updateSelectedRestaurantId(rId);
+        UserManager.getInstance().updateSelectionDate(CalendarUtils.getCurrentDate());
     }
 
-    private void updateDatabase() {
-        // TODO : Update status in database
+    private void removeSelectionFromDatabase(String rId) {
+        /** DO NOT remove restaurant from selected restaurant collection in database
+        because it can be also selected by others workmates !
+        // SelectedRestaurantManager.getInstance().deleteSelectedRestaurant(rId); //
+        */
+        // Remove selected restaurant ID from user document in database
+        UserManager.getInstance().updateSelectedRestaurantId(null);
+        UserManager.getInstance().updateSelectionDate(null);
     }
 
     private void displayToast() {

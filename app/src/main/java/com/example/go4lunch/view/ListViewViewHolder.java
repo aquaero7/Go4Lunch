@@ -44,18 +44,6 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         tvOpenTime = binding.restaurantItemOpenTime;
         mRatingBar = binding.restaurantItemRatingBar;
         ivPicture = binding.restaurantItemPicture;
-
-        /*  // TODO : to be deleted cause replaced with ViewBinding
-        tvTitle = itemView.findViewById(R.id.restaurant_item_title);
-        tvDistance = itemView.findViewById(R.id.restaurant_item_distance);
-        tvCountry = itemView.findViewById(R.id.restaurant_item_country);
-        tvAddress = itemView.findViewById(R.id.restaurant_item_address);
-        ivWorkmateLogo = itemView.findViewById(R.id.restaurant_item_workmate_logo);
-        tvWorkmatesCount = itemView.findViewById(R.id.restaurant_item_workmates_count);
-        tvOpenTime = itemView.findViewById(R.id.restaurant_item_openTime);
-        mRatingBar = itemView.findViewById(R.id.restaurant_item_rating_bar);
-        ivPicture = itemView.findViewById(R.id.restaurant_item_picture);
-        */
     }
 
     public void updateWithRestaurants(Restaurant restaurant, String KEY, String STATUS_OPEN, String STATUS_CLOSED,

@@ -77,23 +77,8 @@ public class RestaurantManager {
 
 
     public static Task<Restaurant> getRestaurantData(String id){
-        // Get the restaurant data from Firestore and cast it to a User model Object
+        // Get the restaurant data from Firestore and cast it to a Restaurant model Object
         return RestaurantRepository.getRestaurantData(id).continueWith(task -> task.getResult().toObject(Restaurant.class));
-
-        /* FOR DEBUG ///////////////////////////////////////////////////////////// TODO : To remove
-        Task<DocumentSnapshot> myTask1 = RestaurantRepository.getRestaurantData(id);
-        myTask1.addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot myTask2 = task.getResult();
-                Restaurant myTask3 = myTask2.toObject(Restaurant.class);
-                String breakPoint1 = "";
-            }
-        });
-        Task<Restaurant> myTaskX = myTask1.continueWith(task -> task.getResult().toObject(Restaurant.class));
-        String breakPoint2 = "";
-        return myTaskX;
-        */  ////////////////////////////////////////////////////////////////////////////////////////
     }
 
     // Clear the restaurants collection

@@ -11,11 +11,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
+import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.User;
+import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.WorkmateAdapter;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,6 +46,9 @@ public class WorkmatesFragment extends Fragment {
 
     // Declare RecyclerView
     private RecyclerView mRecyclerView;
+
+    private List<User> workmatesList;
+    private User workmateToAdd;
 
 
     // Constructor
@@ -87,8 +99,6 @@ public class WorkmatesFragment extends Fragment {
         FragmentWorkmatesBinding binding = FragmentWorkmatesBinding.inflate(inflater, container, false);
 
         mRecyclerView = binding.rvWorkmates;
-        configureRecyclerView();
-        configureOnClickRecyclerView();
 
         return binding.getRoot();
     }
@@ -98,21 +108,24 @@ public class WorkmatesFragment extends Fragment {
         super.onResume();
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.workmates_toolbar_title);
+
+        getWorkmatesListAndConfigureRecyclerView();
+        // configureOnClickRecyclerView();
     }
 
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
-        // 3.2 - Declare and create adapter (TODO : Pass the list of workmates)
-        WorkmateAdapter workmateAdapter = new WorkmateAdapter();
+        // 3.2 - Declare and create adapter
+        WorkmateAdapter workmateAdapter = new WorkmateAdapter(workmatesList, getString(R.string.choice_text), getString(R.string.no_choice_text));
         // 3.3 - Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(workmateAdapter);
         // 3.4 - Set layout manager to position the items
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    // Configure item click on RecyclerView
+    // Configure item click on RecyclerView // Unused
     private void configureOnClickRecyclerView(){
-        ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_detail_restaurant)
+        ItemClickSupport.addTo(mRecyclerView, R.layout.workmate_list_item)
                 .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
@@ -120,5 +133,29 @@ public class WorkmatesFragment extends Fragment {
                     }
                 });
     }
+
+    private void getWorkmatesListAndConfigureRecyclerView() {
+        workmatesList = new ArrayList<>();
+        UserManager.getUsersList(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult() != null) {
+                    // Get users list
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
+                        workmateToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
+                        workmatesList.add(workmateToAdd);
+                    }
+                }
+            } else {
+                Log.w("WorkmatesFragment", "Error getting documents: ", task.getException());
+                Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
+            }
+
+            configureRecyclerView();
+            configureOnClickRecyclerView();
+
+        });
+    }
+
 
 }

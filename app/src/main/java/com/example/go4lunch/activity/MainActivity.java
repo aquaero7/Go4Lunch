@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,10 +28,15 @@ import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.Restaurant;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Map;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -108,7 +114,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         int id = item.getItemId();
         switch (id){
             case R.id.activity_main_drawer_lunch:
-                launchDetailRestaurantActivity();
+                checkCurrentUserSelection();
                 break;
             case R.id.activity_main_drawer_settings:
                 launchSettingActivity();
@@ -282,8 +288,30 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
     */
 
-    private void launchDetailRestaurantActivity() {
+    private void checkCurrentUserSelection() {
+        // Get current user selected restaurant id from database
+        UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
+            // Get current user selected restaurant id from database
+            String selectionId = user.getSelectedRestaurantId();
+            if (selectionId != null) {
+                // Get selected restaurant from restaurants collection in database
+                RestaurantManager.getRestaurantData(selectionId)
+                        .addOnSuccessListener(restaurant -> {
+                            Log.w("MainActivity", "success task getRestaurantData");
+                            launchDetailRestaurantActivity(restaurant);
+                        })
+                        .addOnFailureListener(e -> Log.w("MainActivity", e.getMessage()));
+            } else {
+                Toast.makeText(this, getString(R.string.choice_error), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void launchDetailRestaurantActivity(Restaurant restaurant) {
         Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("RESTAURANT", restaurant);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 

@@ -128,14 +128,15 @@ public class ListViewFragment extends Fragment {
         //
         home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, requireActivity());
         restaurantsList = MapsApisUtils.getRestaurantsFromApi(home, getString(R.string.MAPS_API_KEY), requireContext());
-        restaurantsListForDisplay = DataProcessingUtils.customizeRestaurantsList(restaurantsList);
-        configureRecyclerView();
+        if (restaurantsList != null && restaurantsList.size() != 0) {
+            restaurantsListForDisplay = DataProcessingUtils.customizeRestaurantsList(restaurantsList);
+            configureRecyclerView();
+            configureOnClickRecyclerView();
+        }
         //
 
         /** Solution B : Getting data from Firestore in MapsApisUtils */
         // getRestaurantsListAndConfigureRecyclerView();
-
-        configureOnClickRecyclerView();
 
     }
 
@@ -153,7 +154,7 @@ public class ListViewFragment extends Fragment {
 
     // Configure item click on RecyclerView
     private void configureOnClickRecyclerView(){
-        ItemClickSupport.addTo(mRecyclerView, R.layout.fragment_detail_restaurant)
+        ItemClickSupport.addTo(mRecyclerView, R.layout.restaurant_list_item)
                 .setOnItemClickListener((recyclerView, position, v) -> {
                     Log.w("TAG", "Position : "+position);       // TODO : To be deleted
                     if (restaurantsListForDisplay.size() != 0) {
@@ -167,18 +168,21 @@ public class ListViewFragment extends Fragment {
         restaurantsListForDisplay = new ArrayList<>();
         RestaurantManager.getRestaurantsList(task -> {
             if (task.isSuccessful()) {
-                // Get restaurants list
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Map<String, Object> restaurantData = document.getData(); // TODO : Map data for debug. To be deleted
-                    restaurantToAdd = FirestoreUtils.getRestaurantFromDatabaseDocument(document);
-                    restaurantsListForDisplay.add(restaurantToAdd);
+                if (task.getResult() != null) {
+                    // Get restaurants list
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> restaurantData = document.getData(); // TODO : Map data for debug. To be deleted
+                        restaurantToAdd = FirestoreUtils.getRestaurantFromDatabaseDocument(document);
+                        restaurantsListForDisplay.add(restaurantToAdd);
+                    }
                 }
             } else {
                 Log.d("ListViewFragment", "Error getting documents: ", task.getException());
-                Toast.makeText(requireContext(), "Error retrieving restaurant list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
+                Toast.makeText(requireContext(), "Error retrieving restaurants list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
             }
 
             configureRecyclerView();
+            configureOnClickRecyclerView();
 
         });
     }

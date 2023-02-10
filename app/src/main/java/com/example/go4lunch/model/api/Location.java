@@ -15,6 +15,9 @@ public class Location implements Serializable {
     @Expose
     private double lng;
 
+    // Empty constructor to allow firebase to cast document to object model
+    public Location() {}
+
     public Location(double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
