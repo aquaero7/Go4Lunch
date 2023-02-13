@@ -2,7 +2,6 @@ package com.example.go4lunch.activity;
 
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
 
 import android.os.Bundle;
 import android.view.View;
@@ -13,8 +12,10 @@ import com.example.go4lunch.fragment.DetailRestaurantFragment;
 import com.example.go4lunch.R;
 import com.example.go4lunch.manager.SelectedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.List;
 
 
 public class DetailRestaurantActivity extends AppCompatActivity implements DetailRestaurantFragment.OnButtonClickedListener {
@@ -36,7 +37,7 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
     // --------------
     @Override
     // Binding added as an argument to make it available here
-    public void onButtonClicked(View view, FragmentDetailRestaurantBinding fragmentBinding, String rId, String rName, boolean isSelected) {
+    public void onButtonClicked(View view, FragmentDetailRestaurantBinding fragmentBinding, String rId, String rName, String rAddress, double rRating, List<Photo> rPhotos, boolean isSelected) {
         // Handle the button click event
         String tag = String.valueOf(view.getTag());
         switch (tag) {
@@ -54,7 +55,7 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
                 break;
             case "FAB":
                 if (isSelected) {
-                    addSelectionInDatabase(rId, rName);
+                    addSelectionToDatabase(rId, rName, rAddress, rRating, rPhotos);
                     toastText = getString(R.string.fabChecked);
                 } else {
                     removeSelectionFromDatabase(rId);
@@ -78,9 +79,9 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
         }
     }
 
-    private void addSelectionInDatabase(String rId, String rName) {
+    private void addSelectionToDatabase(String rId, String rName, String rAddress, double rRating, List<Photo> rPhotos) {
         // Add restaurant to selected restaurant collection in database
-        SelectedRestaurantManager.getInstance().createSelectedRestaurant(rId, rName);
+        SelectedRestaurantManager.getInstance().createSelectedRestaurant(rId, rName, rAddress, rRating, rPhotos);
         // Add selected restaurant ID to user document in database
         UserManager.getInstance().updateSelectedRestaurantId(rId);
         UserManager.getInstance().updateSelectionDate(CalendarUtils.getCurrentDate());

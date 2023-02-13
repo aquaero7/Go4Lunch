@@ -9,7 +9,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.WorkmateListItemBinding;
 import com.example.go4lunch.manager.SelectedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
@@ -27,11 +26,6 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
         WorkmateListItemBinding binding = WorkmateListItemBinding.bind(itemView);
         imageView = binding.workmateItemPicture;
         textView = binding.workmateItemTitle;
-
-        /*  // TODO : to be deleted cause replaced with ViewBinding
-        imageView = itemView.findViewById(R.id.workmate_item_picture);
-        textView = itemView.findViewById(R.id.workmate_item_title);
-        */
     }
 
     public void updateWithWorkmate(User workmate, String CHOICE_TEXT, String NO_CHOICE_TEXT) {
@@ -49,7 +43,7 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
             // Get workmate selected restaurant id from database
             UserManager.getInstance().getUserData(workmate.getUid()).addOnSuccessListener(user -> {
                 // Get selected restaurant name from database
-                SelectedRestaurantManager.getRestaurantData(user.getSelectedRestaurantId())
+                SelectedRestaurantManager.getSelectedRestaurantData(user.getSelectedRestaurantId())
                         .addOnSuccessListener(restaurant -> {
                             // mText = workmate.getUsername() + " is eating at \"" + restaurant.getName() + "\"";
                             mText = workmate.getUsername() + CHOICE_TEXT + "\"" + restaurant.getName() + "\"";

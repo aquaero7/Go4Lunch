@@ -1,5 +1,10 @@
 package com.example.go4lunch.utils;
 
+import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;

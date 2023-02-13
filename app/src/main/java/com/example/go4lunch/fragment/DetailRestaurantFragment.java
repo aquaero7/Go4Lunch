@@ -23,10 +23,18 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.User;
+import com.example.go4lunch.model.api.Photo;
+import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.DetailRestaurantWorkmateAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -61,6 +69,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private RatingBar mRatingBar;
     private TextView mTextView2;
     private FloatingActionButton selectionFab;
+    private TextView emptyListMessage;
     private Boolean isSelected;
 
     // Declare restaurant
@@ -68,6 +77,12 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
     // Declare selected restaurant id
     private String selectionId;
+
+    // Declare Workmates-Selectors list
+    private List<User> selectorsList;
+
+    // Declare Workmate-Selector to add to create Workmates-Selectors list
+    private User selectorToAdd;
 
     // Initialize Google Maps API key
     private String KEY;
@@ -129,6 +144,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         mTextView2 = binding.restaurantTv2;
         mRatingBar = binding.restaurantRatingBar;
         selectionFab = binding.selectionFab;
+        emptyListMessage = binding.emptyListMessage;
 
         // Get restaurant from calling activity
         getIntentData();
@@ -142,10 +158,14 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         binding.likeButton.setOnClickListener(this);
         binding.websiteButton.setOnClickListener(this);
 
-        configureRecyclerView();
-        configureOnClickRecyclerView();
-
         return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        getSelectorsListAndConfigureRecyclerView();
     }
 
     @Override
@@ -154,7 +174,8 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     */
     public void onClick(View v) {
         setupSelectionFab();
-        mCallback.onButtonClicked(v, binding, restaurant.getId(), restaurant.getName(), !isSelected);
+        getSelectorsListAndConfigureRecyclerView();
+        mCallback.onButtonClicked(v, binding, restaurant.getId(), restaurant.getName(), restaurant.getAddress(), restaurant.getRating(), restaurant.getPhotos(), !isSelected);
     }
 
     @Override
@@ -171,8 +192,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     Binding added as an argument to make it available in the activity
     */
     public interface OnButtonClickedListener {
-        // public void onButtonClicked(View view);  // TODO : to be deleted
-        void onButtonClicked(View view, FragmentDetailRestaurantBinding binding, String rId, String rName, boolean isSelected);
+        void onButtonClicked(View view, FragmentDetailRestaurantBinding binding, String rId, String rName, String rAddress, double rRating, List<Photo> rPhotos, boolean isSelected);
     }
 
     // Create callback to parent activity
@@ -187,11 +207,14 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
-        // 3.2 - Declare and create adapter (TODO : Pass the list of workmates)
-        DetailRestaurantWorkmateAdapter detailRestaurantWorkmateAdapter = new DetailRestaurantWorkmateAdapter();
-        // 3.3 - Attach the adapter to the recyclerview to populate items
+        // Configure empty selectors list message visibility according to selectors list
+        int emptyListMessageVisibility = (selectorsList.isEmpty()) ? View.VISIBLE : View.GONE;
+        emptyListMessage.setVisibility(emptyListMessageVisibility);
+        // Declare and create adapter
+        DetailRestaurantWorkmateAdapter detailRestaurantWorkmateAdapter = new DetailRestaurantWorkmateAdapter(selectorsList, getString(R.string.joining_text));
+        // Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(detailRestaurantWorkmateAdapter);
-        // 3.4 - Set layout manager to position the items
+        // Set layout manager to position the items
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
@@ -204,6 +227,30 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                         Log.w("TAG", "Position : "+position);
                     }
                 });
+    }
+
+    private void getSelectorsListAndConfigureRecyclerView() {
+        String restaurantId = restaurant.getId();
+        selectorsList = new ArrayList<>();
+        UserManager.getUsersList(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult() != null) {
+                    // Get users list
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
+                        selectorToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
+                        if (selectorToAdd.getSelectedRestaurantId() != null && selectorToAdd.getSelectedRestaurantId().equals(restaurantId)) selectorsList.add(selectorToAdd);
+                    }
+                }
+            } else {
+                Log.w("WorkmatesFragment", "Error getting documents: ", task.getException());
+                Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
+            }
+
+            configureRecyclerView();
+            configureOnClickRecyclerView();
+
+        });
     }
 
     // Get restaurant from calling activity

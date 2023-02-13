@@ -1,10 +1,13 @@
 package com.example.go4lunch.manager;
 
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.repository.SelectedRestaurantRepository;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.List;
 
 public class SelectedRestaurantManager {
 
@@ -27,8 +30,8 @@ public class SelectedRestaurantManager {
         }
     }
 
-    public void createSelectedRestaurant(String id, String name) {
-        selectedRestaurantRepository.createSelectedRestaurant(id, name);
+    public void createSelectedRestaurant(String id, String name, String address, double rating, List<Photo> photos) {
+        selectedRestaurantRepository.createSelectedRestaurant(id, name, address, rating, photos);
     }
 
     public void deleteSelectedRestaurant(String id) {
@@ -40,7 +43,7 @@ public class SelectedRestaurantManager {
         SelectedRestaurantRepository.getSelectedRestaurantsList(listener);
     }
 
-    public static Task<Restaurant> getRestaurantData(String id) {
+    public static Task<Restaurant> getSelectedRestaurantData(String id) {
         // Get the selected restaurant data from Firestore and cast it to a SelectedRestaurant model Object
         return SelectedRestaurantRepository.getSelectedRestaurantData(id).continueWith(task -> task.getResult().toObject(Restaurant.class));
     }

@@ -3,6 +3,7 @@ package com.example.go4lunch.repository;
 import android.util.Log;
 
 import com.example.go4lunch.model.SelectedRestaurant;
+import com.example.go4lunch.model.api.Photo;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -10,6 +11,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.List;
 
 public class SelectedRestaurantRepository {
 
@@ -40,8 +43,8 @@ public class SelectedRestaurantRepository {
     }
 
     // Create selected restaurant in Firestore
-    public void createSelectedRestaurant(String id, String name) {
-        SelectedRestaurant selectedRestaurantToCreate = new SelectedRestaurant(id, name);
+    public void createSelectedRestaurant(String id, String name, String address, double rating, List<Photo> photos) {
+        SelectedRestaurant selectedRestaurantToCreate = new SelectedRestaurant(id, name, address, rating, photos);
         getSelectedRestaurantsCollection().document(id).set(selectedRestaurantToCreate);
     }
 

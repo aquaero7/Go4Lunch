@@ -110,7 +110,6 @@ public class WorkmatesFragment extends Fragment {
         requireActivity().setTitle(R.string.workmates_toolbar_title);
 
         getWorkmatesListAndConfigureRecyclerView();
-        // configureOnClickRecyclerView();
     }
 
     // Configure RecyclerView, Adapter, LayoutManager & glue it together

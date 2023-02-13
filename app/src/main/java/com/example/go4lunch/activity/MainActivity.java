@@ -27,16 +27,13 @@ import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.manager.RestaurantManager;
+import com.example.go4lunch.manager.SelectedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.Map;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -295,7 +292,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             String selectionId = user.getSelectedRestaurantId();
             if (selectionId != null) {
                 // Get selected restaurant from restaurants collection in database
-                RestaurantManager.getRestaurantData(selectionId)
+                // RestaurantManager.getRestaurantData(selectionId)
+                SelectedRestaurantManager.getSelectedRestaurantData(selectionId)
                         .addOnSuccessListener(restaurant -> {
                             Log.w("MainActivity", "success task getRestaurantData");
                             launchDetailRestaurantActivity(restaurant);
