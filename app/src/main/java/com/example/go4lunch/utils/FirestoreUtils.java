@@ -28,12 +28,10 @@ public class FirestoreUtils {
         String uName = Objects.requireNonNull(document.getData().get("username")).toString();
         String uEmail = ((document.getData().get("userEmail")) != null) ? document.getData().get("userEmail").toString() : null;
         String uUrlPicture = ((document.getData().get("userUrlPicture")) != null) ? document.getData().get("userUrlPicture").toString() : null;
-        String selectedRestaurantId = ((document.getData().get("selectedRestaurantId")) != null) ? document.getData().get("selectedRestaurantId").toString() : null;
-        String selectedRestaurantName = ((document.getData().get("selectedRestaurantName")) != null) ? document.getData().get("selectedRestaurantName").toString() : null;
+        String selectionId = ((document.getData().get("selectionId")) != null) ? document.getData().get("selectionId").toString() : null;
         String selectionDate = ((document.getData().get("selectionDate")) != null) ? document.getData().get("selectionDate").toString() : null;
-        List<String> likedRestaurantsIds = null;
 
-        User userFromData = new User(uId, uName, uEmail, uUrlPicture, selectedRestaurantId, selectedRestaurantName, selectionDate, likedRestaurantsIds);
+        User userFromData = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate);
 
         return userFromData;
     }
@@ -182,5 +180,6 @@ public class FirestoreUtils {
         // Create and return geometry
         return new Geometry(location);
     }
+
 
 }

@@ -289,7 +289,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Get current user selected restaurant id from database
         UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
             // Get current user selected restaurant id from database
-            String selectionId = user.getSelectedRestaurantId();
+            String selectionId = user.getSelectionId();
             if (selectionId != null) {
                 // Get selected restaurant from restaurants collection in database
                 // RestaurantManager.getRestaurantData(selectionId)

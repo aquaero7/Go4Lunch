@@ -2,8 +2,6 @@ package com.example.go4lunch.model;
 
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class User {
@@ -12,9 +10,7 @@ public class User {
     private String username;
     @Nullable private String userEmail;
     @Nullable private String userUrlPicture;
-    private List<String> likedRestaurantsIds;
-    private String selectedRestaurantId;
-    private String selectedRestaurantName;
+    private String selectionId;
     @Nullable private String selectionDate;
 
 
@@ -26,26 +22,20 @@ public class User {
         this.username = username;
         this.userEmail = userEmail;
         this.userUrlPicture = userUrlPicture;
-        this.selectedRestaurantId = "";
-        this.selectedRestaurantName = "";
+        this.selectionId = null;
         this.selectionDate = null;
-        this.likedRestaurantsIds = new ArrayList<>();
     }
 
-    //
     public User(String uid, String username, @Nullable String userEmail, @Nullable String userUrlPicture,
-                String selectedRestaurantId, String selectedRestaurantName, @Nullable String selectionDate,
-                List<String> likedRestaurantsIds) {
+                String selectionId, @Nullable String selectionDate) {
         this.uid = uid;
         this.username = username;
         this.userEmail = userEmail;
         this.userUrlPicture = userUrlPicture;
-        this.selectedRestaurantId = selectedRestaurantId;
-        this.selectedRestaurantName = selectedRestaurantName;
+        this.selectionId = selectionId;
         this.selectionDate = selectionDate;
-        this.likedRestaurantsIds = likedRestaurantsIds;
     }
-    //
+
 
     // GETTERS
     public String getUid() {
@@ -60,17 +50,11 @@ public class User {
     @Nullable public String getUserUrlPicture() {
         return userUrlPicture;
     }
-    public String getSelectedRestaurantId() {
-        return selectedRestaurantId;
-    }
-    public String getSelectedRestaurantName() {
-        return selectedRestaurantName;
+    public String getSelectionId() {
+        return selectionId;
     }
     @Nullable public String getSelectionDate() {
         return selectionDate;
-    }
-    public List<String> getLikedRestaurantsIds() {
-        return likedRestaurantsIds;
     }
 
 
@@ -87,17 +71,11 @@ public class User {
     public void setUserUrlPicture(@Nullable String userUrlPicture) {
         this.userUrlPicture = userUrlPicture;
     }
-    public void setSelectedRestaurantId(String selectedRestaurantId) {
-        this.selectedRestaurantId = selectedRestaurantId;
-    }
-    public void setSelectedRestaurantName(String selectedRestaurantName) {
-        this.selectedRestaurantName = selectedRestaurantName;
+    public void setSelectionId(String selectionId) {
+        this.selectionId = selectionId;
     }
     public void setSelectionDate(@Nullable String selectionDate) {
         this.selectionDate = selectionDate;
-    }
-    public void setLikedRestaurantsIds(List<String> likedRestaurantsIds) {
-        this.likedRestaurantsIds = likedRestaurantsIds;
     }
 
 }

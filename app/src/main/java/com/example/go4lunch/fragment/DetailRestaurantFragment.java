@@ -239,11 +239,11 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
                         selectorToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
-                        if (selectorToAdd.getSelectedRestaurantId() != null && selectorToAdd.getSelectedRestaurantId().equals(restaurantId)) selectorsList.add(selectorToAdd);
+                        if (selectorToAdd.getSelectionId() != null && selectorToAdd.getSelectionId().equals(restaurantId)) selectorsList.add(selectorToAdd);
                     }
                 }
             } else {
-                Log.w("WorkmatesFragment", "Error getting documents: ", task.getException());
+    Log.w("DetailRestaurantFragment", "Error getting documents: ", task.getException());
                 Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
             }
 
@@ -278,7 +278,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         // Get current user selected restaurant id from database
         UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
             // Get current user selected restaurant id from database
-            selectionId = user.getSelectedRestaurantId();
+            selectionId = user.getSelectionId();
             // Get the id of this restaurant
             String restaurantId = restaurant.getId();
             // Update selection status

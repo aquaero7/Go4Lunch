@@ -1,5 +1,6 @@
 package com.example.go4lunch.view;
 
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
@@ -11,13 +12,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.RestaurantListItemBinding;
+import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.FirestoreUtils;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ListViewViewHolder extends RecyclerView.ViewHolder {
 
@@ -25,7 +30,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
     private final TextView tvDistance;
     private final TextView tvCountry;
     private final TextView tvAddress;
-    private final TextView tvWorkmatesCount;
+    private final TextView tvSelectionsCount;
     private final TextView tvOpenTime;
     private final ImageView ivWorkmateLogo;
     private final RatingBar mRatingBar;
@@ -40,7 +45,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         tvCountry = binding.restaurantItemCountry;
         tvAddress = binding.restaurantItemAddress;
         ivWorkmateLogo = binding.restaurantItemWorkmateLogo;
-        tvWorkmatesCount = binding.restaurantItemWorkmatesCount;
+        tvSelectionsCount = binding.restaurantItemSelectionsCount;
         tvOpenTime = binding.restaurantItemOpenTime;
         mRatingBar = binding.restaurantItemRatingBar;
         ivPicture = binding.restaurantItemPicture;
@@ -61,9 +66,8 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         tvAddress.setText(restaurant.getAddress());
         // Display workmate logo
         ivWorkmateLogo.setImageResource(R.drawable.ic_outline_person_black_24);
-        // Display workmates count
-        String workmatesCount = "(" + restaurant.getLikesCount() + ")";
-        tvWorkmatesCount.setText(workmatesCount);
+        // Display selections count
+        displaySelectionsCount(restaurant.getId());
         // Display restaurant opening info
         String information = restaurant.getOpeningInformation();
         if (information != "") {
@@ -103,6 +107,30 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         if (restaurant.getPhotos() != null) Picasso.get().load(restaurant.getPhotos().get(0).getPhotoUrl(KEY)).into(ivPicture);
         // Set text scrolling and adapt fields max size in line 2
         ResizeAndScroll();
+    }
+
+    private void displaySelectionsCount(String rId) {
+        // Get workmates list
+        UserManager.getUsersList(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult() != null) {
+                    int selectionsCount = 0;
+                    // Get users list
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
+                        // Get workmate in workmates list
+                        User workmate = FirestoreUtils.getUserFromDatabaseDocument(document);
+                        // Check selected restaurant id and increase selections count if matches with restaurant id
+                        if (workmate.getSelectionId() != null && workmate.getSelectionId().equals(rId)) selectionsCount += 1;
+                    }
+                    // Display selections count
+                    String workmatesCount = "(" + selectionsCount + ")";
+                    tvSelectionsCount.setText(workmatesCount);
+                }
+            } else {
+                Log.w("ListViewViewHolder", "Error getting documents: ", task.getException());
+            }
+        });
     }
 
     private void ResizeAndScroll() {

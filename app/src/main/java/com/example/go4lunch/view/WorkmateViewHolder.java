@@ -38,12 +38,12 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
         }
 
         // Display workmate name
-        if (workmate.getSelectedRestaurantId() != null && workmate.getSelectedRestaurantId() != "") {
+        if (workmate.getSelectionId() != null && workmate.getSelectionId() != "") {
 
             // Get workmate selected restaurant id from database
             UserManager.getInstance().getUserData(workmate.getUid()).addOnSuccessListener(user -> {
                 // Get selected restaurant name from database
-                SelectedRestaurantManager.getSelectedRestaurantData(user.getSelectedRestaurantId())
+                SelectedRestaurantManager.getSelectedRestaurantData(user.getSelectionId())
                         .addOnSuccessListener(restaurant -> {
                             // mText = workmate.getUsername() + " is eating at \"" + restaurant.getName() + "\"";
                             mText = workmate.getUsername() + CHOICE_TEXT + "\"" + restaurant.getName() + "\"";

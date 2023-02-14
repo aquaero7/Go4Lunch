@@ -83,7 +83,7 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
         // Add restaurant to selected restaurant collection in database
         SelectedRestaurantManager.getInstance().createSelectedRestaurant(rId, rName, rAddress, rRating, rPhotos);
         // Add selected restaurant ID to user document in database
-        UserManager.getInstance().updateSelectedRestaurantId(rId);
+        UserManager.getInstance().updateSelectionId(rId);
         UserManager.getInstance().updateSelectionDate(CalendarUtils.getCurrentDate());
     }
 
@@ -93,7 +93,7 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
         // SelectedRestaurantManager.getInstance().deleteSelectedRestaurant(rId); //
         */
         // Remove selected restaurant ID from user document in database
-        UserManager.getInstance().updateSelectedRestaurantId(null);
+        UserManager.getInstance().updateSelectionId(null);
         UserManager.getInstance().updateSelectionDate(null);
     }
 

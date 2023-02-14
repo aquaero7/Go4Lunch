@@ -64,8 +64,8 @@ public class UserManager {
         return userRepository.getUserData(id).continueWith(task -> task.getResult().toObject(User.class)) ;
     }
 
-    public Task<Void> updateSelectedRestaurantId(String selectedRestaurantId) {
-        return userRepository.updateSelectedRestaurantId(selectedRestaurantId);
+    public Task<Void> updateSelectionId(String selectionId) {
+        return userRepository.updateSelectionId(selectionId);
     }
 
     public Task<Void> updateSelectionDate(String selectionDate) {

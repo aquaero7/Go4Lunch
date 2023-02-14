@@ -27,15 +27,11 @@ import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
-import com.example.go4lunch.api.GmapsApiClient;
-import com.example.go4lunch.api.GmapsRestaurantDetailsPojo;
-import com.example.go4lunch.api.GmapsRestaurantPojo;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
 import com.example.go4lunch.manager.RestaurantManager;
+import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.model.api.Geometry;
-import com.example.go4lunch.model.api.OpeningHours;
-import com.example.go4lunch.model.api.Photo;
+import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -55,16 +51,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClickListener {
@@ -91,6 +84,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
     private List<Restaurant> restaurantsList;
+    private int selectionsCount;
 
     public MapViewFragment() {
     }
@@ -251,14 +245,8 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                 // Other settings
                 mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
-                /*  // TODO : To be deleted
-                mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(48.7270, 2.1200))
-                        .title("Marker in VLB"));   // TODO : Test to be deleted
-                mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(43.0900, 5.8400))
-                        .title("Marker in SFLP"));  // TODO : Test to be deleted
-                */
-                displayRestaurantsOnMap(restaurantsList);
 
+                displayRestaurantsOnMap(restaurantsList);
             });
         }
     }
@@ -271,12 +259,11 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                 double rLng = restaurant.getGeometry().getLocation().getLng();
                 String rId = restaurant.getId();
 
-                mGoogleMap.addMarker(new MarkerOptions()
+                Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                         .position(new LatLng(rLat, rLng))
-                        .title(restaurant.getName())
-                        // .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)) // TODO : Set color according to selection status
-                        // .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))   // TODO : Set color according to selection status
-                ).setTag(rId);
+                        .title(restaurant.getName()));
+                marker.setTag(rId);
+                getSelectionsCountAndUpdateMarkerIcon(rId, marker);
             }
             mGoogleMap.setOnMarkerClickListener(this);
         }
@@ -293,6 +280,37 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         intent.putExtras(bundle);
         startActivity(intent);
     }
+
+    private void getSelectionsCountAndUpdateMarkerIcon(String rId, Marker marker) {
+        // Get workmates list
+        UserManager.getUsersList(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult() != null) {
+                    selectionsCount = 0;
+                    // Get users list
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
+                        // Get workmate in workmates list
+                        User workmate = FirestoreUtils.getUserFromDatabaseDocument(document);
+                        // Check selected restaurant id and increase selections count if matches with restaurant id
+                        if (workmate.getSelectionId() != null && workmate.getSelectionId().equals(rId)) selectionsCount += 1;
+                    }
+                    // Update marker color
+                    float markerColor = (selectionsCount > 0) ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_RED;
+                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(markerColor));
+                }
+            } else {
+                Log.w("MapViewFragment", "Error getting documents: ", task.getException());
+                Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
+            }
+        });
+    }
+
+
+
+
+
+
 
 
 

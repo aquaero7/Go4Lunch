@@ -84,11 +84,11 @@
         android:layout_marginEnd="4dp"
         android:scaleType="centerCrop"
         app:layout_constraintTop_toBottomOf="@id/restaurant_item_distance"
-        app:layout_constraintEnd_toStartOf="@id/restaurant_item_workmates_count"
+        app:layout_constraintEnd_toStartOf="@id/restaurant_item_selections_count"
         android:contentDescription="@string/ic_workmate_logo"/>
 
     <TextView
-        android:id="@+id/restaurant_item_workmates_count"
+        android:id="@+id/restaurant_item_selections_count"
         android:layout_width="wrap_content"
         android:layout_height="28dp"
         android:layout_marginEnd="4dp"
@@ -128,7 +128,7 @@
         android:rating="3"
         android:stepSize="0.1"
         android:isIndicator="true"
-        app:layout_constraintTop_toBottomOf="@id/restaurant_item_workmates_count"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_item_selections_count"
         app:layout_constraintEnd_toStartOf="@id/restaurant_item_picture" />
 
     <!-- Picture -->
