@@ -127,9 +127,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
         /*  // TODO : Test transfer Autocomplete to fragment
         // Get the toolbar view
-        // toolbar = binding.includedToolbarMvf.toolbarMvf;
         toolbar = ActivityMainBinding.inflate(getLayoutInflater()).includedToolbar.toolbar;
-        toolbar.setTitle(R.string.mapView_toolbar_title);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         */
 
@@ -137,18 +135,15 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         // Initialize CardView
         autocompleteCardView = ActivityMainBinding.inflate(getLayoutInflater()).includedToolbar.includedAutocompleteCardView.autocompleteCardView;
         // autocompleteCardView = FragmentAutocompleteBinding.inflate(getLayoutInflater()).autocompleteCardView;
-        // autocompleteCardView = binding.includedToolbarMvf.includedAutocompleteCardViewMvf.autocompleteCardView;
-        // autocompleteCardView = binding.includedAutocompleteCardViewMvf.autocompleteCardView;
-        // autocompleteCardView = binding.includedAutocompleteCardViewMvf.autocompleteCardView;
         //
 
         //  // TODO : Test transfer Autocomplete to fragment
         // Initialize AutocompleteSupportFragment
         // autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        // autocompleteFragment = AutocompleteSupportFragment.newInstance();
         autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
         //
-
 
 
 

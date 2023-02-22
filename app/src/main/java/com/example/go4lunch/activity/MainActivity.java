@@ -106,8 +106,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         */
 
         /*  // TODO : Test transfer Autocomplete to fragment
-        // Initialize AutocompleteSupportFragment
+        // Initialize CardView
         autocompleteCardView = binding.includedToolbar.includedAutocompleteCardView.autocompleteCardView;
+        */
+
+        /*  // TODO : Test transfer Autocomplete to fragment
+        // Initialize AutocompleteSupportFragment
         autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
         // this.initializeAutocompleteSupportFragment();    // TODO : To be deleted
@@ -188,6 +192,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         }
     }
     */
+
+
+
 
     /**
     * ---------------------

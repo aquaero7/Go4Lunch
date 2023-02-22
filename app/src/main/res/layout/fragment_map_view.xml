@@ -17,10 +17,4 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:id="@+id/map"/>
 
-    <!--include
-        android:id="@+id/includedToolbarMvf"
-        layout="@layout/fragment_map_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/-->
-
 </androidx.constraintlayout.widget.ConstraintLayout>
