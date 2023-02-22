@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.api.GmapsApiClient;
@@ -18,12 +20,20 @@ import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -34,11 +44,15 @@ public class MapsApisUtils {
 
     private static final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
     private static final double DEF_LONGITUDE = 0;  //VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
-    private static final int DEFAULT_RADIUS = 1000;
+    private static final int DEFAULT_RADIUS = 1000; // Distance in meters
     private static List<Restaurant> restaurantsList = new ArrayList<>();
     private static double latitude;
     private static double longitude;
 
+
+    public static int getDefaultRadius() {
+        return DEFAULT_RADIUS;
+    }
 
     // USED WITH SOLUTION 1 :
     @SuppressWarnings("MissingPermission")
@@ -162,5 +176,46 @@ public class MapsApisUtils {
             }
         });
     }
+
+    public static void initializeAutocompleteSupportFragment(AutocompleteSupportFragment autocompleteFragment) {
+        // Initialize the AutocompleteSupportFragment.
+        // autocompleteCardView = binding.includedToolbar.includedAutocompleteCardView.autocompleteCardView;
+        // autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        // Specify the type values of place data to return.
+        autocompleteFragment.setTypesFilter(Arrays.asList("restaurant"));
+        // Specify the country of place data to return.
+        autocompleteFragment.setCountries("FR");
+    }
+
+    public static void configureAutocompleteSupportFragment(AutocompleteSupportFragment autocompleteFragment, Activity activity) {
+        // Specify the limitation to only show results within the defined region
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
+        LatLng home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, activity);
+        // int radius = MapsApisUtils.getDefaultRadius();   TODO : To be deleted
+        LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, DEFAULT_RADIUS);
+        autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                // TODO: Get info about the selected place.
+                LatLng latLng = place.getLatLng();
+                double latitude = latLng.latitude;
+                double longitude = latLng.longitude;
+                Log.i("MainActivity", "Place: " + place.getName() + ", " + place.getId() + ", " + latitude + ", " + longitude);
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // TODO: Handle the error.
+                Log.i("MainActivity", "An error occurred: " + status);
+            }
+
+        });
+    }
+
 
 }

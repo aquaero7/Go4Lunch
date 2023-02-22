@@ -3,8 +3,10 @@ package com.example.go4lunch.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.app.Activity;
@@ -24,16 +26,34 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.example.go4lunch.databinding.FragmentAutocompleteBinding;
+import com.example.go4lunch.fragment.ListViewFragment;
+import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
-import com.example.go4lunch.manager.RestaurantManager;
+import com.example.go4lunch.fragment.WorkmatesFragment;
 import com.example.go4lunch.manager.SelectedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.api.Geometry;
+import com.example.go4lunch.utils.DataProcessingUtils;
+import com.example.go4lunch.utils.MapsApisUtils;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Arrays;
+import java.util.Objects;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -42,13 +62,25 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
+    // For ViewPager and Tabs
+    private final String MAP_VIEW_TAB_TITLE = "Map View";
+    private final String LIST_VIEW_TAB_TITLE = "List View";
+    private final String WORKMATES_TAB_TITLE = "Workmates";
+    private ViewPager2 pager;
+    private TabLayout tabs;
+
     private ImageView userPicture;
     private TextView userName;
     private TextView userEmail;
 
+    //  // TODO : Test transfer Autocomplete to fragment
+    // Declare the AutocompleteSupportFragment.
+    private FragmentAutocompleteBinding fragmentAutocompleteBinding;
+    private CardView autocompleteCardView;
+    private AutocompleteSupportFragment autocompleteFragment;
+    //
 
     private final UserManager userManager = UserManager.getInstance();
-
 
     /*
     // Declare main fragment
@@ -73,6 +105,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         this.configureAndShowWorkmatesFragment();
         */
 
+        /*  // TODO : Test transfer Autocomplete to fragment
+        // Initialize AutocompleteSupportFragment
+        autocompleteCardView = binding.includedToolbar.includedAutocompleteCardView.autocompleteCardView;
+        autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
+        // this.initializeAutocompleteSupportFragment();    // TODO : To be deleted
+        */
+
+
         // Get the toolbar view
         this.configureToolbar();
 
@@ -88,12 +129,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     }
 
+    /** To be commented if menu is handled in fragments */
+    /*
     @Override
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         // Inflate the menu and add it to the Toolbar
         getMenuInflater().inflate(R.menu.activity_main_menu, menu);
         return true;
     }
+    */
 
     @Override
     public void onBackPressed() {
@@ -126,20 +170,26 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         return true;
     }
 
+    /** To be commented if menu is handled in fragments */
+    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle actions on menu items
         switch (item.getItemId()) {
             case R.id.menu_activity_main_search:
-                Toast.makeText(this, "Click on search button", Toast.LENGTH_LONG).show();
-                createRestaurantForTest1();                                 // TODO : Test to delete
+                Toast.makeText(this, "Click on search button in MainActivity", Toast.LENGTH_LONG).show();   // TODO : To be deleted
+                // configureAutocompleteSupportFragment();  // TODO : To be deleted
+                toggleVisibility(autocompleteCardView);
+                if (autocompleteCardView.getVisibility() == View.VISIBLE) MapsApisUtils.configureAutocompleteSupportFragment(autocompleteFragment, this);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+    */
 
-    /*
+    /**
     * ---------------------
     * CONFIGURATIONS
     * ---------------------
@@ -149,13 +199,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Get the toolbar view inside the activity layout
 
         /*  // Case 1 : Without Navigation Drawer
-        // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        // Toolbar toolbar = findViewById(R.id.toolbar);   // TODO : To be deleted cause replaced with ViewBinding
         Toolbar toolbar = binding.includedToolbar.toolbar;
         */
 
         // // Case 2 : With Navigation Drawer
-        // this.toolbar = (Toolbar) findViewById(R.id.toolbar); // TODO : To be deleted cause replaced with ViewBinding
         this.toolbar = binding.includedToolbar.toolbar;
         //
 
@@ -166,7 +213,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void configureViewPagerAndTabs(){
 
         // Initialize title list
-        String [] tabTitles={"Map View","List View","Workmates"};
+        String [] tabTitles={MAP_VIEW_TAB_TITLE,LIST_VIEW_TAB_TITLE,WORKMATES_TAB_TITLE};
 
         // Initialize icon list
         int[] tabIcons = {
@@ -176,15 +223,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         };
 
         // Get ViewPager from layout
-        // ViewPager2 pager = (ViewPager2)findViewById(R.id.activity_main_viewpager);   // TODO : To be deleted cause replaced with ViewBinding
-        ViewPager2 pager = binding.activityMainViewpager;
+        pager = binding.activityMainViewpager;
 
         // Set Adapter PagerAdapter and glue it together
         pager.setAdapter(new PagerAdapter(getSupportFragmentManager(), getLifecycle()));
 
         // Get TabLayout from layout
-        // TabLayout tabs = (TabLayout)findViewById(R.id.activity_main_tabs);   // TODO : To be deleted cause replaced with ViewBinding
-        TabLayout tabs = binding.activityMainTabs;
+        tabs = binding.activityMainTabs;
 
         // Glue TabLayout and ViewPager together
         new TabLayoutMediator(tabs, pager, (tab, position) -> {
@@ -196,11 +241,30 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
         // Design purpose. Tabs have the same width
         tabs.setTabMode(TabLayout.MODE_FIXED);
+
+        /*  // TODO : Test transfer Autocomplete to fragment
+        // Add a listener to detect tab selection change
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                autocompleteCardView.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+        */
     }
 
     // Configure Drawer Layout
     private void configureDrawerLayout(){
-        // this.drawerLayout = (DrawerLayout) findViewById(R.id.activity_main_drawer_layout);   // TODO : To be deleted cause replaced with ViewBinding
         this.drawerLayout = binding.activityMainDrawerLayout;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
@@ -210,7 +274,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     // Configure NavigationView
     private void configureNavigationView(){
-        // this.navigationView = (NavigationView) findViewById(R.id.activity_main_nav_view);   // TODO : To be deleted cause replaced with ViewBinding
         this.navigationView = binding.activityMainNavView;
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -228,8 +291,71 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         progressBar.setVisibility(View.INVISIBLE);
     }
 
+    /*  // TODO : Test transfer Autocomplete method to MapsApiUtils
+    // Initialize AutocompleteSupportFragment
+    private void initializeAutocompleteSupportFragment() {
+        // Initialize the AutocompleteSupportFragment.
+        autocompleteCardView = binding.includedToolbar.includedAutocompleteCardView.autocompleteCardView;
+        autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        // Specify the type values of place data to return.
+        autocompleteFragment.setTypesFilter(Arrays.asList("restaurant"));
+        // Specify the country of place data to return.
+        autocompleteFragment.setCountries("FR");
+        // Specify the limitation to only show results within the defined region    // TODO : Create method to calculate from home
+    }
+    */
 
-    /*
+    /*  // TODO : Test transfer Autocomplete method to MapsApiUtils
+    // Configure AutocompleteSupportFragment
+    private void configureAutocompleteSupportFragment() {
+
+        // Specify the limitation to only show results within the defined region
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        LatLng home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, this);
+        int radius = MapsApisUtils.getDefaultRadius();
+        LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, radius);
+        autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
+
+
+        // Get current tab
+        String currentTabName = tabs.getTabAt(tabs.getSelectedTabPosition()).getText().toString();
+        // Display autocomplete search menu only for Map and List Views
+        if (currentTabName.equals(MAP_VIEW_TAB_TITLE) || currentTabName.equals(LIST_VIEW_TAB_TITLE)) {
+            toggleVisibility(autocompleteCardView);
+            if (autocompleteCardView.getVisibility() == View.VISIBLE) {
+
+                // Set up a PlaceSelectionListener to handle the response.
+                autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+                    @Override
+                    public void onPlaceSelected(@NonNull Place place) {
+                        // TODO: Get info about the selected place.
+                        LatLng latLng = place.getLatLng();
+                        double latitude = latLng.latitude;
+                        double longitude = latLng.longitude;
+                        Log.i("MainActivity", "Place: " + place.getName() + ", " + place.getId() + ", " + latitude + ", " + longitude);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Status status) {
+                        // TODO: Handle the error.
+                        Log.i("MainActivity", "An error occurred: " + status);
+                    }
+
+                });
+
+            }
+
+        }
+
+    }
+    */
+
+
+
+
+    /**
      * ---------------------
      * FRAGMENTS
      * ---------------------
@@ -360,10 +486,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         finish();
     }
 
-    //                                                                         TODO : Test to delete
-    private void createRestaurantForTest1() {
-        RestaurantManager.getInstance().createRestaurant();
+    private void toggleVisibility(View view) {
+        if (view.getVisibility() == View.VISIBLE) {
+            view.setVisibility(View.GONE);
+        } else {
+            view.setVisibility(View.VISIBLE);
+        }
     }
+
+
 
 
 

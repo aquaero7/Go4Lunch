@@ -1,5 +1,7 @@
 package com.example.go4lunch.utils;
 
+import android.graphics.RadialGradient;
+
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
@@ -7,7 +9,9 @@ import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Period;
 import com.example.go4lunch.model.api.Photo;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.maps.android.SphericalUtil;
+import com.google.maps.android.geometry.Bounds;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,6 +138,29 @@ public class DataProcessingUtils {
     public static void sortByDistanceAndName (List<Restaurant> restaurantList) {
         Collections.sort(restaurantList, Restaurant.comparatorName);
         Collections.sort(restaurantList, Restaurant.comparatorDistance);
+    }
+
+    public static LatLngBounds calculateBounds(LatLng home, int radius) {
+        // Distances in meters / Angles in radians
+        double earthRadius = 6371e3;
+        double earthCircle = 2 * Math.PI * earthRadius;
+        double latHome = home.latitude;
+        double lngHome = home.longitude;
+        double latDegreeInMeters = 2 * Math.PI * earthRadius / 180;
+        double lngDegreeInMeters = 2 * Math.PI * earthRadius / 360;
+        double angle = Math.PI / 4;
+        double curveCoef = (earthCircle / 2 * angle) / (2 * earthRadius * Math.sin(angle / 2)) / Math.PI;
+        double dLat = radius * curveCoef / (latDegreeInMeters * Math.sin(lngHome));
+        double dLng = radius * curveCoef / (lngDegreeInMeters * Math.sin(latHome));
+
+        double latNE = latHome + dLat;
+        double lngNE = lngHome - dLng;
+        double latSW = latHome - dLat;
+        double lngSW = lngHome + dLng;
+        LatLng sw = new LatLng(latSW, lngSW);
+        LatLng ne = new LatLng(latNE, lngNE);
+
+        return new LatLngBounds(sw, ne);
     }
 
 

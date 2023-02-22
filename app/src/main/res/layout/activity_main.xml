@@ -42,7 +42,7 @@
 
         <!-- Toolbar import -->
 
-        <!-- If using a specific layout for the toolbar and tag 'include' -->
+        <!-- If using a specific layout for the toolbar with tag 'include' -->
         <include
             android:id="@+id/includedToolbar"
             layout="@layout/activity_main_toolbar"
@@ -62,7 +62,7 @@
             app:title="I'm Hungry!"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"/>
         -->
 
         <include
