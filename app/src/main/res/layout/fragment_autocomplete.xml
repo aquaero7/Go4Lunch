@@ -4,8 +4,7 @@
     android:id="@+id/autocomplete_cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:visibility="gone"
-    >
+    android:visibility="gone">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/autocomplete_fragment"

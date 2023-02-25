@@ -8,21 +8,20 @@
 <androidx.appcompat.widget.Toolbar
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
-    android:id="@+id/toolbar"
     android:minHeight="?attr/actionBarSize"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/colorPrimary"
     android:theme="@style/ToolbarTheme"
-    app:titleTextAppearance="@style/Toolbar.TitleText">
+    app:titleTextAppearance="@style/Toolbar.TitleText"
+    android:id="@+id/toolbar">
 
-    <include
-        android:id="@+id/includedAutocompleteCardView"
-        layout="@layout/fragment_autocomplete"
+    <SearchView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        />
+        android:layout_marginVertical="8dp"
+        android:theme="@style/SearchViewStyle"
+        android:visibility="gone"
+        android:id="@+id/searchView"/>
 
 </androidx.appcompat.widget.Toolbar>

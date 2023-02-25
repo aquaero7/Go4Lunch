@@ -16,7 +16,7 @@ public class PagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        // 4 - Page to return
+        // Page to return
         switch (position){
             /*
             case 0: //Page number 1
@@ -27,6 +27,7 @@ public class PagerAdapter extends FragmentStateAdapter {
             case 2: //Page number 3
                 return WorkmatesFragment.newInstance();
             default:    //Page number 1
+                // return MapViewFragment.newInstance();
                 return MapViewFragment.newInstance();
         }
     }
@@ -35,4 +36,6 @@ public class PagerAdapter extends FragmentStateAdapter {
     public int getItemCount() {
         return 3;
     }
+
+
 }

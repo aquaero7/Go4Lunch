@@ -7,6 +7,9 @@ import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentOnAttachListener;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.app.Activity;
@@ -15,11 +18,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,33 +30,18 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.databinding.FragmentAutocompleteBinding;
-import com.example.go4lunch.fragment.ListViewFragment;
 import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
-import com.example.go4lunch.fragment.WorkmatesFragment;
 import com.example.go4lunch.manager.SelectedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.model.api.Geometry;
-import com.example.go4lunch.utils.DataProcessingUtils;
-import com.example.go4lunch.utils.MapsApisUtils;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.Arrays;
-import java.util.Objects;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -72,6 +60,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private ImageView userPicture;
     private TextView userName;
     private TextView userEmail;
+
+    private SearchView searchView;
 
     //  // TODO : Test transfer Autocomplete to fragment
     // Declare the AutocompleteSupportFragment.
@@ -131,6 +121,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Configure progressBar
         this.configureProgressBar();
 
+        // Initialize SearchView and setup listener
+        searchView = binding.includedToolbar.searchView;
+        this.configureSearchViewListener(searchView);
+
+
     }
 
     /** To be commented if menu is handled in fragments */
@@ -183,8 +178,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             case R.id.menu_activity_main_search:
                 Toast.makeText(this, "Click on search button in MainActivity", Toast.LENGTH_LONG).show();   // TODO : To be deleted
                 // configureAutocompleteSupportFragment();  // TODO : To be deleted
-                toggleVisibility(autocompleteCardView);
-                if (autocompleteCardView.getVisibility() == View.VISIBLE) MapsApisUtils.configureAutocompleteSupportFragment(autocompleteFragment, this);
+                // toggleVisibility(autocompleteCardView);
+                // if (autocompleteCardView.getVisibility() == View.VISIBLE) MapsApisUtils.configureAutocompleteSupportFragment(autocompleteFragment, this);
+                toggleVisibility(searchView);
 
                 return true;
             default:
@@ -192,7 +188,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         }
     }
     */
-
 
 
 
@@ -359,6 +354,28 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
     */
 
+    private void configureSearchViewListener(SearchView searchView) {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchView.setQuery("", false);
+                searchView.setVisibility(View.GONE);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // TODO : For test. To be replaced by Autocomplete action if MapViewFragment (page 0)
+                if (newText.length() > 2) {
+                    Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();
+                    MapViewFragment fm = (MapViewFragment) getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
+                    fm.moveCameraTo(new LatLng(43.0931, 5.8392));
+                }
+                return false;
+            }
+        });
+    }
+
 
 
 
@@ -500,6 +517,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             view.setVisibility(View.VISIBLE);
         }
     }
+
+    public void toggleSearchViewVisibility() {
+        SearchView view = binding.includedToolbar.searchView;
+        if (view.getVisibility() == View.VISIBLE) {
+            view.setVisibility(View.GONE);
+        } else {
+            view.setVisibility(View.VISIBLE);
+        }
+    }
+
 
 
 

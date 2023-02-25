@@ -38,6 +38,13 @@
         <item name="color">@color/white</item>
     </style>
 
+    <!-- TOOLBAR SEARCH VIEW THEME -->
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <!-- Color of the query text in the SearchView -->
+        <item name="android:editTextColor">@color/black</item>
+        <item name="android:background">@color/white</item>
+    </style>
+
     <!-- SIGN-IN ACTIVITY THEME -->
     <style name="AuthTheme" parent="FirebaseUI">
         <item name="colorPrimary">@color/app_background</item>

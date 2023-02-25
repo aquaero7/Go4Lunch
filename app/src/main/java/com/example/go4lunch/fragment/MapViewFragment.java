@@ -7,7 +7,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
@@ -15,7 +14,6 @@ import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -30,12 +28,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
+import com.example.go4lunch.activity.MainActivity;
 import com.example.go4lunch.databinding.ActivityMainBinding;
-import com.example.go4lunch.databinding.FragmentAutocompleteBinding;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
@@ -77,6 +76,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
     //  // TODO : Test transfer Autocomplete to fragment
     private Toolbar toolbar;
     private ActivityMainBinding activityBinding;
+    private SearchView searchView;
     private CardView autocompleteCardView;
     private AutocompleteSupportFragment autocompleteFragment;
     //
@@ -125,6 +125,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         // Set the layout file as the content view.
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
 
+
         /*  // TODO : Test transfer Autocomplete to fragment
         // Get the toolbar view
         toolbar = ActivityMainBinding.inflate(getLayoutInflater()).includedToolbar.toolbar;
@@ -133,15 +134,15 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
         //  // TODO : Test transfer Autocomplete to fragment
         // Initialize CardView
-        autocompleteCardView = ActivityMainBinding.inflate(getLayoutInflater()).includedToolbar.includedAutocompleteCardView.autocompleteCardView;
+        // autocompleteCardView = ActivityMainBinding.inflate(getLayoutInflater()).includedToolbar.includedAutocompleteCardView.autocompleteCardView;
         // autocompleteCardView = FragmentAutocompleteBinding.inflate(getLayoutInflater()).autocompleteCardView;
+        autocompleteCardView = binding.includedAutocompleteCardView.autocompleteCardView;
         //
 
         //  // TODO : Test transfer Autocomplete to fragment
         // Initialize AutocompleteSupportFragment
-        // autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        // autocompleteFragment = AutocompleteSupportFragment.newInstance();
-        autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
         //
 
@@ -179,14 +180,17 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     }
 
-    /** To use if menu is handled in fragment */
+    /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
+    //
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.activity_main_menu, menu);
     }
+    //
 
-    /** To use if menu is handled in fragment */
+    /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
+    //
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // Handle actions on menu items
@@ -194,7 +198,9 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
             case R.id.menu_activity_main_search:
                 // configureAutocompleteSupportFragment();
                 Toast.makeText(requireContext(), "Click on search button in MapViewFragment", Toast.LENGTH_LONG).show();   // TODO : To be deleted
-                toggleVisibility(autocompleteCardView);
+                // toggleVisibility(autocompleteCardView);
+                // TODO : Direct method to be replaced by interface
+                ((MainActivity)requireActivity()).toggleSearchViewVisibility();
                 if (autocompleteCardView.getVisibility() == View.VISIBLE) Toast.makeText(requireContext(), "CardView is visible", Toast.LENGTH_LONG).show();   // TODO : To be deleted
                 if (autocompleteCardView.getVisibility() == View.GONE) Toast.makeText(requireContext(), "CardView is gone", Toast.LENGTH_LONG).show();   // TODO : To be deleted
                 if (autocompleteCardView.getVisibility() == View.VISIBLE) MapsApisUtils.configureAutocompleteSupportFragment(autocompleteFragment, requireActivity());
@@ -204,6 +210,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                 return super.onOptionsItemSelected(item);
         }
     }
+    //
 
     @Override
     public void onResume() {
@@ -378,6 +385,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         });
     }
 
+    /*  // TODO : To be deleted
     private void toggleVisibility(View view) {
         if (view.getVisibility() == View.VISIBLE) {
             view.setVisibility(View.GONE);
@@ -385,6 +393,15 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
             view.setVisibility(View.VISIBLE);
         }
     }
+    */
+
+    //  // TODO : For test
+    public void moveCameraTo(LatLng latLng) {
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
+    }
+
+
+
 
 
 
