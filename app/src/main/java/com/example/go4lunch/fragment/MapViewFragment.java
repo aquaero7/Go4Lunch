@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -40,8 +41,10 @@ import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
@@ -57,11 +60,16 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.List;
@@ -94,7 +102,6 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
     private double longitude;
     private static final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
     private static final double DEF_LONGITUDE = 0;  //VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
-    // private static final int DEFAULT_RADIUS = 1000;
 
     private static final int DEFAULT_ZOOM = 15;
     private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -125,29 +132,6 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         // Set the layout file as the content view.
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
 
-
-        /*  // TODO : Test transfer Autocomplete to fragment
-        // Get the toolbar view
-        toolbar = ActivityMainBinding.inflate(getLayoutInflater()).includedToolbar.toolbar;
-        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
-        */
-
-        //  // TODO : Test transfer Autocomplete to fragment
-        // Initialize CardView
-        // autocompleteCardView = ActivityMainBinding.inflate(getLayoutInflater()).includedToolbar.includedAutocompleteCardView.autocompleteCardView;
-        // autocompleteCardView = FragmentAutocompleteBinding.inflate(getLayoutInflater()).autocompleteCardView;
-        autocompleteCardView = binding.includedAutocompleteCardView.autocompleteCardView;
-        //
-
-        //  // TODO : Test transfer Autocomplete to fragment
-        // Initialize AutocompleteSupportFragment
-        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
-        //
-
-
-
         // Require latest version of map renderer
         // getLatestRenderer();    // TODO : Not working : Legacy version is used anyway !
 
@@ -168,6 +152,15 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
+        // Initialize CardView
+        autocompleteCardView = binding.includedAutocompleteCardView.autocompleteCardView;
+
+        // Initialize AutocompleteSupportFragment
+        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
+
+
         // return rootView;
         return binding.getRoot();
     }
@@ -180,47 +173,12 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     }
 
-    /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
-    //
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.activity_main_menu, menu);
-    }
-    //
-
-    /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
-    //
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // Handle actions on menu items
-        switch (item.getItemId()) {
-            case R.id.menu_activity_main_search:
-                // configureAutocompleteSupportFragment();
-                Toast.makeText(requireContext(), "Click on search button in MapViewFragment", Toast.LENGTH_LONG).show();   // TODO : To be deleted
-                // toggleVisibility(autocompleteCardView);
-                // TODO : Direct method to be replaced by interface
-                ((MainActivity)requireActivity()).toggleSearchViewVisibility();
-                if (autocompleteCardView.getVisibility() == View.VISIBLE) Toast.makeText(requireContext(), "CardView is visible", Toast.LENGTH_LONG).show();   // TODO : To be deleted
-                if (autocompleteCardView.getVisibility() == View.GONE) Toast.makeText(requireContext(), "CardView is gone", Toast.LENGTH_LONG).show();   // TODO : To be deleted
-                if (autocompleteCardView.getVisibility() == View.VISIBLE) MapsApisUtils.configureAutocompleteSupportFragment(autocompleteFragment, requireActivity());
-
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-    //
-
     @Override
     public void onResume() {
         super.onResume();
 
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.mapView_toolbar_title);
-
-        // Clear restaurants list
-        clearRestaurantsList();
 
         // Initialize and load the map
         /** SOLUTION 1. Doesn't focus on current location at first display */   // getDeviceLocation();
@@ -230,6 +188,8 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         // SOLUTION 1.
         home = MapsApisUtils.getDeviceLocation(locationPermissionsGranted, fusedLocationProviderClient, requireActivity());
 
+        // Clear restaurants list
+        clearRestaurantsList();
         if (locationPermissionsGranted) restaurantsList = MapsApisUtils.getRestaurantsFromApi(home, getString(R.string.MAPS_API_KEY), requireContext());
 
         loadMap();
@@ -257,18 +217,30 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         return false;
     }
 
+    /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.activity_main_menu, menu);
+    }
 
-    private void getLatestRenderer() {
-        MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, renderer -> {
-            switch (renderer) {
-                case LATEST:
-                    Log.w("MapsDemo", "The latest version of the renderer is used.");
-                    break;
-                case LEGACY:
-                    Log.w("MapsDemo", "The legacy version of the renderer is used.");
-                    break;
-            }
-        });
+    /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // Handle actions on menu items
+        switch (item.getItemId()) {
+            case R.id.menu_activity_main_search:
+                // configureAutocompleteSupportFragment();
+                Toast.makeText(requireContext(), "Click on search button in MapViewFragment", Toast.LENGTH_LONG).show();   // TODO : To be deleted
+                // toggleVisibility(autocompleteCardView);
+                // TODO : Direct method to be replaced by interface
+                ((MainActivity)requireActivity()).toggleSearchViewVisibility();
+                // if (autocompleteCardView.getVisibility() == View.VISIBLE) Toast.makeText(requireContext(), "CardView is visible", Toast.LENGTH_LONG).show();   // TODO : To be deleted
+                // if (autocompleteCardView.getVisibility() == View.GONE) Toast.makeText(requireContext(), "CardView is gone", Toast.LENGTH_LONG).show();   // TODO : To be deleted
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void registerPermissionsCallback() {
@@ -385,21 +357,51 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         });
     }
 
-    /*  // TODO : To be deleted
-    private void toggleVisibility(View view) {
-        if (view.getVisibility() == View.VISIBLE) {
-            view.setVisibility(View.GONE);
-        } else {
-            view.setVisibility(View.VISIBLE);
-        }
-    }
-    */
-
     //  // TODO : For test
     public void moveCameraTo(LatLng latLng) {
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
     }
 
+    public void launchAutocomplete(String text) {
+        autocompleteCardView.setVisibility(View.VISIBLE);
+        // MapsApisUtils.configureAutocompleteSupportFragment(autocompleteFragment, requireActivity(), text);
+        configureAutocompleteSupportFragment(text);
+    }
+
+    private void configureAutocompleteSupportFragment(String text) {
+        // Specify the limitation to only show results within the defined region
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        LatLng home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, requireActivity());
+        LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, MapsApisUtils.getDefaultRadius());
+        autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
+        autocompleteFragment.setActivityMode(AutocompleteActivityMode.valueOf("FULLSCREEN"));
+        autocompleteFragment.setText(text);
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                // TODO: Get info about the selected place.
+                LatLng latLng = place.getLatLng();
+                double latitude = latLng.latitude;
+                double longitude = latLng.longitude;
+                Log.i("MapViewFragment", "Place: " + place.getName() + ", " + place.getId() + ", " + latitude + ", " + longitude);
+                //
+
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 90));
+                autocompleteFragment.setText("");
+                autocompleteCardView.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // TODO: Handle the error.
+                Log.i("MainActivity", "An error occurred: " + status);
+                autocompleteFragment.setText("");
+                autocompleteCardView.setVisibility(View.GONE);
+            }
+        });
+    }
 
 
 
@@ -417,6 +419,20 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void getLatestRenderer() {
+        MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, renderer -> {
+            switch (renderer) {
+                case LATEST:
+                    Log.w("MapsDemo", "The latest version of the renderer is used.");
+                    break;
+                case LEGACY:
+                    Log.w("MapsDemo", "The legacy version of the renderer is used.");
+                    break;
+            }
+        });
+    }
 
 
 //  TODO : TO ARCHIVE : OTHER SOLUTIONS AVAILABLE TO GET AND UPDATE CURRENT LOCATION................

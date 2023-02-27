@@ -18,24 +18,21 @@ public class PagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         // Page to return
         switch (position){
-            /*
-            case 0: //Page number 1
+            case 0: // Page number 1
                 return MapViewFragment.newInstance();
-            */
-            case 1: //Page number 2
+            case 1: // Page number 2
                 return ListViewFragment.newInstance();
-            case 2: //Page number 3
+            case 2: // Page number 3
                 return WorkmatesFragment.newInstance();
-            default:    //Page number 1
-                // return MapViewFragment.newInstance();
-                return MapViewFragment.newInstance();
+            // default:    //Page number 1
+            //     return MapViewFragment.newInstance();
         }
+        return MapViewFragment.newInstance();   // For default = Page number 1
     }
 
     @Override
     public int getItemCount() {
         return 3;
     }
-
 
 }

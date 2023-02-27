@@ -9,11 +9,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.activity.MainActivity;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.User;
@@ -100,6 +104,10 @@ public class WorkmatesFragment extends Fragment {
 
         mRecyclerView = binding.rvWorkmates;
 
+        /** To use if menu is handled in fragment
+         * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
+        setHasOptionsMenu(true);
+
         return binding.getRoot();
     }
 
@@ -110,6 +118,28 @@ public class WorkmatesFragment extends Fragment {
         requireActivity().setTitle(R.string.workmates_toolbar_title);
 
         getWorkmatesListAndConfigureRecyclerView();
+    }
+
+    /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.activity_main_menu, menu);
+    }
+
+    /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // Handle actions on menu items
+        switch (item.getItemId()) {
+            case R.id.menu_activity_main_search:
+                Toast.makeText(requireContext(), "Click on search button in Workmates", Toast.LENGTH_LONG).show();   // TODO : To be deleted
+                // TODO : Direct method to be replaced by interface
+                ((MainActivity)requireActivity()).toggleSearchViewVisibility();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     // Configure RecyclerView, Adapter, LayoutManager & glue it together

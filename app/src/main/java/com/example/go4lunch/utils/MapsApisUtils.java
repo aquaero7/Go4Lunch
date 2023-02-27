@@ -9,11 +9,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.api.GmapsApiClient;
 import com.example.go4lunch.api.GmapsRestaurantDetailsPojo;
 import com.example.go4lunch.api.GmapsRestaurantPojo;
+import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
@@ -31,6 +34,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +44,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MapsApisUtils {
+public class MapsApisUtils extends FragmentActivity {
 
     private static final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
     private static final double DEF_LONGITUDE = 0;  //VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
@@ -48,7 +52,6 @@ public class MapsApisUtils {
     private static List<Restaurant> restaurantsList = new ArrayList<>();
     private static double latitude;
     private static double longitude;
-
 
     public static int getDefaultRadius() {
         return DEFAULT_RADIUS;
@@ -189,13 +192,15 @@ public class MapsApisUtils {
         autocompleteFragment.setCountries("FR");
     }
 
-    public static void configureAutocompleteSupportFragment(AutocompleteSupportFragment autocompleteFragment, Activity activity) {
+    /*  // TODO : To be deleted cause transferred to MapViewFragment
+    public static void configureAutocompleteSupportFragment(AutocompleteSupportFragment autocompleteFragment, Activity activity, String text) {
         // Specify the limitation to only show results within the defined region
         FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
         LatLng home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, activity);
         // int radius = MapsApisUtils.getDefaultRadius();   TODO : To be deleted
         LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, DEFAULT_RADIUS);
         autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
+        autocompleteFragment.setText(text);
 
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -216,6 +221,7 @@ public class MapsApisUtils {
 
         });
     }
+    */
 
 
 }
