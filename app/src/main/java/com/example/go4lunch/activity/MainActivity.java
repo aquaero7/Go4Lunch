@@ -36,6 +36,7 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.manager.SelectedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -47,7 +48,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Objects;
 
-public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, EventListener {
 
     // For Navigation Drawer design
     private Toolbar toolbar;
@@ -65,6 +66,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private TextView userName;
     private TextView userEmail;
 
+    private Fragment fmt;
     private SearchView searchView;
 
     private final UserManager userManager = UserManager.getInstance();
@@ -135,6 +137,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         }
         this.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void toggleSearchViewVisibility() {
+        SearchView view = binding.includedToolbar.searchView;
+        if (view.getVisibility() == View.VISIBLE) {
+            view.setVisibility(View.GONE);
+        } else {
+            view.setVisibility(View.VISIBLE);
+        }
     }
 
 
@@ -241,6 +253,26 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
+                // Get fragment's identification
+                fmt = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
+
+                switch (fmt.getTag()) {
+                    case "f0":
+                        Toast.makeText(MainActivity.this, "Query is : " + query, Toast.LENGTH_SHORT).show();
+                        ((MapViewFragment)fmt).launchAutocomplete(query);
+                        break;
+                    case "f1":
+                        Toast.makeText(MainActivity.this, "Query is : " + query, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Search not yet implemented on ListView\nQuery is : " + query, Toast.LENGTH_SHORT).show();    // TODO : To be replaced by action
+                        // TODO : Do action
+                        break;
+                    case "f2":
+                        Toast.makeText(MainActivity.this, "Query is : " + query, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Search not implemented on Workmates\nQuery is : " + query, Toast.LENGTH_SHORT).show();   // TODO : To be replaced by action
+                        // TODO : Do action
+                        break;
+                }
                 searchView.setQuery("", false);
                 searchView.setVisibility(View.GONE);
                 return false;
@@ -248,32 +280,34 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // TODO : For test. To be replaced by Autocomplete action if MapViewFragment (page 0)
-                if (newText.length() == 3) {
-                    Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();
+                /*  // TODO : For debug : To be deleted
+                int testId = getSupportFragmentManager().findFragmentById(pager.getCurrentItem()).getId();
+                String testTag = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem()).getTag();
+                MapViewFragment fm = (MapViewFragment) getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
+                */
 
-                    /*  // TODO : For debug : To be deleted
-                    int testId = getSupportFragmentManager().findFragmentById(pager.getCurrentItem()).getId();
-                    String testTag = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem()).getTag();
-                    MapViewFragment fm = (MapViewFragment) getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
-                    */
+                // Get fragment's identification
+                fmt = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
 
-                    Fragment fmt = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
-
-                    switch (fmt.getTag()) {
-                        case "f0":
+                switch (fmt.getTag()) {
+                    case "f0":
+                        if (newText.length() == 3) {
+                            Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();
+                            searchView.setQuery("", false);
+                            searchView.setVisibility(View.GONE);
                             ((MapViewFragment)fmt).launchAutocomplete(newText);
-                            break;
-                        case "f1":
-                            Toast.makeText(MainActivity.this, "Not yet implemented on ListView", Toast.LENGTH_LONG).show();
-                            break;
-                        case "f2":
-                            Toast.makeText(MainActivity.this, "Not yet implemented on Workmates", Toast.LENGTH_LONG).show();
-                            break;
-                    }
-                    searchView.setQuery("", false);
-                    searchView.setVisibility(View.GONE);
+                        }
+                        break;
+                    case "f1":
+                        //Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Search not yet implemented on ListView\nQuery is : " + newText, Toast.LENGTH_SHORT).show();
+                        break;
+                    case "f2":
+                        Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Search not implemented on Workmates\nQuery is : " + newText, Toast.LENGTH_SHORT).show();
+                        break;
                 }
+
                 return false;
             }
         });
@@ -354,22 +388,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         finish();
     }
 
-    private void toggleVisibility(View view) {
-        if (view.getVisibility() == View.VISIBLE) {
-            view.setVisibility(View.GONE);
-        } else {
-            view.setVisibility(View.VISIBLE);
-        }
-    }
-
-    public void toggleSearchViewVisibility() {
-        SearchView view = binding.includedToolbar.searchView;
-        if (view.getVisibility() == View.VISIBLE) {
-            view.setVisibility(View.GONE);
-        } else {
-            view.setVisibility(View.VISIBLE);
-        }
-    }
 
 
 

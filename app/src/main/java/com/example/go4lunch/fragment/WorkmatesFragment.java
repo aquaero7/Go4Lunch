@@ -1,5 +1,6 @@
 package com.example.go4lunch.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ import com.example.go4lunch.activity.MainActivity;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.WorkmateAdapter;
@@ -53,6 +55,8 @@ public class WorkmatesFragment extends Fragment {
 
     private List<User> workmatesList;
     private User workmateToAdd;
+
+    private EventListener eventListener;
 
 
     // Constructor
@@ -112,6 +116,17 @@ public class WorkmatesFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        if (context instanceof EventListener) {
+            eventListener = (EventListener) context;
+        } else {
+            Log.w("MapViewFragment", "EventListener error");
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         // Setup toolbar title (Activity title)
@@ -133,9 +148,8 @@ public class WorkmatesFragment extends Fragment {
         // Handle actions on menu items
         switch (item.getItemId()) {
             case R.id.menu_activity_main_search:
-                Toast.makeText(requireContext(), "Click on search button in Workmates", Toast.LENGTH_LONG).show();   // TODO : To be deleted
-                // TODO : Direct method to be replaced by interface
-                ((MainActivity)requireActivity()).toggleSearchViewVisibility();
+                Toast.makeText(requireContext(), "Click on search button in Workmates", Toast.LENGTH_SHORT).show();   // TODO : To be deleted
+                eventListener.toggleSearchViewVisibility();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

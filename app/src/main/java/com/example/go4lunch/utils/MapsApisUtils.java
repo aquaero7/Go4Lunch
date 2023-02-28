@@ -38,6 +38,7 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -185,9 +186,11 @@ public class MapsApisUtils extends FragmentActivity {
         // autocompleteCardView = binding.includedToolbar.includedAutocompleteCardView.autocompleteCardView;
         // autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        // autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        autocompleteFragment.setPlaceFields(Collections.singletonList(Place.Field.ID));
         // Specify the type values of place data to return.
-        autocompleteFragment.setTypesFilter(Arrays.asList("restaurant"));
+        // autocompleteFragment.setTypesFilter(Arrays.asList("restaurant"));
+        autocompleteFragment.setTypesFilter(Collections.singletonList("restaurant"));
         // Specify the country of place data to return.
         autocompleteFragment.setCountries("FR");
     }

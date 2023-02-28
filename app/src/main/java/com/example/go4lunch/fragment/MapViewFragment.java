@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -42,6 +43,7 @@ import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.DataProcessingUtils;
+import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.google.android.gms.common.api.Status;
@@ -88,6 +90,8 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
     private CardView autocompleteCardView;
     private AutocompleteSupportFragment autocompleteFragment;
     //
+
+    private EventListener eventListener;
 
     private SupportMapFragment mapFragment;
     private LocationManager mLocationManager;
@@ -174,6 +178,17 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        if (context instanceof EventListener) {
+            eventListener = (EventListener) context;
+        } else {
+            Log.w("MapViewFragment", "EventListener error");
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -230,13 +245,8 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         // Handle actions on menu items
         switch (item.getItemId()) {
             case R.id.menu_activity_main_search:
-                // configureAutocompleteSupportFragment();
-                Toast.makeText(requireContext(), "Click on search button in MapViewFragment", Toast.LENGTH_LONG).show();   // TODO : To be deleted
-                // toggleVisibility(autocompleteCardView);
-                // TODO : Direct method to be replaced by interface
-                ((MainActivity)requireActivity()).toggleSearchViewVisibility();
-                // if (autocompleteCardView.getVisibility() == View.VISIBLE) Toast.makeText(requireContext(), "CardView is visible", Toast.LENGTH_LONG).show();   // TODO : To be deleted
-                // if (autocompleteCardView.getVisibility() == View.GONE) Toast.makeText(requireContext(), "CardView is gone", Toast.LENGTH_LONG).show();   // TODO : To be deleted
+                Toast.makeText(requireContext(), "Click on search button in MapViewFragment", Toast.LENGTH_SHORT).show();   // TODO : To be deleted
+                eventListener.toggleSearchViewVisibility();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -364,7 +374,6 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     public void launchAutocomplete(String text) {
         autocompleteCardView.setVisibility(View.VISIBLE);
-        // MapsApisUtils.configureAutocompleteSupportFragment(autocompleteFragment, requireActivity(), text);
         configureAutocompleteSupportFragment(text);
     }
 
@@ -381,16 +390,33 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                // TODO: Get info about the selected place.
+                /* TODO: Get info about the selected place.
                 LatLng latLng = place.getLatLng();
                 double latitude = latLng.latitude;
                 double longitude = latLng.longitude;
                 Log.i("MapViewFragment", "Place: " + place.getName() + ", " + place.getId() + ", " + latitude + ", " + longitude);
-                //
-
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 90));
-                autocompleteFragment.setText("");
-                autocompleteCardView.setVisibility(View.GONE);
+                */
+                String placeId = place.getId();
+                RestaurantManager.getRestaurantsList(task -> {
+                    if (task.isSuccessful()) {
+                        if (task.getResult() != null) {
+                            // Get restaurants list
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Restaurant restaurant = FirestoreUtils.getRestaurantFromDatabaseDocument(document);
+                                if (restaurant.getId() == placeId) {
+                                    double lat = restaurant.getGeometry().getLocation().getLat();
+                                    double lng = restaurant.getGeometry().getLocation().getLng();
+                                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 90));
+                                    autocompleteFragment.setText("");
+                                    autocompleteCardView.setVisibility(View.GONE);
+                                }
+                            }
+                        }
+                    } else {
+                        Log.d("MapViewFragment", "Error getting documents: ", task.getException());
+                        Toast.makeText(requireContext(), "Error retrieving restaurants list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
+                    }
+                });
             }
 
             @Override
