@@ -147,7 +147,7 @@ public class ListViewFragment extends Fragment {
         requireActivity().setTitle(R.string.listView_toolbar_title);
 
         /** Solution A : Getting data from API in MapsApisUtils */
-        //
+        /*
         home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, requireActivity());
         restaurantsList = MapsApisUtils.getRestaurantsFromApi(home, getString(R.string.MAPS_API_KEY), requireContext());
         if (restaurantsList != null && restaurantsList.size() != 0) {
@@ -155,10 +155,10 @@ public class ListViewFragment extends Fragment {
             configureRecyclerView();
             configureOnClickRecyclerView();
         }
-        //
+        */
 
         /** Solution B : Getting data from Firestore in MapsApisUtils */
-        // getRestaurantsListAndConfigureRecyclerView();
+        getRestaurantsListAndConfigureRecyclerView();
 
     }
 

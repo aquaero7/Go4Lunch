@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.Task;
@@ -35,11 +36,13 @@ import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -182,49 +185,16 @@ public class MapsApisUtils extends FragmentActivity {
     }
 
     public static void initializeAutocompleteSupportFragment(AutocompleteSupportFragment autocompleteFragment) {
-        // Initialize the AutocompleteSupportFragment.
-        // autocompleteCardView = binding.includedToolbar.includedAutocompleteCardView.autocompleteCardView;
-        // autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         // Specify the types of place data to return.
         // autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
         autocompleteFragment.setPlaceFields(Collections.singletonList(Place.Field.ID));
         // Specify the type values of place data to return.
-        // autocompleteFragment.setTypesFilter(Arrays.asList("restaurant"));
         autocompleteFragment.setTypesFilter(Collections.singletonList("restaurant"));
         // Specify the country of place data to return.
         autocompleteFragment.setCountries("FR");
     }
 
-    /*  // TODO : To be deleted cause transferred to MapViewFragment
-    public static void configureAutocompleteSupportFragment(AutocompleteSupportFragment autocompleteFragment, Activity activity, String text) {
-        // Specify the limitation to only show results within the defined region
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
-        LatLng home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, activity);
-        // int radius = MapsApisUtils.getDefaultRadius();   TODO : To be deleted
-        LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, DEFAULT_RADIUS);
-        autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
-        autocompleteFragment.setText(text);
 
-        // Set up a PlaceSelectionListener to handle the response.
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(@NonNull Place place) {
-                // TODO: Get info about the selected place.
-                LatLng latLng = place.getLatLng();
-                double latitude = latLng.latitude;
-                double longitude = latLng.longitude;
-                Log.i("MainActivity", "Place: " + place.getName() + ", " + place.getId() + ", " + latitude + ", " + longitude);
-            }
-
-            @Override
-            public void onError(@NonNull Status status) {
-                // TODO: Handle the error.
-                Log.i("MainActivity", "An error occurred: " + status);
-            }
-
-        });
-    }
-    */
 
 
 }

@@ -203,8 +203,9 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         // SOLUTION 1.
         home = MapsApisUtils.getDeviceLocation(locationPermissionsGranted, fusedLocationProviderClient, requireActivity());
 
-        // Clear restaurants list
-        clearRestaurantsList();
+        // Clear restaurants list in Firebase   // TODO : To be deleted
+        // clearRestaurantsList();  // Finally clearing restaurant list in Firebase isn't a good idea !
+
         if (locationPermissionsGranted) restaurantsList = MapsApisUtils.getRestaurantsFromApi(home, getString(R.string.MAPS_API_KEY), requireContext());
 
         loadMap();
@@ -379,8 +380,8 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     private void configureAutocompleteSupportFragment(String text) {
         // Specify the limitation to only show results within the defined region
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        LatLng home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, requireActivity());
+        // FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        // LatLng home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, requireActivity());
         LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, MapsApisUtils.getDefaultRadius());
         autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
         autocompleteFragment.setActivityMode(AutocompleteActivityMode.valueOf("FULLSCREEN"));
@@ -390,22 +391,18 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                /* TODO: Get info about the selected place.
-                LatLng latLng = place.getLatLng();
-                double latitude = latLng.latitude;
-                double longitude = latLng.longitude;
-                Log.i("MapViewFragment", "Place: " + place.getName() + ", " + place.getId() + ", " + latitude + ", " + longitude);
-                */
                 String placeId = place.getId();
+                Log.i("MapViewFragment", "Place: " + placeId);
                 RestaurantManager.getRestaurantsList(task -> {
                     if (task.isSuccessful()) {
                         if (task.getResult() != null) {
                             // Get restaurants list
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Restaurant restaurant = FirestoreUtils.getRestaurantFromDatabaseDocument(document);
-                                if (restaurant.getId() == placeId) {
+                                if (Objects.equals(restaurant.getId(), placeId)) {
                                     double lat = restaurant.getGeometry().getLocation().getLat();
                                     double lng = restaurant.getGeometry().getLocation().getLng();
+                                    Log.i("MapViewFragment", "Place: " + placeId + ", " + lat + ", " + lng);
                                     mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 90));
                                     autocompleteFragment.setText("");
                                     autocompleteCardView.setVisibility(View.GONE);
