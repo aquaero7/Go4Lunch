@@ -1,22 +1,15 @@
 package com.example.go4lunch.fragment;
 
 
-import static android.content.Context.LOCATION_SERVICE;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,12 +17,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
-import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
@@ -40,19 +31,11 @@ import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationAvailability;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.Priority;
-import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.OnMapsSdkInitializedCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -68,12 +51,18 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 
-public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClickListener {
+public class MapViewFragment extends Fragment implements
+        OnMapReadyCallback,
+        GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnMarkerClickListener,
+        OnMapsSdkInitializedCallback {
+
 
     private FragmentMapViewBinding binding;
     private SupportMapFragment mapFragment;
@@ -82,14 +71,15 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     private EventListener eventListener;
 
-    private PlacesClient placesClient;
     private boolean locationPermissionsGranted;
+    private boolean focusHome;
     private GoogleMap mGoogleMap;
     private LatLng home;
+    private PlacesClient placesClient;
 
     private static final int DEFAULT_ZOOM = 17;
     private static final int RESTAURANT_ZOOM = 19;
-    private List<Restaurant> restaurantsList;
+    private List<Restaurant> restaurantsList = new ArrayList<>();
     private int selectionsCount;
 
     public MapViewFragment() {
@@ -113,11 +103,8 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         // Set the layout file as the content view.
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
 
-        // Require latest version of map renderer
-        // getLatestRenderer();    // TODO : Not working : Legacy version is used anyway !
-
-        // Display map with or without home focus
-        displayMap(true);
+        // Require latest version of map renderer   // Not working : Legacy version is used anyway !
+        MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this);
 
         // Initialize SDK Places for Autocomplete API
         Places.initialize(requireContext(), getString(R.string.MAPS_API_KEY));
@@ -145,6 +132,10 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         super.onViewCreated(view, savedInstanceState);
         // Get a handle to the fragment and register the callback.
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        // Acquiring the map
+        assert mapFragment != null;
+        mapFragment.getMapAsync(this);
+
     }
 
     @Override
@@ -164,7 +155,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.mapView_toolbar_title);
         // Display map with or without home focus
-        displayMap(false);
+        displayMap();
     }
 
     @Override
@@ -175,18 +166,6 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         /** USED WITH SOLUTION 2 */ // if (fusedLocationProviderClient != null && locationCallback != null)
                                         // fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         /** USED WITH SOLUTION 4 */ // if (mLocationManager != null) mLocationManager.removeUpdates(locationListener);
-    }
-
-    @Override
-    public boolean onMarkerClick(@NonNull Marker marker) {
-        String refId = marker.getTag().toString();
-        for (Restaurant restaurant : restaurantsList) {
-            if(restaurant.getId().equals(refId)) {
-                launchDetailRestaurantActivity(restaurant);
-                break;
-            }
-        }
-        return false;
     }
 
     /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
@@ -210,43 +189,90 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
-    private void displayMap(boolean focusHome) {
-        // Check permissions
-        locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
-        // Get current location
-        home = MapsApisUtils.getHome();
-        // Get restaurants list object
-        // Clear restaurants list in Firebase before   // TODO : To be deleted
-        // clearRestaurantsList();  // Finally clearing restaurant list in Firebase isn't a good idea !
-        restaurantsList = MapsApisUtils.getRestaurantsList();
-        // Load map with or without home focus
-        loadMap(focusHome);
-    }
-
-    @SuppressWarnings("MissingPermission")
-    // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method
-    private void loadMap(boolean focusHome) {
-        if (mapFragment != null) {
-            /** Manipulates the map once available.
-             This callback is triggered when the map is ready to be used.
-             This is where we can add markers or lines, add listeners or move the camera. */
-            mapFragment.getMapAsync(googleMap -> {
-                mGoogleMap = googleMap;
-                // Customize map
-                mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
-                // Set camera position
-                mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
-                if (focusHome && home != null) mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
-                // Other settings
-                mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
-
-                displayRestaurantsOnMap(restaurantsList);
-            });
+    @Override
+    public void onMapsSdkInitialized(@NonNull MapsInitializer.Renderer renderer) {
+        switch (renderer) {
+            case LATEST:
+                Log.w("MapViewFragment", "The latest version of the renderer is used.");
+                break;
+            case LEGACY:
+                Log.w("MapViewFragment", "The legacy version of the renderer is used.");
+                break;
         }
     }
 
-    @SuppressLint("PotentialBehaviorOverride")  // Concerns OnMarkerClickListener below
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        /** Manipulates the map once available.
+         This callback is triggered when the map is ready to be used.
+         This is where we can add markers or lines, add listeners or move the camera. */
+        mGoogleMap = googleMap;
+        // Initialize the map
+        initializeMap();
+        // Display map with or without home focus
+        displayMap();
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        // Request for home focus and default zoom
+        focusHome = true;
+        mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
+        // Refresh restaurant list display
+        if (restaurantsList.isEmpty()) restaurantsList = FirestoreUtils.getRestaurantsList();
+        displayRestaurantsOnMap(restaurantsList);
+        return false;
+    }
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        String refId = marker.getTag().toString();
+        for (Restaurant restaurant : restaurantsList) {
+            if(restaurant.getId().equals(refId)) {
+                launchDetailRestaurantActivity(restaurant);
+                break;
+            }
+        }
+        return false;
+    }
+
+    @SuppressWarnings("MissingPermission")  // Permissions already checked from MainActivity
+    private void initializeMap() {
+        // Check permissions
+        locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
+        // Customize map
+        mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
+        // Set camera default zoom
+        mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
+        // Other settings
+        mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
+        // Request for home focus at first display
+        focusHome = true;
+        // Set listener to my location button in order to know if home focus is requested
+        mGoogleMap.setOnMyLocationButtonClickListener(this);
+    }
+
+    private void displayMap() {
+        // Get current location
+        home = MapsApisUtils.getHome();
+        // Get restaurants list from Firestore
+        if (restaurantsList.isEmpty()) restaurantsList = FirestoreUtils.getRestaurantsList();
+
+        // Display map with or without home focus
+        if (mGoogleMap != null && home != null) {
+            // Set camera position if requested
+            if (focusHome) {
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
+            }
+            // Display restaurants on map
+            displayRestaurantsOnMap(restaurantsList);
+        }
+        // No more home focus after first display (except if MyLocationButton is triggered)
+        focusHome = false;
+    }
+
+    @SuppressLint("PotentialBehaviorOverride")  // This remark concerns OnMarkerClickListener below
     private void displayRestaurantsOnMap(List<Restaurant> restaurants) {
         if (restaurants != null) {
             for (Restaurant restaurant : restaurants) {
@@ -320,28 +346,17 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
             public void onPlaceSelected(@NonNull Place place) {
                 String placeId = place.getId();
                 Log.i("MapViewFragment", "Place: " + placeId);
-                RestaurantManager.getRestaurantsList(task -> {
-                    if (task.isSuccessful()) {
-                        if (task.getResult() != null) {
-                            // Get restaurants list
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Restaurant restaurant = FirestoreUtils.getRestaurantFromDatabaseDocument(document);
-                                if (Objects.equals(restaurant.getId(), placeId)) {
-                                    double lat = restaurant.getGeometry().getLocation().getLat();
-                                    double lng = restaurant.getGeometry().getLocation().getLng();
-                                    Log.i("MapViewFragment", "Place: " + placeId + ", " + lat + ", " + lng);
-                                    // Focus map on this restaurant
-                                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), RESTAURANT_ZOOM));
-                                    autocompleteFragment.setText("");
-                                    autocompleteCardView.setVisibility(View.GONE);
-                                }
-                            }
-                        }
-                    } else {
-                        Log.d("MapViewFragment", "Error getting documents: ", task.getException());
-                        Toast.makeText(requireContext(), "Error retrieving restaurants list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
+                for (Restaurant restaurant : restaurantsList) {
+                    if (Objects.equals(restaurant.getId(), placeId)) {
+                        double lat = restaurant.getGeometry().getLocation().getLat();
+                        double lng = restaurant.getGeometry().getLocation().getLng();
+                        Log.i("MapViewFragment", "Place: " + placeId + ", " + lat + ", " + lng);
+                        // Focus map on this restaurant
+                        if (mGoogleMap != null) mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), RESTAURANT_ZOOM));
+                        autocompleteFragment.setText("");
+                        autocompleteCardView.setVisibility(View.GONE);
                     }
-                });
+                }
             }
 
             @Override
@@ -354,28 +369,5 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         });
     }
 
-
-
-
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void getLatestRenderer() {
-        MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, renderer -> {
-            switch (renderer) {
-                case LATEST:
-                    Log.w("MapsDemo", "The latest version of the renderer is used.");
-                    break;
-                case LEGACY:
-                    Log.w("MapsDemo", "The legacy version of the renderer is used.");
-                    break;
-            }
-        });
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

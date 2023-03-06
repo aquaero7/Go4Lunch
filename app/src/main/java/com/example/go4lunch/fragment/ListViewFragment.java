@@ -208,6 +208,7 @@ public class ListViewFragment extends Fragment {
     }
 
     private void getRestaurantsListAndConfigureRecyclerView() {
+        /*  // TODO : To be deleted cause transferred to FirestoreUtils
         restaurantsListForDisplay = new ArrayList<>();
         RestaurantManager.getRestaurantsList(task -> {
             if (task.isSuccessful()) {
@@ -228,6 +229,11 @@ public class ListViewFragment extends Fragment {
             configureOnClickRecyclerView();
 
         });
+        */
+
+        restaurantsListForDisplay = FirestoreUtils.getRestaurantsList();
+        configureRecyclerView();
+        configureOnClickRecyclerView();
     }
 
     private void launchDetailRestaurantActivity(Restaurant restaurant) {

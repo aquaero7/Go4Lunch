@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
@@ -21,6 +22,9 @@ import java.util.Map;
 import java.util.Objects;
 
 public class FirestoreUtils {
+
+    private static List<Restaurant> restaurantsList = new ArrayList<>();
+
 
     // Get user data from firestore with given document and create user
     public static User getUserFromDatabaseDocument(QueryDocumentSnapshot document) {
@@ -188,6 +192,26 @@ public class FirestoreUtils {
         // Create and return geometry
         return new Geometry(location);
     }
+
+    public static List<Restaurant> getRestaurantsList() {
+        RestaurantManager.getRestaurantsList(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult() != null) {
+                    // Get restaurants list
+                    restaurantsList.clear();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> restaurantData = document.getData(); // TODO : Map data for debug. To be deleted
+                        Restaurant restaurantToAdd = FirestoreUtils.getRestaurantFromDatabaseDocument(document);
+                        restaurantsList.add(restaurantToAdd);
+                    }
+                }
+            } else {
+                Log.d("FirestoreUtils", "Error getting documents: ", task.getException());
+            }
+        });
+        return restaurantsList;
+    }
+
 
 
 }
