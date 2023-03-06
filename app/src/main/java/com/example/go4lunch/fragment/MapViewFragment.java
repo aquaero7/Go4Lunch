@@ -3,21 +3,15 @@ package com.example.go4lunch.fragment;
 
 import static android.content.Context.LOCATION_SERVICE;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -35,7 +29,6 @@ import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
-import com.example.go4lunch.activity.MainActivity;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
 import com.example.go4lunch.manager.RestaurantManager;
@@ -59,6 +52,7 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -82,36 +76,19 @@ import java.util.Objects;
 public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClickListener {
 
     private FragmentMapViewBinding binding;
-
-    //  // TODO : Test transfer Autocomplete to fragment
-    private Toolbar toolbar;
-    private ActivityMainBinding activityBinding;
-    private SearchView searchView;
+    private SupportMapFragment mapFragment;
     private CardView autocompleteCardView;
     private AutocompleteSupportFragment autocompleteFragment;
-    //
 
     private EventListener eventListener;
 
-    private SupportMapFragment mapFragment;
-    private LocationManager mLocationManager;
+    private PlacesClient placesClient;
+    private boolean locationPermissionsGranted;
     private GoogleMap mGoogleMap;
     private LatLng home;
-    private PlacesClient placesClient;
-    private FusedLocationProviderClient fusedLocationProviderClient;
-    private boolean locationPermissionsGranted = false;
 
-    // private Location lastKnownLocation;
-    private double latitude;
-    private double longitude;
-    private static final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
-    private static final double DEF_LONGITUDE = 0;  //VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
-
-    private static final int DEFAULT_ZOOM = 15;
-    private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-    private ActivityResultLauncher<String[]> requestPermissionsLauncher;
-    private LocationRequest locationRequest;
-    private LocationCallback locationCallback;
+    private static final int DEFAULT_ZOOM = 17;
+    private static final int RESTAURANT_ZOOM = 19;
     private List<Restaurant> restaurantsList;
     private int selectionsCount;
 
@@ -139,18 +116,13 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         // Require latest version of map renderer
         // getLatestRenderer();    // TODO : Not working : Legacy version is used anyway !
 
-        // Initialize SDK Places
+        // Display map with or without home focus
+        displayMap(true);
+
+        // Initialize SDK Places for Autocomplete API
         Places.initialize(requireContext(), getString(R.string.MAPS_API_KEY));
-        // Create a new PlacesClient instance
+        // Create a new PlacesClient instance or Autocomplete API
         placesClient = Places.createClient(requireContext());
-        // Create a new FusedLocationProviderClient.
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-
-        // Register permissions callback
-        registerPermissionsCallback();
-
-        // Check permissions
-        checkPermissions();
 
         /** To use if menu is handled in fragment
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
@@ -160,10 +132,9 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         autocompleteCardView = binding.includedAutocompleteCardView.autocompleteCardView;
 
         // Initialize AutocompleteSupportFragment
-        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
-
 
         // return rootView;
         return binding.getRoot();
@@ -174,7 +145,6 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         super.onViewCreated(view, savedInstanceState);
         // Get a handle to the fragment and register the callback.
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-
     }
 
     @Override
@@ -191,24 +161,10 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
     @Override
     public void onResume() {
         super.onResume();
-
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.mapView_toolbar_title);
-
-        // Initialize and load the map
-        /** SOLUTION 1. Doesn't focus on current location at first display */   // getDeviceLocation();
-        /** SOLUTION 2. Doesn't focus on current location at first display */   // requestDeviceLocation();
-        /** SOLUTION 3. Doesn't focus on current location at first display */   // startLocationUpdates();
-        /** SOLUTION 4. Focus ok on current location at first display */        // getUpdatedLocation();
-        // SOLUTION 1.
-        home = MapsApisUtils.getDeviceLocation(locationPermissionsGranted, fusedLocationProviderClient, requireActivity());
-
-        // Clear restaurants list in Firebase   // TODO : To be deleted
-        // clearRestaurantsList();  // Finally clearing restaurant list in Firebase isn't a good idea !
-
-        if (locationPermissionsGranted) restaurantsList = MapsApisUtils.getRestaurantsFromApi(home, getString(R.string.MAPS_API_KEY), requireContext());
-
-        loadMap();
+        // Display map with or without home focus
+        displayMap(false);
     }
 
     @Override
@@ -254,56 +210,33 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
-    private void registerPermissionsCallback() {
-        ActivityResultContracts.RequestMultiplePermissions permissionsContract = new ActivityResultContracts.RequestMultiplePermissions();
-        requestPermissionsLauncher = registerForActivityResult(permissionsContract, result -> {
-            Boolean fineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
-            Boolean coarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION,false);
-            if (fineLocationGranted != null && fineLocationGranted) {
-                locationPermissionsGranted = true;
-                Log.w("ActivityResultLauncher", "Fine location permission was granted");
-            } else if (coarseLocationGranted != null && coarseLocationGranted) {
-                locationPermissionsGranted = true;
-                Log.w("ActivityResultLauncher", "Only coarse location permission was granted");
-            } else {
-                // locationPermissionsGranted = false;
-                Log.w("ActivityResultLauncher", "No location permission was granted");
-            }
-        });
-    }
-
-    private void checkPermissions() {
-        // Check and request permissions
-        if ((ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            && (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            Log.w("checkPermissions", "Permissions not granted");
-            // The registered ActivityResultCallback gets the result of this(these) request(s).
-            requestPermissionsLauncher.launch(PERMISSIONS);
-        } else {
-            Log.w("checkPermissions", "Permissions granted");
-            locationPermissionsGranted = true;
-        }
+    private void displayMap(boolean focusHome) {
+        // Check permissions
+        locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
+        // Get current location
+        home = MapsApisUtils.getHome();
+        // Get restaurants list object
+        // Clear restaurants list in Firebase before   // TODO : To be deleted
+        // clearRestaurantsList();  // Finally clearing restaurant list in Firebase isn't a good idea !
+        restaurantsList = MapsApisUtils.getRestaurantsList();
+        // Load map with or without home focus
+        loadMap(focusHome);
     }
 
     @SuppressWarnings("MissingPermission")
     // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method
-    private void loadMap() {
+    private void loadMap(boolean focusHome) {
         if (mapFragment != null) {
-            /* Manipulates the map once available.
-                This callback is triggered when the map is ready to be used.
-                This is where we can add markers or lines, add listeners or move the camera. */
+            /** Manipulates the map once available.
+             This callback is triggered when the map is ready to be used.
+             This is where we can add markers or lines, add listeners or move the camera. */
             mapFragment.getMapAsync(googleMap -> {
-
-                // SET POSITION ON MAP
                 mGoogleMap = googleMap;
-
-                // CUSTOMIZE MAP
+                // Customize map
                 mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
-
                 // Set camera position
-                // mGoogleMap.moveCamera(CameraUpdateFactory.zoomBy(DEFAULT_ZOOM));
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
-
+                mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
+                if (focusHome && home != null) mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
                 // Other settings
                 mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
@@ -313,7 +246,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
-    @SuppressLint("PotentialBehaviorOverride")  // For OnMarkerClickListener
+    @SuppressLint("PotentialBehaviorOverride")  // Concerns OnMarkerClickListener below
     private void displayRestaurantsOnMap(List<Restaurant> restaurants) {
         if (restaurants != null) {
             for (Restaurant restaurant : restaurants) {
@@ -368,11 +301,7 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
         });
     }
 
-    //  // TODO : For test
-    public void moveCameraTo(LatLng latLng) {
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
-    }
-
+    // Launched from activity
     public void launchAutocomplete(String text) {
         autocompleteCardView.setVisibility(View.VISIBLE);
         configureAutocompleteSupportFragment(text);
@@ -380,8 +309,6 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     private void configureAutocompleteSupportFragment(String text) {
         // Specify the limitation to only show results within the defined region
-        // FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        // LatLng home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, requireActivity());
         LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, MapsApisUtils.getDefaultRadius());
         autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
         autocompleteFragment.setActivityMode(AutocompleteActivityMode.valueOf("FULLSCREEN"));
@@ -403,7 +330,8 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                                     double lat = restaurant.getGeometry().getLocation().getLat();
                                     double lng = restaurant.getGeometry().getLocation().getLng();
                                     Log.i("MapViewFragment", "Place: " + placeId + ", " + lat + ", " + lng);
-                                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), 90));
+                                    // Focus map on this restaurant
+                                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), RESTAURANT_ZOOM));
                                     autocompleteFragment.setText("");
                                     autocompleteCardView.setVisibility(View.GONE);
                                 }
@@ -433,15 +361,6 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
 
 
 
-
-
-
-
-
-
-
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void getLatestRenderer() {
@@ -455,140 +374,6 @@ public class MapViewFragment extends Fragment implements GoogleMap.OnMarkerClick
                     break;
             }
         });
-    }
-
-
-//  TODO : TO ARCHIVE : OTHER SOLUTIONS AVAILABLE TO GET AND UPDATE CURRENT LOCATION................
-
-    // USED WITH SOLUTION 2 ////////////////////////////////////////////////////////////////////////
-
-    @SuppressWarnings("MissingPermission")
-    private void requestDeviceLocation() {
-        if(locationPermissionsGranted) {
-            locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
-                    .setWaitForAccurateLocation(false)
-                    .setMinUpdateIntervalMillis(500)
-                    .setMaxUpdateDelayMillis(1000)
-                    .build();
-
-            locationCallback = new LocationCallback() {
-                @Override
-                public void onLocationAvailability(@NonNull LocationAvailability locationAvailability) {
-                    super.onLocationAvailability(locationAvailability);
-                }
-
-                @Override
-                public void onLocationResult(@NonNull LocationResult locationResult) {
-                    super.onLocationResult(locationResult);
-                    if (!locationResult.getLocations().isEmpty()) {
-                        latitude = Objects.requireNonNull(locationResult.getLastLocation()).getLatitude();
-                        longitude = Objects.requireNonNull(locationResult.getLastLocation()).getLongitude();
-                    } else {
-                        latitude = DEF_LATITUDE;
-                        longitude = DEF_LONGITUDE;
-                    }
-                }
-            };
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-        } else {
-            latitude = DEF_LATITUDE;
-            longitude = DEF_LONGITUDE;
-        }
-        home = new LatLng(latitude, longitude);
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // USED WITH SOLUTION 3 ////////////////////////////////////////////////////////////////////////
-
-    @SuppressWarnings("MissingPermission")
-    private void startLocationUpdates() {
-        if (locationPermissionsGranted) {
-            // Create the location request to start receiving updates
-            locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
-                    .setWaitForAccurateLocation(false)
-                    .setMinUpdateIntervalMillis(500)
-                    .setMaxUpdateDelayMillis(1000)
-                    .build();
-
-            // Create LocationSettingsRequest object using location request
-            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-            builder.addLocationRequest(locationRequest);
-            LocationSettingsRequest locationSettingsRequest = builder.build();
-
-            // Check whether location settings are satisfied
-            // https://developers.google.com/android/reference/com/google/android/gms/location/SettingsClient
-            SettingsClient settingsClient = LocationServices.getSettingsClient(requireActivity());
-            settingsClient.checkLocationSettings(locationSettingsRequest);
-
-            // new Google API SDK v11 uses getFusedLocationProviderClient(this)
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-                @Override
-                public void onLocationResult(@NonNull LocationResult locationResult) {
-                    // do work here
-                    onLocationChanged(Objects.requireNonNull(locationResult.getLastLocation()));
-                }
-            },
-            Looper.myLooper());
-        } else {
-            latitude = DEF_LATITUDE;
-            longitude = DEF_LONGITUDE;
-        }
-        home = new LatLng(latitude, longitude);
-    }
-
-    public void onLocationChanged(Location location) {
-        // New location has now been determined
-        // You can now create a LatLng Object for use with maps
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // USED WITH SOLUTION 4 (OLDER SOLUTION) ///////////////////////////////////////////////////////
-
-    // Listen to locations changes and get current position
-    private final LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(@NonNull Location location) {
-            // Update location metrics
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-        }
-    };
-
-    @SuppressWarnings("MissingPermission")
-    // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method
-    private void getUpdatedLocation() {
-        if (locationPermissionsGranted) {
-            // Get updated location from system and send it to listeners
-            mLocationManager = (LocationManager) requireActivity().getSystemService(LOCATION_SERVICE);
-            String bestProvider = null;
-            if (mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                bestProvider = LocationManager.NETWORK_PROVIDER;
-                mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 0, locationListener);
-            }
-            if (mLocationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)) {
-                bestProvider = LocationManager.PASSIVE_PROVIDER;
-                mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 10000, 0, locationListener);
-            }
-            if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                bestProvider = LocationManager.GPS_PROVIDER;
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, locationListener);
-            }
-
-            latitude = mLocationManager.getLastKnownLocation(bestProvider).getLatitude();
-            longitude = mLocationManager.getLastKnownLocation(bestProvider).getLongitude();
-            Log.w("getDeviceLocation", "Best Provider found: " + bestProvider);
-
-        } else {
-            latitude = DEF_LATITUDE;
-            longitude = DEF_LONGITUDE;
-            Toast.makeText(requireActivity(), R.string.info_no_permission, Toast.LENGTH_SHORT).show();
-            Log.w("getDeviceLocation", "Permissions not granted");
-        }
-        home = new LatLng(latitude, longitude);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

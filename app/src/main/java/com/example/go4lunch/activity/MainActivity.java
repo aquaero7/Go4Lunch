@@ -1,19 +1,20 @@
 package com.example.go4lunch.activity;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentOnAttachListener;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -29,7 +30,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.databinding.ActivityMainBinding;
-import com.example.go4lunch.databinding.FragmentAutocompleteBinding;
 import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
@@ -38,17 +38,19 @@ import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.MapsApisUtils;
-import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.Objects;
+import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, EventListener {
+
+    private static Activity mActivity;
 
     // For Navigation Drawer design
     private Toolbar toolbar;
@@ -66,6 +68,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private TextView userName;
     private TextView userEmail;
 
+    private String MAPS_API_KEY;
+    private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    private ActivityResultLauncher<String[]> requestPermissionsLauncher;
+    private static FusedLocationProviderClient fusedLocationProviderClient;
+    private static boolean locationPermissionsGranted;
+    private static LatLng home;
+    private static double latitude;
+    private static double longitude;
+    private static List<Restaurant> restaurantsList;
+
     private Fragment fmt;
     private SearchView searchView;
 
@@ -81,12 +93,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // setContentView(R.layout.activity_main);  // Useless with initBinding in BaseActivity ?
-        /*
-        this.configureAndShowMapViewFragment();
-        this.configureAndShowListViewFragment();
-        this.configureAndShowWorkmatesFragment();
-        */
+        mActivity = this;
+        MAPS_API_KEY = getString(R.string.MAPS_API_KEY);
 
         // Get the toolbar view
         this.configureToolbar();
@@ -101,12 +109,39 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Configure progressBar
         this.configureProgressBar();
 
+        // Create a new FusedLocationProviderClient.
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        // Check permissions and get device location
+        checkPermissionsAndGetDeviceLocation();
+
         // Initialize SearchView and setup listener
         searchView = binding.includedToolbar.searchView;
         this.configureSearchViewListener(searchView);
 
-
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+
+    @Override
+    public void toggleSearchViewVisibility() {
+        SearchView view = binding.includedToolbar.searchView;
+        if (view.getVisibility() == View.VISIBLE) {
+            view.setVisibility(View.GONE);
+        } else {
+            view.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    /**
+     * ---------------------
+     * LISTENERS
+     * ---------------------
+     */
 
     @Override
     public void onBackPressed() {
@@ -139,17 +174,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         return true;
     }
 
-    @Override
-    public void toggleSearchViewVisibility() {
-        SearchView view = binding.includedToolbar.searchView;
-        if (view.getVisibility() == View.VISIBLE) {
-            view.setVisibility(View.GONE);
-        } else {
-            view.setVisibility(View.VISIBLE);
-        }
-    }
-
-
     /**
     * ---------------------
     * CONFIGURATIONS
@@ -158,14 +182,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     private void configureToolbar(){
         // Get the toolbar view inside the activity layout
-
-        /*  // Case 1 : Without Navigation Drawer
-        Toolbar toolbar = binding.includedToolbar.toolbar;
-        */
-
-        // // Case 2 : With Navigation Drawer
         this.toolbar = binding.includedToolbar.toolbar;
-        //
 
         // Sets the Toolbar
         setSupportActionBar(toolbar);
@@ -313,6 +330,51 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         });
     }
 
+    /**
+     * ---------------------
+     * METHODS
+     * ---------------------
+     */
+
+    private void checkPermissionsAndGetDeviceLocation() {
+        // This is the result of the user answer to permissions request
+        ActivityResultContracts.RequestMultiplePermissions permissionsContract = new ActivityResultContracts.RequestMultiplePermissions();
+        requestPermissionsLauncher = registerForActivityResult(permissionsContract, result -> {
+            Boolean fineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
+            Boolean coarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION,false);
+            if (fineLocationGranted != null && fineLocationGranted) {
+                /** Fine location permission granted */
+                Log.w("ActivityResultLauncher", "Fine location permission was granted by user");
+                locationPermissionsGranted = true;
+                home = MapsApisUtils.getDeviceLocationFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
+            } else if (coarseLocationGranted != null && coarseLocationGranted) {
+                /** Coarse location permission granted */
+                Log.w("ActivityResultLauncher", "Only coarse location permission was granted by user");
+                locationPermissionsGranted = true;
+                home = MapsApisUtils.getDeviceLocationFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
+            } else {
+                /** No location permission granted */
+                Log.w("ActivityResultLauncher", "No location permission was granted by user");
+                locationPermissionsGranted = false;
+            }
+        });
+
+        // Check and request permissions
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            /** Permissions not granted
+             *  Request permissions to user.
+             *  The registered ActivityResultCallback gets the result of this(these) request(s). */
+            Log.w("checkPermissions", "Permissions not granted");
+            requestPermissionsLauncher.launch(PERMISSIONS);
+        } else {
+            /** Permissions granted */
+            Log.w("checkPermissions", "Permissions granted");
+            locationPermissionsGranted = true;
+            home = MapsApisUtils.getDeviceLocationFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
+        }
+    }
+
     private void checkCurrentUserSelection() {
         // Get current user selected restaurant id from database
         UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
@@ -363,9 +425,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     // Update user picture
     private void setProfilePicture(Uri profilePictureUrl){
-
         userPicture.setImageTintList(null);
-
         Glide.with(this)
                 .load(profilePictureUrl)
                 .apply(RequestOptions.circleCropTransform())
@@ -387,6 +447,14 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         setResult(Activity.RESULT_OK, intent);
         finish();
     }
+
+
+
+
+
+
+
+
 
 
 

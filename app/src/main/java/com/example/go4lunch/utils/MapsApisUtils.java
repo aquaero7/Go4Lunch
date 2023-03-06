@@ -4,45 +4,29 @@ import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.api.GmapsApiClient;
 import com.example.go4lunch.api.GmapsRestaurantDetailsPojo;
 import com.example.go4lunch.api.GmapsRestaurantPojo;
-import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,55 +37,72 @@ public class MapsApisUtils extends FragmentActivity {
     private static final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
     private static final double DEF_LONGITUDE = 0;  //VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
     private static final int DEFAULT_RADIUS = 1000; // Distance in meters
+    private static boolean locationPermissionsGranted;
     private static List<Restaurant> restaurantsList = new ArrayList<>();
     private static double latitude;
     private static double longitude;
+    private static LatLng home;
+
 
     public static int getDefaultRadius() {
         return DEFAULT_RADIUS;
     }
 
+    public static boolean arePermissionsGranted() {
+        return locationPermissionsGranted;
+    }
+
+    public static LatLng getHome() {
+        return home;
+    }
+
+    public static List<Restaurant> getRestaurantsList() {
+        return restaurantsList;
+    }
+
+
     // USED WITH SOLUTION 1 :
     @SuppressWarnings("MissingPermission")
     // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method in MapsViewFragment
-    public static LatLng getDeviceLocation(boolean locationPermissionsGranted, FusedLocationProviderClient fusedLocationProviderClient, Activity activity) {
+    public static LatLng getDeviceLocationFromApi(Activity activity, FusedLocationProviderClient fusedLocationProviderClient, String KEY, boolean permissionsGranted) {
+        locationPermissionsGranted = permissionsGranted;
         try {
-            if (locationPermissionsGranted) {
-                // Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-                Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);
-                locationResult.addOnCompleteListener(activity, task -> {
-                    if (task.isSuccessful()) {
-                        Location lastKnownLocation = task.getResult();
-                        if (lastKnownLocation != null) {
-                            latitude = lastKnownLocation.getLatitude();
-                            longitude = lastKnownLocation.getLongitude();
-                        } else {
-                            latitude = DEF_LATITUDE;
-                            longitude = DEF_LONGITUDE;
-                            Toast.makeText(activity, R.string.info_no_current_location, Toast.LENGTH_SHORT).show();
-                            Log.w("getDeviceLocation", "Exception: %s", task.getException());
-                        }
-                    }
-                    else {
+            Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+            // Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);
+            locationResult.addOnCompleteListener(activity, task -> {
+                if (task.isSuccessful()) {
+                    Location lastKnownLocation = task.getResult();
+                    if (lastKnownLocation != null) {
+                        latitude = lastKnownLocation.getLatitude();
+                        longitude = lastKnownLocation.getLongitude();
+                        Toast.makeText(activity, "Yep ! Got location !", Toast.LENGTH_SHORT).show();
+                        // Initialize current location
+                        home = new LatLng(latitude, longitude);
+                        // Get nearby restaurants list from API
+                        restaurantsList = getRestaurantsFromApi(activity, home, KEY);
+                    } else {
+                        latitude = DEF_LATITUDE;
+                        longitude = DEF_LONGITUDE;
+                        // Initialize default location
+                        home = new LatLng(latitude, longitude);
+                        Toast.makeText(activity, R.string.info_no_current_location, Toast.LENGTH_SHORT).show();
                         Log.w("getDeviceLocation", "Exception: %s", task.getException());
                     }
-                });
-            } else {
-                latitude = DEF_LATITUDE;
-                longitude = DEF_LONGITUDE;
-                Toast.makeText(activity, R.string.info_no_permission, Toast.LENGTH_SHORT).show();
-                Log.w("getDeviceLocation", "Permissions not granted");
-            }
+                }
+                else {
+                    Log.w("getDeviceLocation", "Exception: %s", task.getException());
+                }
+            });
+
         } catch (SecurityException e) {
             Log.w("Exception: %s", e.getMessage(), e);
         }
 
-        return new LatLng(latitude, longitude);
+        return home;
     }
 
-
     // Get restaurants list from API
-    public static List<Restaurant> getRestaurantsFromApi(LatLng latLng, String apiKey, Context context) {
+    public static List<Restaurant> getRestaurantsFromApi(Context context, LatLng latLng, String apiKey) {
 
         // Call Place Nearby Search API
         Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient().getPlaces("restaurant", latLng.latitude + "," + latLng.longitude, DEFAULT_RADIUS, apiKey);

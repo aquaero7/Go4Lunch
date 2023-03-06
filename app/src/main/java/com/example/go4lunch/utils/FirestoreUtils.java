@@ -79,14 +79,22 @@ public class FirestoreUtils {
             // TODO : Replacement getting and displaying more info from API
             long currentDayOfWeek = CalendarUtils.getCurrentDayOfWeek();
             String currentTime = CalendarUtils.getCurrentTime();
+            long pClosingDay;
+            String pClosingTime;
+
 
             // Get the list of opening periods
             ArrayList periodsList = (ArrayList) ((Map<String, Object>) document.getData().get("openingHours")).get("periods");
 
             // Get details for each period p
             for (int i = 0; i < periodsList.size(); i++) {
-                long pClosingDay = (long) ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("close")).get("day");
-                String pClosingTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("close")).get("time").toString();
+                if (((Map<String, Object>) periodsList.get(i)).get("close") != null) {
+                    pClosingDay = (long) ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("close")).get("day");
+                    pClosingTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("close")).get("time").toString();
+                } else {
+                    pClosingDay = -1;
+                    pClosingTime = "";
+                }
                 long pOpeningDay = (long) ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("open")).get("day");
                 String pOpeningTime = ((Map<String, Object>) ((Map<String, Object>) periodsList.get(i)).get("open")).get("time").toString();
 
