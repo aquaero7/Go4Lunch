@@ -240,7 +240,7 @@ public class MapViewFragment extends Fragment implements
     private void initializeMap() {
         // Check permissions
         locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
-        // Customize map
+        // Display MyLocationButton if permissions granted
         mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
         // Set camera default zoom
         mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
@@ -253,7 +253,11 @@ public class MapViewFragment extends Fragment implements
         mGoogleMap.setOnMyLocationButtonClickListener(this);
     }
 
+    @SuppressLint("MissingPermission")
     private void displayMap() {
+        // Re-check permissions to display MyLocationButton if necessary
+        locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
+        if (mGoogleMap != null) mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
         // Get current location
         home = MapsApisUtils.getHome();
         // Get restaurants list from Firestore
