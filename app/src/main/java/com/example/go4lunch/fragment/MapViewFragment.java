@@ -253,7 +253,11 @@ public class MapViewFragment extends Fragment implements
         mGoogleMap.setOnMyLocationButtonClickListener(this);
     }
 
+    @SuppressLint("MissingPermission")
     private void displayMap() {
+        // Re-check permissions to display MyLocationButton if necessary
+        locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
+        if (mGoogleMap != null) mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
         // Get current location
         home = MapsApisUtils.getHome();
         // Get restaurants list from Firestore
