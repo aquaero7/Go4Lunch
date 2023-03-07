@@ -19,6 +19,7 @@
     <string name="info_no_permission">Features requiring permissions that you have denied are unavailable.</string>
     <string name="info_no_current_location">Current location is null. Using defaults.</string>
     <string name="choice_error">No restaurants selected.\nPlease choose one before !</string>
+    <string name="search_error">Search not implemented on %s.\nQuery is :\ </string>
 
     <!-- contentDescriptions -->
     <string name="selection_fab">Selection FAB</string>

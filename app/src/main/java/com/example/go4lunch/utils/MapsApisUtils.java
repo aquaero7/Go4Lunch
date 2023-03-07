@@ -165,14 +165,11 @@ public class MapsApisUtils extends FragmentActivity {
                 String website = restaurantDetails.getWebsite();
                 OpeningHours openingHours = restaurantDetails.getOpeningHours();    // Can be commented to make openingHours come from nearby api
 
-                /** For solution A : Getting data from API in ListViewFragment */
-                // Add restaurant to the list
+                /** Add restaurant to current restaurants list */
                 restaurantsList.add(new Restaurant(id, name, distance, photos,
                         nationality, address, rating, openingHours, phoneNumber, website, geometry));
 
-                /** For solution B : Getting data from Firestore in ListViewFragment
-                TODO : To be deleted if replaced by list from API in ListViewFragment ??? */
-                // Create ou update restaurant in Firebase
+                /** Create or update restaurant in Firebase */
                 RestaurantManager.getInstance().createRestaurant(id, name, distance, photos,
                         nationality, address, rating, openingHours, phoneNumber, website, geometry);
             }

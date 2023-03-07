@@ -1,8 +1,6 @@
 package com.example.go4lunch.utils;
 
-import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
@@ -11,12 +9,9 @@ import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.Location;
 import com.example.go4lunch.model.api.Photo;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,9 +19,20 @@ import java.util.Objects;
 public class FirestoreUtils {
 
     private static List<Restaurant> restaurantsList = new ArrayList<>();
+    private static List<User> workmatesList = new ArrayList<>();
 
 
-    // Get user data from firestore with given document and create user
+    // Get current restaurant list
+    public static List<Restaurant> getRestaurantsList() {
+        return restaurantsList;
+    }
+
+    // Get current restaurant list
+    public static List<User> getWorkmatesList() {
+        return workmatesList;
+    }
+
+    // Get user data from Firestore with given document and create user
     public static User getUserFromDatabaseDocument(QueryDocumentSnapshot document) {
         String uId = Objects.requireNonNull(document.getData().get("uid")).toString();
         String uName = Objects.requireNonNull(document.getData().get("username")).toString();
@@ -40,7 +46,7 @@ public class FirestoreUtils {
         return userFromData;
     }
 
-    // Get restaurant data from firestore with given document and create restaurant
+    // Get restaurant data from Firestore with given document and create restaurant
     public static Restaurant getRestaurantFromDatabaseDocument(QueryDocumentSnapshot document) {
         String rId = Objects.requireNonNull(document.getData().get("id")).toString();
         String rName = Objects.requireNonNull(document.getData().get("name")).toString();
@@ -77,7 +83,7 @@ public class FirestoreUtils {
             boolean openNow = (boolean) ((Map<String, Object>) document.getData().get("openingHours")).get("openNow");
 
             // TODO : To be deleted and replaced by method below
-            openingInformation = openNow ? "open" : "closed";
+            // openingInformation = openNow ? "open" : "closed";
             //
 
             // TODO : Replacement getting and displaying more info from API
@@ -129,7 +135,7 @@ public class FirestoreUtils {
                 }
             }
 
-            /*  Define information to display
+            /*  Built information to display
                 Information must be either 3 char (code) or 7 char (code+schedule) length   */
             if (openNow) {
                 if (closingTime1.equals("0000") || closingTime2.equals("0000")) {
@@ -193,7 +199,8 @@ public class FirestoreUtils {
         return new Geometry(location);
     }
 
-    public static List<Restaurant> getRestaurantsList() {
+    // Get restaurants list from Firestore
+    public static List<Restaurant> getRestaurantsListFromDatabaseDocument() {
         RestaurantManager.getRestaurantsList(task -> {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
@@ -212,6 +219,25 @@ public class FirestoreUtils {
         return restaurantsList;
     }
 
+    // Get workmates list from Firestore
+    public static List<User> getWorkmatesListFromDatabaseDocument() {
+        UserManager.getUsersList(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult() != null) {
+                    // Get users list
+                    workmatesList.clear();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
+                        User workmateToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
+                        workmatesList.add(workmateToAdd);
+                    }
+                }
+            } else {
+                Log.w("FirestoreUtils", "Error getting documents: ", task.getException());
+            }
+        });
+        return workmatesList;
+    }
 
 
 }

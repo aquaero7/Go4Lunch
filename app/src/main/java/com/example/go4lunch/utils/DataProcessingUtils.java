@@ -29,6 +29,7 @@ public class DataProcessingUtils {
         return (int) distance;
     }
 
+    /*
     public static List<Restaurant> customizeRestaurantsList(List<Restaurant> restaurantsList) {
         List<Restaurant> customizedRestaurantsList = new ArrayList<>();
         for (Restaurant restaurant : restaurantsList) {
@@ -66,7 +67,7 @@ public class DataProcessingUtils {
             boolean openNow = restaurant.getOpeningHours().isOpenNow();
 
             // TODO : To be deleted and replaced by method below
-            openingInformation = openNow ? "open" : "closed";
+            // openingInformation = openNow ? "open" : "closed";
             //
 
             // TODO : Replacement getting and displaying more info from API
@@ -110,9 +111,9 @@ public class DataProcessingUtils {
                 }
             }
 
-            /*  Define information to display
+            /*  Built information to display
                 Information must be either 3 char (code) or 7 char (code+schedule) length   */
-            if (openNow) {
+/*            if (openNow) {
                 if (closingTime1.equals("0000") || closingTime2.equals("0000")) {
                     openingInformation = "OP*";                     // Open 24/7
                 } else if (currentTime.compareTo(closingTime1) < 0) {
@@ -134,6 +135,7 @@ public class DataProcessingUtils {
         }
         return openingInformation;
     }
+    */
 
     public static void sortByDistanceAndName (List<Restaurant> restaurantList) {
         Collections.sort(restaurantList, Restaurant.comparatorName);

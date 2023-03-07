@@ -36,7 +36,9 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.manager.SelectedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.EventListener;
+import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -58,11 +60,20 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private NavigationView navigationView;
 
     // For ViewPager and Tabs
+    private ViewPager2 pager;
+    private TabLayout tabs;
     private final String MAP_VIEW_TAB_TITLE = "Map View";
     private final String LIST_VIEW_TAB_TITLE = "List View";
     private final String WORKMATES_TAB_TITLE = "Workmates";
-    private ViewPager2 pager;
-    private TabLayout tabs;
+    private final String [] tabTitles={     // Initialize title list
+            MAP_VIEW_TAB_TITLE,
+            LIST_VIEW_TAB_TITLE,
+            WORKMATES_TAB_TITLE};
+    int[] tabIcons = {                      // Initialize icon list
+            R.drawable.ic_baseline_map_black_24,
+            R.drawable.ic_baseline_view_list_black_24,
+            R.drawable.ic_baseline_group_black_24
+    };
 
     private ImageView userPicture;
     private TextView userName;
@@ -74,9 +85,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private static FusedLocationProviderClient fusedLocationProviderClient;
     private static boolean locationPermissionsGranted;
     private static LatLng home;
-    private static double latitude;
-    private static double longitude;
-    private static List<Restaurant> restaurantsList;
+    private static List<Restaurant> restaurantsList;    // To make it available for fragments in FirestoreUtils
+    private static List<User> workmatesList;            // To make it available for fragments in FirestoreUtils
 
     private Fragment fmt;
     private SearchView searchView;
@@ -190,16 +200,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     private void configureViewPagerAndTabs(){
 
-        // Initialize title list
-        String [] tabTitles={MAP_VIEW_TAB_TITLE,LIST_VIEW_TAB_TITLE,WORKMATES_TAB_TITLE};
-
-        // Initialize icon list
-        int[] tabIcons = {
-                R.drawable.ic_baseline_map_black_24,
-                R.drawable.ic_baseline_view_list_black_24,
-                R.drawable.ic_baseline_group_black_24
-        };
-
         // Get ViewPager from layout
         pager = binding.activityMainViewpager;
 
@@ -276,18 +276,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
                 switch (fmt.getTag()) {
                     case "f0":
-                        Toast.makeText(MainActivity.this, "Query is : " + query, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Query is : " + query, Toast.LENGTH_SHORT).show();    // TODO : To be deleted
                         ((MapViewFragment)fmt).launchAutocomplete(query);
                         break;
                     case "f1":
-                        Toast.makeText(MainActivity.this, "Query is : " + query, Toast.LENGTH_SHORT).show();
-                        Toast.makeText(MainActivity.this, "Search not yet implemented on ListView\nQuery is : " + query, Toast.LENGTH_SHORT).show();    // TODO : To be replaced by action
-                        // TODO : Do action
-                        break;
+                        // TODO : List filtering
                     case "f2":
-                        Toast.makeText(MainActivity.this, "Query is : " + query, Toast.LENGTH_SHORT).show();
-                        Toast.makeText(MainActivity.this, "Search not implemented on Workmates\nQuery is : " + query, Toast.LENGTH_SHORT).show();   // TODO : To be replaced by action
-                        // TODO : Do action
+                        Toast.makeText(MainActivity.this, String.format(getString(R.string.search_error), tabTitles[pager.getCurrentItem()]) + query, Toast.LENGTH_SHORT).show();
                         break;
                 }
                 searchView.setQuery("", false);
@@ -309,19 +304,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 switch (fmt.getTag()) {
                     case "f0":
                         if (newText.length() == 3) {
-                            Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();  // TODO : To be deleted
                             searchView.setQuery("", false);
                             searchView.setVisibility(View.GONE);
                             ((MapViewFragment)fmt).launchAutocomplete(newText);
                         }
                         break;
                     case "f1":
-                        //Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();
-                        Toast.makeText(MainActivity.this, "Search not yet implemented on ListView\nQuery is : " + newText, Toast.LENGTH_SHORT).show();
-                        break;
                     case "f2":
-                        Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();
-                        Toast.makeText(MainActivity.this, "Search not implemented on Workmates\nQuery is : " + newText, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, String.format(getString(R.string.search_error), tabTitles[pager.getCurrentItem()]) + newText, Toast.LENGTH_SHORT).show(); // TODO : To be deleted
                         break;
                 }
 
@@ -336,6 +327,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
      * ---------------------
      */
 
+    private void getDataFromApi() {
+        // Get current location
+        home = MapsApisUtils.getDeviceLocationFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
+        /** Also initialize objects restaurantsList and workmatesList in FirestoreUtils
+            in order to make them available for fragments */
+        restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
+        workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
+    }
+
     private void checkPermissionsAndGetDeviceLocation() {
         // This is the result of the user answer to permissions request
         ActivityResultContracts.RequestMultiplePermissions permissionsContract = new ActivityResultContracts.RequestMultiplePermissions();
@@ -346,12 +346,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 /** Fine location permission granted */
                 Log.w("ActivityResultLauncher", "Fine location permission was granted by user");
                 locationPermissionsGranted = true;
-                home = MapsApisUtils.getDeviceLocationFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
+                getDataFromApi();
             } else if (coarseLocationGranted != null && coarseLocationGranted) {
                 /** Coarse location permission granted */
                 Log.w("ActivityResultLauncher", "Only coarse location permission was granted by user");
                 locationPermissionsGranted = true;
-                home = MapsApisUtils.getDeviceLocationFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
+                getDataFromApi();
             } else {
                 /** No location permission granted */
                 Log.w("ActivityResultLauncher", "No location permission was granted by user");
@@ -371,7 +371,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             /** Permissions granted */
             Log.w("checkPermissions", "Permissions granted");
             locationPermissionsGranted = true;
-            home = MapsApisUtils.getDeviceLocationFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
+            getDataFromApi();
         }
     }
 

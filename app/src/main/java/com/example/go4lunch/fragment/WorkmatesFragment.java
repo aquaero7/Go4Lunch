@@ -178,26 +178,9 @@ public class WorkmatesFragment extends Fragment {
     }
 
     private void getWorkmatesListAndConfigureRecyclerView() {
-        workmatesList = new ArrayList<>();
-        UserManager.getUsersList(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult() != null) {
-                    // Get users list
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
-                        workmateToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
-                        workmatesList.add(workmateToAdd);
-                    }
-                }
-            } else {
-                Log.w("WorkmatesFragment", "Error getting documents: ", task.getException());
-                Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
-            }
-
-            configureRecyclerView();
-            configureOnClickRecyclerView();
-
-        });
+        workmatesList = FirestoreUtils.getWorkmatesList();
+        configureRecyclerView();
+        configureOnClickRecyclerView();
     }
 
 

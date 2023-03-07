@@ -20,24 +20,17 @@ import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
-import com.example.go4lunch.activity.MainActivity;
 import com.example.go4lunch.databinding.FragmentListViewBinding;
-import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.ItemClickSupport;
-import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.view.ListViewAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,10 +56,8 @@ public class ListViewFragment extends Fragment {
     private RecyclerView mRecyclerView;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private LatLng home;
     private List<Restaurant> restaurantsList;
-    private List<Restaurant> restaurantsListForDisplay;
-    private Restaurant restaurantToAdd;
+    private List<Restaurant> sortedRestaurantsList;
 
     private EventListener eventListener;
 
@@ -145,21 +136,8 @@ public class ListViewFragment extends Fragment {
         super.onResume();
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.listView_toolbar_title);
-
-        /** Solution A : Getting data from API in MapsApisUtils */
-        /*
-        home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, requireActivity());
-        restaurantsList = MapsApisUtils.getRestaurantsFromApi(home, getString(R.string.MAPS_API_KEY), requireContext());
-        if (restaurantsList != null && restaurantsList.size() != 0) {
-            restaurantsListForDisplay = DataProcessingUtils.customizeRestaurantsList(restaurantsList);
-            configureRecyclerView();
-            configureOnClickRecyclerView();
-        }
-        */
-
-        /** Solution B : Getting data from Firestore in MapsApisUtils */
+        // Getting restaurants list from Firestore and configure RecyclerView
         getRestaurantsListAndConfigureRecyclerView();
-
     }
 
     /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
@@ -186,7 +164,7 @@ public class ListViewFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
-        ListViewAdapter listViewAdapter = new ListViewAdapter(restaurantsListForDisplay, getString(R.string.MAPS_API_KEY),
+        ListViewAdapter listViewAdapter = new ListViewAdapter(restaurantsList, getString(R.string.MAPS_API_KEY),
                 getString(R.string.status_open), getString(R.string.status_closed), getString(R.string.status_open247),
                 getString(R.string.status_open_until), getString(R.string.status_open_at));
         // 3.3 - Attach the adapter to the recyclerview to populate items
@@ -200,38 +178,15 @@ public class ListViewFragment extends Fragment {
         ItemClickSupport.addTo(mRecyclerView, R.layout.restaurant_list_item)
                 .setOnItemClickListener((recyclerView, position, v) -> {
                     Log.w("TAG", "Position : "+position);       // TODO : To be deleted
-                    if (restaurantsListForDisplay.size() != 0) {
-                        Restaurant mRestaurant = restaurantsListForDisplay.get(position);
+                    if (restaurantsList.size() != 0) {
+                        Restaurant mRestaurant = restaurantsList.get(position);
                         launchDetailRestaurantActivity(mRestaurant);
                     }
                 });
     }
 
     private void getRestaurantsListAndConfigureRecyclerView() {
-        /*  // TODO : To be deleted cause transferred to FirestoreUtils
-        restaurantsListForDisplay = new ArrayList<>();
-        RestaurantManager.getRestaurantsList(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult() != null) {
-                    // Get restaurants list
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> restaurantData = document.getData(); // TODO : Map data for debug. To be deleted
-                        restaurantToAdd = FirestoreUtils.getRestaurantFromDatabaseDocument(document);
-                        restaurantsListForDisplay.add(restaurantToAdd);
-                    }
-                }
-            } else {
-                Log.d("ListViewFragment", "Error getting documents: ", task.getException());
-                Toast.makeText(requireContext(), "Error retrieving restaurants list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
-            }
-
-            configureRecyclerView();
-            configureOnClickRecyclerView();
-
-        });
-        */
-
-        restaurantsListForDisplay = FirestoreUtils.getRestaurantsList();
+        restaurantsList = FirestoreUtils.getRestaurantsList();
         configureRecyclerView();
         configureOnClickRecyclerView();
     }
@@ -244,7 +199,7 @@ public class ListViewFragment extends Fragment {
         startActivity(intent);
     }
 
-    public void filterRestaurantsListForDisplay() {
+    public void sortRestaurantsList() {
 
     }
 
