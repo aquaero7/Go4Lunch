@@ -2,6 +2,7 @@ package com.example.go4lunch.model;
 
 import androidx.annotation.Nullable;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class User {
@@ -77,5 +78,8 @@ public class User {
     public void setSelectionDate(@Nullable String selectionDate) {
         this.selectionDate = selectionDate;
     }
+
+    // Comparator for sort by name
+    public static Comparator<User> comparatorName = Comparator.comparing(User::getUsername);
 
 }

@@ -15,7 +15,9 @@ import com.example.go4lunch.databinding.RestaurantListItemBinding;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
+import com.example.go4lunch.utils.MapsApisUtils;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
@@ -57,7 +59,8 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         // Display restaurant name
         tvTitle.setText(restaurant.getName());
         // Display restaurant distance
-        String distance = restaurant.getDistance() + "m";
+        // String distance = restaurant.getDistance() + "m";    // TODO : To be deleted
+        String distance = DataProcessingUtils.calculateRestaurantDistance(restaurant, MapsApisUtils.getHome()) + "m";
         tvDistance.setText(distance);
         // Display restaurant country                                                       // TODO
         // tvCountry.setText(restaurant.getNationality());

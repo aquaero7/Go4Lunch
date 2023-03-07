@@ -22,9 +22,11 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentListViewBinding;
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.ItemClickSupport;
+import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.view.ListViewAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -57,7 +59,8 @@ public class ListViewFragment extends Fragment {
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private List<Restaurant> restaurantsList;
-    private List<Restaurant> sortedRestaurantsList;
+    private List<Restaurant> restaurantsListWithDistances;
+    private LatLng home;
 
     private EventListener eventListener;
 
@@ -164,7 +167,7 @@ public class ListViewFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
-        ListViewAdapter listViewAdapter = new ListViewAdapter(restaurantsList, getString(R.string.MAPS_API_KEY),
+        ListViewAdapter listViewAdapter = new ListViewAdapter(restaurantsListWithDistances, getString(R.string.MAPS_API_KEY),
                 getString(R.string.status_open), getString(R.string.status_closed), getString(R.string.status_open247),
                 getString(R.string.status_open_until), getString(R.string.status_open_at));
         // 3.3 - Attach the adapter to the recyclerview to populate items
@@ -178,15 +181,18 @@ public class ListViewFragment extends Fragment {
         ItemClickSupport.addTo(mRecyclerView, R.layout.restaurant_list_item)
                 .setOnItemClickListener((recyclerView, position, v) -> {
                     Log.w("TAG", "Position : "+position);       // TODO : To be deleted
-                    if (restaurantsList.size() != 0) {
-                        Restaurant mRestaurant = restaurantsList.get(position);
+                    if (restaurantsListWithDistances.size() != 0) {
+                        Restaurant mRestaurant = restaurantsListWithDistances.get(position);
                         launchDetailRestaurantActivity(mRestaurant);
                     }
                 });
     }
 
     private void getRestaurantsListAndConfigureRecyclerView() {
+        home = MapsApisUtils.getHome();
         restaurantsList = FirestoreUtils.getRestaurantsList();
+        restaurantsListWithDistances = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
+        DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistances);
         configureRecyclerView();
         configureOnClickRecyclerView();
     }
@@ -199,9 +205,7 @@ public class ListViewFragment extends Fragment {
         startActivity(intent);
     }
 
-    public void sortRestaurantsList() {
 
-    }
 
 
 

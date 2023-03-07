@@ -59,9 +59,6 @@ public class Restaurant implements Serializable {
     @Expose
     private Geometry geometry;
 
-    private double latitude;
-    private double longitude;
-
     @Nullable private List<User> selectors;
 
 
@@ -226,20 +223,10 @@ public class Restaurant implements Serializable {
     // SORTS
 
     // Comparator for sort by distance
-    public static Comparator<Restaurant> comparatorDistance = new Comparator<Restaurant>() {
-        @Override
-        public int compare(Restaurant o1, Restaurant o2) {
-            return (int) (o1.getDistance() - o2.getDistance());
-        }
-    };
+    public static Comparator<Restaurant> comparatorDistance = (o1, o2) -> (int) (o1.getDistance() - o2.getDistance());
 
     // Comparator for sort by name
-    public static Comparator<Restaurant> comparatorName = new Comparator<Restaurant>() {
-        @Override
-        public int compare(Restaurant o1, Restaurant o2) {
-            return o1.getName().compareTo(o2.getName());
-        }
-    };
+    public static Comparator<Restaurant> comparatorName = Comparator.comparing(Restaurant::getName);
 
 
 

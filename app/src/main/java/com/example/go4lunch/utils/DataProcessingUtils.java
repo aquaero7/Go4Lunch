@@ -137,9 +137,12 @@ public class DataProcessingUtils {
     }
     */
 
-    public static void sortByDistanceAndName (List<Restaurant> restaurantList) {
-        Collections.sort(restaurantList, Restaurant.comparatorName);
-        Collections.sort(restaurantList, Restaurant.comparatorDistance);
+    public static List<Restaurant> updateRestaurantsListWithDistances(List<Restaurant> restaurantsList, LatLng home) {
+        for (Restaurant restaurant : restaurantsList) {
+            int distance =  calculateRestaurantDistance(restaurant, home);
+            restaurant.setDistance(distance);
+        }
+        return restaurantsList;
     }
 
     public static LatLngBounds calculateBounds(LatLng home, int radius) {
@@ -163,6 +166,15 @@ public class DataProcessingUtils {
         LatLng ne = new LatLng(latNE, lngNE);
 
         return new LatLngBounds(sw, ne);
+    }
+
+    public static void sortByDistanceAndName (List<Restaurant> restaurantsList) {
+        Collections.sort(restaurantsList, Restaurant.comparatorName);
+        Collections.sort(restaurantsList, Restaurant.comparatorDistance);
+    }
+
+    public static void sortByName(List<User> workmatesList) {
+        Collections.sort(workmatesList, User.comparatorName);
     }
 
 

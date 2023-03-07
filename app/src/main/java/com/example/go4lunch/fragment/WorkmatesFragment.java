@@ -22,6 +22,7 @@ import com.example.go4lunch.activity.MainActivity;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.ItemClickSupport;
@@ -179,6 +180,7 @@ public class WorkmatesFragment extends Fragment {
 
     private void getWorkmatesListAndConfigureRecyclerView() {
         workmatesList = FirestoreUtils.getWorkmatesList();
+        DataProcessingUtils.sortByName(workmatesList);
         configureRecyclerView();
         configureOnClickRecyclerView();
     }

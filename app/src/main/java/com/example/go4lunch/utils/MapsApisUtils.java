@@ -56,10 +56,11 @@ public class MapsApisUtils extends FragmentActivity {
         return home;
     }
 
+    /*  // TODO : TO be deleted cause list recovered from Firestore in FirestoreUtils
     public static List<Restaurant> getRestaurantsList() {
         return restaurantsList;
     }
-
+    */
 
     // USED WITH SOLUTION 1 :
     @SuppressWarnings("MissingPermission")
@@ -144,7 +145,8 @@ public class MapsApisUtils extends FragmentActivity {
         OpeningHours openingHours = nearbyRestaurant.getOpeningHours(); // Can be commented if openingHours come from nearby api
         List<Photo> photos = nearbyRestaurant.getPhotos();
         Geometry geometry = nearbyRestaurant.getGeometry();
-        long distance = DataProcessingUtils.calculateRestaurantDistance(nearbyRestaurant, latLng);
+        // long distance = DataProcessingUtils.calculateRestaurantDistance(nearbyRestaurant, latLng);
+        long distance = 0;
 
         // Call Place Details API
         Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(id,
