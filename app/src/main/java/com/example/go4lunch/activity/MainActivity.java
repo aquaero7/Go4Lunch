@@ -33,7 +33,7 @@ import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
-import com.example.go4lunch.manager.SelectedRestaurantManager;
+import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
@@ -382,8 +382,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             String selectionId = user.getSelectionId();
             if (selectionId != null) {
                 // Get selected restaurant from restaurants collection in database
-                // RestaurantManager.getRestaurantData(selectionId)
-                SelectedRestaurantManager.getSelectedRestaurantData(selectionId)
+                RestaurantManager.getRestaurantData(selectionId)
                         .addOnSuccessListener(restaurant -> {
                             Log.w("MainActivity", "success task getRestaurantData");
                             launchDetailRestaurantActivity(restaurant);

@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.example.go4lunch.fragment.DetailRestaurantFragment;
 import com.example.go4lunch.R;
-import com.example.go4lunch.manager.SelectedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
@@ -55,7 +54,7 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
                 break;
             case "FAB":
                 if (isSelected) {
-                    addSelectionToDatabase(rId, rName, rAddress, rRating, rPhotos);
+                    addSelectionToDatabase(rId);
                     toastText = getString(R.string.fabChecked);
                 } else {
                     removeSelectionFromDatabase(rId);
@@ -79,19 +78,13 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
         }
     }
 
-    private void addSelectionToDatabase(String rId, String rName, String rAddress, double rRating, List<Photo> rPhotos) {
-        // Add restaurant to selected restaurant collection in database
-        SelectedRestaurantManager.getInstance().createSelectedRestaurant(rId, rName, rAddress, rRating, rPhotos);
+    private void addSelectionToDatabase(String rId) {
         // Add selected restaurant ID to user document in database
         UserManager.getInstance().updateSelectionId(rId);
         UserManager.getInstance().updateSelectionDate(CalendarUtils.getCurrentDate());
     }
 
     private void removeSelectionFromDatabase(String rId) {
-        /** DO NOT remove restaurant from selected restaurant collection in database
-        because it can be also selected by others workmates !
-        // SelectedRestaurantManager.getInstance().deleteSelectedRestaurant(rId); //
-        */
         // Remove selected restaurant ID from user document in database
         UserManager.getInstance().updateSelectionId(null);
         UserManager.getInstance().updateSelectionDate(null);

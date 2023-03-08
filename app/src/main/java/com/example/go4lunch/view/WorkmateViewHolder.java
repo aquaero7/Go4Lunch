@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.databinding.WorkmateListItemBinding;
-import com.example.go4lunch.manager.SelectedRestaurantManager;
+import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.User;
 import com.squareup.picasso.Picasso;
@@ -43,16 +43,14 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
             // Get workmate selected restaurant id from database
             UserManager.getInstance().getUserData(workmate.getUid()).addOnSuccessListener(user -> {
                 // Get selected restaurant name from database
-                SelectedRestaurantManager.getSelectedRestaurantData(user.getSelectionId())
+                RestaurantManager.getRestaurantData(user.getSelectionId())
                         .addOnSuccessListener(restaurant -> {
-                            // mText = workmate.getUsername() + " is eating at \"" + restaurant.getName() + "\"";
                             mText = workmate.getUsername() + CHOICE_TEXT + "\"" + restaurant.getName() + "\"";
                             textView.setText(mText);
                         })
                         .addOnFailureListener(e -> Log.w("WorkmateViewHolder", e.getMessage()));
             });
         } else {
-            // mText = workmate.getUsername() + " is probably eating somewhere...";
             mText = workmate.getUsername() + NO_CHOICE_TEXT;
             textView.setText(mText);
         }
