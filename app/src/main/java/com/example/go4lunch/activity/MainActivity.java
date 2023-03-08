@@ -37,6 +37,7 @@ import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
@@ -90,6 +91,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     private Fragment fmt;
     private SearchView searchView;
+
+    private final String currentDate = CalendarUtils.getCurrentDate();
 
     private final UserManager userManager = UserManager.getInstance();
 
@@ -378,9 +381,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void checkCurrentUserSelection() {
         // Get current user selected restaurant id from database
         UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
-            // Get current user selected restaurant id from database
+            // Get current user selected restaurant from database
             String selectionId = user.getSelectionId();
-            if (selectionId != null) {
+            String selectionDate = user.getSelectionDate();
+            boolean isSelected = selectionId != null && currentDate.equals(selectionDate);
+            if (isSelected) {
                 // Get selected restaurant from restaurants collection in database
                 RestaurantManager.getRestaurantData(selectionId)
                         .addOnSuccessListener(restaurant -> {

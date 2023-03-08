@@ -11,8 +11,10 @@ import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.example.go4lunch.fragment.DetailRestaurantFragment;
 import com.example.go4lunch.R;
 import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
+import com.example.go4lunch.utils.FirestoreUtils;
 
 import java.util.List;
 
@@ -60,6 +62,8 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
                     removeSelectionFromDatabase(rId);
                     toastText = getString(R.string.fabUnchecked);
                 }
+                // Update workmates list only to make selection change updated in workmates view
+                List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
                 break;
         }
         displayToast();
