@@ -25,6 +25,7 @@ import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Photo;
+import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.DetailRestaurantWorkmateAdapter;
@@ -33,6 +34,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -70,13 +72,17 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private TextView mTextView2;
     private FloatingActionButton selectionFab;
     private TextView emptyListMessage;
-    private Boolean isSelected;
 
     // Declare restaurant
     private Restaurant restaurant;
 
-    // Declare selected restaurant id
+    // Declare current date
+    private final String currentDate = CalendarUtils.getCurrentDate();
+
+    // Declare selected restaurant
     private String selectionId;
+    private String selectionDate;
+    private Boolean isSelected;
 
     // Declare Workmates-Selectors list
     private List<User> selectorsList;
@@ -235,11 +241,13 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         UserManager.getUsersList(task -> {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
-                    // Get users list
+                    // Check selected restaurant id and date and get users list
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
                         selectorToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
-                        if (selectorToAdd.getSelectionId() != null && selectorToAdd.getSelectionId().equals(restaurantId)) selectorsList.add(selectorToAdd);
+                        boolean isSelector = (restaurantId.equals(selectorToAdd.getSelectionId())
+                                        && currentDate.equals(selectorToAdd.getSelectionDate()));
+                        if (isSelector) selectorsList.add(selectorToAdd);
                     }
                 }
             } else {
@@ -279,10 +287,11 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
             // Get current user selected restaurant id from database
             selectionId = user.getSelectionId();
+            selectionDate = user.getSelectionDate();
             // Get the id of this restaurant
             String restaurantId = restaurant.getId();
             // Update selection status
-            isSelected = (restaurantId.equals(selectionId));
+            isSelected = (restaurantId.equals(selectionId)) && (currentDate.equals(selectionDate));
             // Define the foreground of the selection FAB mipmap, according to the selection status
             int resId = (isSelected) ? R.mipmap.im_check_green_white : R.mipmap.im_check_grey_white;
             // Set up the new foreground of the selection FAB

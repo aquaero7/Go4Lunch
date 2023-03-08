@@ -13,13 +13,15 @@ import com.example.go4lunch.databinding.WorkmateListItemBinding;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.utils.CalendarUtils;
 import com.squareup.picasso.Picasso;
 
 public class WorkmateViewHolder extends RecyclerView.ViewHolder {
 
-    ImageView imageView;
-    TextView textView;
-    String mText;
+    private final ImageView imageView;
+    private final TextView textView;
+    private String mText;
+    private final String currentDate = CalendarUtils.getCurrentDate();
 
     public WorkmateViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -32,24 +34,21 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
 
         // Display workmate picture
         String pictureUrl = workmate.getUserUrlPicture();
-        if (pictureUrl != null && pictureUrl != "") {
+        if (pictureUrl != null && !pictureUrl.equals("")) {
             Picasso.get().load(pictureUrl).into(imageView);
             imageView.setColorFilter(Color.argb(0, 0, 0, 0));
         }
 
         // Display workmate name
-        if (workmate.getSelectionId() != null && workmate.getSelectionId() != "") {
-
-            // Get workmate selected restaurant id from database
-            UserManager.getInstance().getUserData(workmate.getUid()).addOnSuccessListener(user -> {
-                // Get selected restaurant name from database
-                RestaurantManager.getRestaurantData(user.getSelectionId())
-                        .addOnSuccessListener(restaurant -> {
-                            mText = workmate.getUsername() + CHOICE_TEXT + "\"" + restaurant.getName() + "\"";
-                            textView.setText(mText);
-                        })
-                        .addOnFailureListener(e -> Log.w("WorkmateViewHolder", e.getMessage()));
-            });
+        boolean isSelected = workmate.getSelectionId() != null && currentDate.equals(workmate.getSelectionDate());
+        if (isSelected) {
+            // Get selected restaurant name from database
+            RestaurantManager.getRestaurantData(workmate.getSelectionId())
+                    .addOnSuccessListener(restaurant -> {
+                        mText = workmate.getUsername() + CHOICE_TEXT + "\"" + restaurant.getName() + "\"";
+                        textView.setText(mText);
+                    })
+                    .addOnFailureListener(e -> Log.w("WorkmateViewHolder", e.getMessage()));
         } else {
             mText = workmate.getUsername() + NO_CHOICE_TEXT;
             textView.setText(mText);

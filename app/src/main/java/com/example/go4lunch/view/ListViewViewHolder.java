@@ -15,6 +15,7 @@ import com.example.go4lunch.databinding.RestaurantListItemBinding;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
@@ -38,10 +39,13 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
     private final RatingBar mRatingBar;
     private final ImageView ivPicture;
 
+    private final String currentDate = CalendarUtils.getCurrentDate();
+
 
     public ListViewViewHolder(@NonNull View itemView) {
         super(itemView);
         RestaurantListItemBinding binding = RestaurantListItemBinding.bind(itemView);
+
         tvTitle = binding.restaurantItemTitle;
         tvDistance = binding.restaurantItemDistance;
         tvCountry = binding.restaurantItemCountry;
@@ -123,8 +127,10 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
                         Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
                         // Get workmate in workmates list
                         User workmate = FirestoreUtils.getUserFromDatabaseDocument(document);
-                        // Check selected restaurant id and increase selections count if matches with restaurant id
-                        if (workmate.getSelectionId() != null && workmate.getSelectionId().equals(rId)) selectionsCount += 1;
+                        // Check selected restaurant id and date and increase selections count if matches with restaurant id
+                        boolean isSelected = rId.equals(workmate.getSelectionId())
+                                        && currentDate.equals(workmate.getSelectionDate());
+                        if (isSelected) selectionsCount += 1;
                     }
                     // Display selections count
                     String workmatesCount = "(" + selectionsCount + ")";

@@ -26,6 +26,7 @@ import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
@@ -81,6 +82,7 @@ public class MapViewFragment extends Fragment implements
     private static final int RESTAURANT_ZOOM = 19;
     private List<Restaurant> restaurantsList = new ArrayList<>();
     private int selectionsCount;
+    private final String currentDate = CalendarUtils.getCurrentDate();
 
     public MapViewFragment() {
     }
@@ -321,8 +323,9 @@ public class MapViewFragment extends Fragment implements
                         Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
                         // Get workmate in workmates list
                         User workmate = FirestoreUtils.getUserFromDatabaseDocument(document);
-                        // Check selected restaurant id and increase selections count if matches with restaurant id
-                        if (workmate.getSelectionId() != null && workmate.getSelectionId().equals(rId)) selectionsCount += 1;
+                        // Check selected restaurant and increase selections count if matches with restaurant id
+                        boolean isSelected = rId.equals(workmate.getSelectionId()) && currentDate.equals(workmate.getSelectionDate());
+                        if (isSelected) selectionsCount += 1;
                     }
                     // Update marker color
                     float markerColor = (selectionsCount > 0) ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_RED;
