@@ -50,7 +50,8 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
                     })
                     .addOnFailureListener(e -> Log.w("WorkmateViewHolder", e.getMessage()));
         } else {
-            mText = workmate.getUsername() + NO_CHOICE_TEXT;
+            // mText = workmate.getUsername() + NO_CHOICE_TEXT;
+            mText = workmate.getUsername();
             textView.setText(mText);
         }
 

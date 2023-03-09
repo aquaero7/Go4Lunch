@@ -183,7 +183,7 @@ public class MapViewFragment extends Fragment implements
         // Handle actions on menu items
         switch (item.getItemId()) {
             case R.id.menu_activity_main_search:
-                Toast.makeText(requireContext(), "Click on search button in MapViewFragment", Toast.LENGTH_SHORT).show();   // TODO : To be deleted
+                // Toast.makeText(requireContext(), "Click on search button in MapViewFragment", Toast.LENGTH_SHORT).show();   // TODO : To be deleted
                 eventListener.toggleSearchViewVisibility();
                 return true;
             default:
@@ -300,10 +300,6 @@ public class MapViewFragment extends Fragment implements
         }
     }
 
-    private void clearRestaurantsList() {
-        RestaurantManager.clearRestaurantsCollection();
-    }
-
     private void launchDetailRestaurantActivity(Restaurant restaurant) {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
@@ -333,12 +329,12 @@ public class MapViewFragment extends Fragment implements
                 }
             } else {
                 Log.w("MapViewFragment", "Error getting documents: ", task.getException());
-                Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
+                // Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
             }
         });
     }
 
-    // Launched from activity
+    // Autocomplete launched from activity
     public void launchAutocomplete(String text) {
         autocompleteCardView.setVisibility(View.VISIBLE);
         configureAutocompleteSupportFragment(text);

@@ -251,8 +251,8 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                     }
                 }
             } else {
-    Log.w("DetailRestaurantFragment", "Error getting documents: ", task.getException());
-                Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
+                Log.w("DetailRestaurantFragment", "Error getting documents: ", task.getException());
+                // Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
             }
 
             configureRecyclerView();
@@ -269,7 +269,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
             if (bundle != null) {
                 restaurant = (Restaurant) bundle.getSerializable("RESTAURANT");
                 Log.w("DetailRestaurantFragment", "Name of this restaurant : " + restaurant.getName());    // TODO : For debug. To be deleted
-                Toast.makeText(requireContext(), restaurant.getName(), Toast.LENGTH_SHORT).show();  // TODO : For debug. To be deleted
+                // Toast.makeText(requireContext(), restaurant.getName(), Toast.LENGTH_SHORT).show();  // TODO : For debug. To be deleted
             }
         }
     }

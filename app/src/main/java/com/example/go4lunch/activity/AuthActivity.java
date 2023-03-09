@@ -143,9 +143,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
     // Show Snack Bar with a message
     private void showSnackBar(String message){
-        // Snackbar.make(binding.authLayout, message, Snackbar.LENGTH_LONG).show();
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
-        // Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void startApp(){
