@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.example.go4lunch.fragment.ListViewFragment;
 import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
@@ -45,6 +46,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
@@ -231,8 +233,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                // TODO : Autocomplete transferred to MapViewFragment
-                // autocompleteCardView.setVisibility(View.GONE);
+                searchView.setQuery("", false);
+                searchView.setVisibility(View.GONE);
+
             }
 
             @Override
@@ -273,22 +276,23 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
                 // Get fragment's identification
                 fmt = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
 
                 switch (fmt.getTag()) {
                     case "f0":
-                        Toast.makeText(MainActivity.this, "Query is : " + query, Toast.LENGTH_SHORT).show();    // TODO : To be deleted
+                        // Toast.makeText(MainActivity.this, "Query is : " + query, Toast.LENGTH_SHORT).show();    // TODO : To be deleted
                         ((MapViewFragment)fmt).launchAutocomplete(query);
+                        searchView.setQuery("", false);
                         break;
                     case "f1":
-                        // TODO : List filtering
+                        ((ListViewFragment)fmt).filterList(query);
+                        break;
                     case "f2":
-                        Toast.makeText(MainActivity.this, String.format(getString(R.string.search_error), tabTitles[pager.getCurrentItem()]) + query, Toast.LENGTH_SHORT).show();
+                        showSnackBar(String.format(getString(R.string.search_error), tabTitles[pager.getCurrentItem()]));
+                        searchView.setQuery("", false);
                         break;
                 }
-                searchView.setQuery("", false);
                 searchView.setVisibility(View.GONE);
                 return false;
             }
@@ -307,20 +311,37 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 switch (fmt.getTag()) {
                     case "f0":
                         if (newText.length() == 3) {
-                            Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();  // TODO : To be deleted
+                            // Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();  // TODO : To be deleted
                             searchView.setQuery("", false);
                             searchView.setVisibility(View.GONE);
                             ((MapViewFragment)fmt).launchAutocomplete(newText);
                         }
                         break;
                     case "f1":
+                        ((ListViewFragment)fmt).filterList(newText);
+                        break;
                     case "f2":
-                        Toast.makeText(MainActivity.this, String.format(getString(R.string.search_error), tabTitles[pager.getCurrentItem()]) + newText, Toast.LENGTH_SHORT).show(); // TODO : To be deleted
+                        // showSnackBar(String.format(getString(R.string.search_error), tabTitles[pager.getCurrentItem()]));   // TODO : To be deleted
                         break;
                 }
-
                 return false;
             }
+        });
+
+        searchView.setOnCloseListener(() -> {
+            // Get fragment's identification
+            fmt = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
+
+            switch (fmt.getTag()) {
+                case "f0":
+                case "f2":
+                    break;
+                case "f1":
+                    ((ListViewFragment)fmt).filterList("");
+                    break;
+            }
+            searchView.setVisibility(View.GONE);
+            return false;
         });
     }
 
@@ -330,9 +351,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
      * ---------------------
      */
 
-    private void getDataFromApi() {
+    private void getLocationDataFromApi() {
         // Get current location
-        home = MapsApisUtils.getDeviceLocationFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
+        home = MapsApisUtils.getDataFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
         /** Also initialize objects restaurantsList and workmatesList in FirestoreUtils
             in order to make them available for fragments */
         restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
@@ -349,12 +370,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 /** Fine location permission granted */
                 Log.w("ActivityResultLauncher", "Fine location permission was granted by user");
                 locationPermissionsGranted = true;
-                getDataFromApi();
+                getLocationDataFromApi();
             } else if (coarseLocationGranted != null && coarseLocationGranted) {
                 /** Coarse location permission granted */
                 Log.w("ActivityResultLauncher", "Only coarse location permission was granted by user");
                 locationPermissionsGranted = true;
-                getDataFromApi();
+                getLocationDataFromApi();
             } else {
                 /** No location permission granted */
                 Log.w("ActivityResultLauncher", "No location permission was granted by user");
@@ -374,7 +395,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             /** Permissions granted */
             Log.w("checkPermissions", "Permissions granted");
             locationPermissionsGranted = true;
-            getDataFromApi();
+            getLocationDataFromApi();
         }
     }
 
@@ -394,7 +415,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                         })
                         .addOnFailureListener(e -> Log.w("MainActivity", e.getMessage()));
             } else {
-                Toast.makeText(this, getString(R.string.choice_error), Toast.LENGTH_LONG).show();
+                showSnackBar(getString(R.string.choice_error));
             }
         });
     }
@@ -450,6 +471,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         Intent intent = new Intent();
         setResult(Activity.RESULT_OK, intent);
         finish();
+    }
+
+    private void showSnackBar(String message) {
+        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
 
 

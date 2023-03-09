@@ -133,6 +133,13 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
                         if (isSelected) selectionsCount += 1;
                     }
                     // Display selections count
+                    if (selectionsCount >0) {
+                        ivWorkmateLogo.setVisibility(View.VISIBLE);
+                        tvSelectionsCount.setVisibility(View.VISIBLE);
+                    } else {
+                        ivWorkmateLogo.setVisibility(View.INVISIBLE);
+                        tvSelectionsCount.setVisibility(View.INVISIBLE);
+                    }
                     String workmatesCount = "(" + selectionsCount + ")";
                     tvSelectionsCount.setText(workmatesCount);
                 }

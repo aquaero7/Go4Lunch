@@ -65,7 +65,7 @@ public class MapsApisUtils extends FragmentActivity {
     // USED WITH SOLUTION 1 :
     @SuppressWarnings("MissingPermission")
     // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method in MapsViewFragment
-    public static LatLng getDeviceLocationFromApi(Activity activity, FusedLocationProviderClient fusedLocationProviderClient, String KEY, boolean permissionsGranted) {
+    public static LatLng getDataFromApi(Activity activity, FusedLocationProviderClient fusedLocationProviderClient, String KEY, boolean permissionsGranted) {
         locationPermissionsGranted = permissionsGranted;
         try {
             Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();

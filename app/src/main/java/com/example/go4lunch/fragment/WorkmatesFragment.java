@@ -149,7 +149,7 @@ public class WorkmatesFragment extends Fragment {
         // Handle actions on menu items
         switch (item.getItemId()) {
             case R.id.menu_activity_main_search:
-                Toast.makeText(requireContext(), "Click on search button in Workmates", Toast.LENGTH_SHORT).show();   // TODO : To be deleted
+                // Toast.makeText(requireContext(), "Click on search button in Workmates", Toast.LENGTH_SHORT).show();   // TODO : To be deleted
                 eventListener.toggleSearchViewVisibility();
                 return true;
             default:

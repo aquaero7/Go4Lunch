@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.go4lunch.databinding.ActivityDetailRestaurantBinding;
+import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.example.go4lunch.fragment.DetailRestaurantFragment;
 import com.example.go4lunch.R;
@@ -15,20 +17,26 @@ import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
 
-public class DetailRestaurantActivity extends AppCompatActivity implements DetailRestaurantFragment.OnButtonClickedListener {
+public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaurantBinding> implements DetailRestaurantFragment.OnButtonClickedListener {
 
-    // private Boolean isSelected; // TODO : Update status with information in database
-    private String toastText;
+    private String message;
+    private String toastText;   // TODO : Delete after action completion
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    ActivityDetailRestaurantBinding getViewBinding() {
+        return ActivityDetailRestaurantBinding.inflate(getLayoutInflater());
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail_restaurant);
+        // setContentView(R.layout.activity_detail_restaurant); // TODO : To be deleted cause this activity extends BaseActivity and overrides getViewBinding
 
         configureAndShowDetailRestaurantFragment();
     }
@@ -57,16 +65,20 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
             case "FAB":
                 if (isSelected) {
                     addSelectionToDatabase(rId);
-                    toastText = getString(R.string.fabChecked);
+                    message = getString(R.string.fabChecked);
                 } else {
                     removeSelectionFromDatabase(rId);
-                    toastText = getString(R.string.fabUnchecked);
+                    message = getString(R.string.fabUnchecked);
                 }
-                // Update workmates list only to make selection change updated in workmates view
+                toastText = tag;    // TODO : Delete after action completion
+                showSnackBar(message);
+
+                /** Update object workmatesList in FirestoreUtils
+                 in order to only make selection changes available for workmates fragment */
                 List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
                 break;
         }
-        displayToast();
+        displayToast(); // TODO : Delete after action completion
     }
 
     private void configureAndShowDetailRestaurantFragment() {
@@ -94,10 +106,6 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
         UserManager.getInstance().updateSelectionDate(null);
     }
 
-    private void displayToast() {
-        Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
-    }
-
     private void callRestaurant(){
         // TODO
     }
@@ -108,6 +116,14 @@ public class DetailRestaurantActivity extends AppCompatActivity implements Detai
 
     private void displayRestaurantWebsite(){
         // TODO
+    }
+
+    private void showSnackBar(String message) {
+        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
+    }
+
+    private void displayToast() {
+        Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
     }
 
 
