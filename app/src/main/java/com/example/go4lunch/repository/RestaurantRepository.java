@@ -150,7 +150,7 @@ public class RestaurantRepository {
     public static Task<DocumentSnapshot> getRestaurantData(String id) {
         if(id != null){
             return getRestaurantsCollection().document(id).get();
-        }else{
+        } else {
             return null;
         }
     }
@@ -168,6 +168,5 @@ public class RestaurantRepository {
             }
         });
     }
-
 
 }

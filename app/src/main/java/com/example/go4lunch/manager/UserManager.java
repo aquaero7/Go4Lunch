@@ -49,25 +49,27 @@ public class UserManager {
         userRepository.createUser();
     }
 
+    // Get the users list from Firestore
     public static void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
-        // Get the users list from Firestore
         UserRepository.getUsersList(listener);
     }
 
+    // Get the current user from Firestore and cast it to a User model Object
     public Task<User> getCurrentUserData() {
-        // Get the current user from Firestore and cast it to a User model Object
         return userRepository.getCurrentUserData().continueWith(task -> task.getResult().toObject(User.class)) ;
     }
 
+    // Get the user from Firestore and cast it to a User model Object
     public Task<User> getUserData(String id) {
-        // Get the user from Firestore and cast it to a User model Object
         return userRepository.getUserData(id).continueWith(task -> task.getResult().toObject(User.class)) ;
     }
 
+    // Set ir update user selection restaurant id
     public Task<Void> updateSelectionId(String selectionId) {
         return userRepository.updateSelectionId(selectionId);
     }
 
+    // Set or update user selection date
     public Task<Void> updateSelectionDate(String selectionDate) {
         return userRepository.updateSelectionDate(selectionDate);
     }

@@ -40,6 +40,8 @@ public class RestaurantManager {
         }
     }
 
+    // Create restaurant in Firestore
+
     // Method for database constructor
     public void createRestaurant(String id, String name, long distance, List<Photo> photos, String nationality,
                                  String address, double rating, OpeningHours openingHours, int likesCount,
@@ -69,15 +71,13 @@ public class RestaurantManager {
         restaurantRepository.createRestaurant(id, name);
     }
 
-
+    // Get the restaurants list from Firestore
     public static void getRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
-        // Get the restaurants list from Firestore
         RestaurantRepository.getRestaurantsList(listener);
     }
 
-
+    // Get the restaurant data from Firestore and cast it to a Restaurant model Object
     public static Task<Restaurant> getRestaurantData(String id){
-        // Get the restaurant data from Firestore and cast it to a Restaurant model Object
         return RestaurantRepository.getRestaurantData(id).continueWith(task -> task.getResult().toObject(Restaurant.class));
     }
 
@@ -85,6 +85,5 @@ public class RestaurantManager {
     public static void clearRestaurantsCollection() {
         RestaurantRepository.clearRestaurantsCollection();
     }
-
 
 }

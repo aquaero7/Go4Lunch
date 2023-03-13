@@ -1,18 +1,17 @@
 package com.example.go4lunch.activity;
 
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.go4lunch.databinding.ActivityDetailRestaurantBinding;
-import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.example.go4lunch.fragment.DetailRestaurantFragment;
 import com.example.go4lunch.R;
+import com.example.go4lunch.manager.LikedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
@@ -27,6 +26,8 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
     private String message;
     private String toastText;   // TODO : Delete after action completion
 
+    LikedRestaurantManager likedRestaurantManager = LikedRestaurantManager.getInstance();
+
 
     @Override
     ActivityDetailRestaurantBinding getViewBinding() {
@@ -37,7 +38,6 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // setContentView(R.layout.activity_detail_restaurant); // TODO : To be deleted cause this activity extends BaseActivity and overrides getViewBinding
-
         configureAndShowDetailRestaurantFragment();
     }
 
@@ -46,7 +46,7 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
     // --------------
     @Override
     // Binding added as an argument to make it available here
-    public void onButtonClicked(View view, FragmentDetailRestaurantBinding fragmentBinding, String rId, String rName, String rAddress, double rRating, List<Photo> rPhotos, boolean isSelected) {
+    public void onButtonClicked(View view, FragmentDetailRestaurantBinding fragmentBinding, String rId, String rName, String rAddress, double rRating, List<Photo> rPhotos, boolean isSelected, boolean isLiked, String uId) {
         // Handle the button click event
         String tag = String.valueOf(view.getTag());
         switch (tag) {
@@ -55,7 +55,10 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
                 toastText = tag;    // TODO : Delete after action completion
                 break;
             case "BTN_LIKE":
-                likeRestaurant();
+                updateLike(isLiked, rId, uId);
+                /** Update objects likedRestaurantsList in FirestoreUtils
+                 only to make likes changes available for DetailRestaurant fragment */
+                List<LikedRestaurant> likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
                 toastText = tag;    // TODO : Delete after action completion
                 break;
             case "BTN_WEBSITE":
@@ -73,8 +76,8 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
                 toastText = tag;    // TODO : Delete after action completion
                 showSnackBar(message);
 
-                /** Update object workmatesList in FirestoreUtils
-                 in order to only make selection changes available for workmates fragment */
+                /** Update objects workmatesList in FirestoreUtils
+                 only to make selection changes available for Workmates fragment */
                 List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
                 break;
         }
@@ -110,8 +113,12 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         // TODO
     }
 
-    private void likeRestaurant(){
-        // TODO
+    private void updateLike(boolean isLiked, String rId, String uId){
+        if (isLiked) {
+            likedRestaurantManager.createLikedRestaurant(rId+uId, rId, uId);
+        } else {
+            likedRestaurantManager.deleteLikedRestaurant(rId+uId);
+        }
     }
 
     private void displayRestaurantWebsite(){

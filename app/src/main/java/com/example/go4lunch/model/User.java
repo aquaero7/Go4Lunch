@@ -2,10 +2,14 @@ package com.example.go4lunch.model;
 
 import androidx.annotation.Nullable;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
 
     private String uid;
     private String username;

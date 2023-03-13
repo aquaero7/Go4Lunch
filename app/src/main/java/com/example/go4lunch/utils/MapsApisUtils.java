@@ -76,7 +76,7 @@ public class MapsApisUtils extends FragmentActivity {
                     if (lastKnownLocation != null) {
                         latitude = lastKnownLocation.getLatitude();
                         longitude = lastKnownLocation.getLongitude();
-                        Toast.makeText(activity, "Yep ! Got location !", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(activity, "Yep ! Got location !", Toast.LENGTH_SHORT).show();    // TODO : To be deleted
                         // Initialize current location
                         home = new LatLng(latitude, longitude);
                         // Get nearby restaurants list from API

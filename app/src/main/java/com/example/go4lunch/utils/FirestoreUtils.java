@@ -2,8 +2,10 @@ package com.example.go4lunch.utils;
 
 import android.util.Log;
 
+import com.example.go4lunch.manager.LikedRestaurantManager;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
@@ -20,17 +22,24 @@ public class FirestoreUtils {
 
     private static List<Restaurant> restaurantsList = new ArrayList<>();
     private static List<User> workmatesList = new ArrayList<>();
+    private static List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
 
 
-    // Get current restaurant list
+    // Get current restaurants list
     public static List<Restaurant> getRestaurantsList() {
         return restaurantsList;
     }
 
-    // Get current restaurant list
+    // Get current workmates list
     public static List<User> getWorkmatesList() {
         return workmatesList;
     }
+
+    // Get current liked restaurants list
+    public static List<LikedRestaurant> getLikedRestaurantsList() {
+        return likedRestaurantsList;
+    }
+
 
     // Get user data from Firestore with given document and create user
     public static User getUserFromDatabaseDocument(QueryDocumentSnapshot document) {
@@ -199,6 +208,16 @@ public class FirestoreUtils {
         return new Geometry(location);
     }
 
+    // Get liked restaurant data from Firestore with given document and create liked restaurant
+    public static LikedRestaurant getLikedRestaurantFromDatabaseDocument(QueryDocumentSnapshot document) {
+        String id = Objects.requireNonNull(document.getId());
+        String rId = Objects.requireNonNull(document.getData().get("rid")).toString();
+        String uId = Objects.requireNonNull(document.getData().get("uid")).toString();
+        LikedRestaurant likedRestaurantFromData = new LikedRestaurant(id, rId, uId);
+
+        return likedRestaurantFromData;
+    }
+
     // Get restaurants list from Firestore
     public static List<Restaurant> getRestaurantsListFromDatabaseDocument() {
         RestaurantManager.getRestaurantsList(task -> {
@@ -237,6 +256,26 @@ public class FirestoreUtils {
             }
         });
         return workmatesList;
+    }
+
+    // Get liked restaurants list from Firestore
+    public static List<LikedRestaurant> getLikedRestaurantsListFromDatabaseDocument() {
+        LikedRestaurantManager.getLikedRestaurantsList(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult() != null) {
+                    // Get liked restaurants list
+                    likedRestaurantsList.clear();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> likedRestaurantData = document.getData(); // TODO : Map data for debug. To be deleted
+                        LikedRestaurant likedRestaurantToAdd = FirestoreUtils.getLikedRestaurantFromDatabaseDocument(document);
+                        likedRestaurantsList.add(likedRestaurantToAdd);
+                    }
+                }
+            } else {
+                Log.d("FirestoreUtils", "Error getting documents: ", task.getException());
+            }
+        });
+        return likedRestaurantsList;
     }
 
 

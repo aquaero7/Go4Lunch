@@ -36,6 +36,7 @@ import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
@@ -88,13 +89,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private static FusedLocationProviderClient fusedLocationProviderClient;
     private static boolean locationPermissionsGranted;
     private static LatLng home;
-    private static List<Restaurant> restaurantsList;    // To make it available for fragments in FirestoreUtils
-    private static List<User> workmatesList;            // To make it available for fragments in FirestoreUtils
+    private static List<Restaurant> restaurantsList;            // To make it available for fragments in FirestoreUtils
+    private static List<User> workmatesList;                    // To make it available for fragments in FirestoreUtils
+    private static List<LikedRestaurant> likedRestaurantsList;  // To make it available for fragments in FirestoreUtils
 
     private Fragment fmt;
     private SearchView searchView;
 
     private final String currentDate = CalendarUtils.getCurrentDate();
+    private String uid;
 
     private final UserManager userManager = UserManager.getInstance();
 
@@ -110,6 +113,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
         mActivity = this;
         MAPS_API_KEY = getString(R.string.MAPS_API_KEY);
+
+        // Get current user Id
+        getCurrentUserId();
 
         // Get the toolbar view
         this.configureToolbar();
@@ -140,6 +146,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         super.onResume();
     }
 
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("UID", uid);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (uid.isEmpty()) uid = savedInstanceState.getString("UID");
+    }
 
     @Override
     public void toggleSearchViewVisibility() {
@@ -351,13 +368,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
      * ---------------------
      */
 
+    private void getCurrentUserId() {
+        uid = userManager.getCurrentUserId();
+    }
+
     private void getLocationDataFromApi() {
         // Get current location
         home = MapsApisUtils.getDataFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
         /** Also initialize objects restaurantsList and workmatesList in FirestoreUtils
-            in order to make them available for fragments */
+            to make them available for fragments */
         restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
         workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
+        likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
     }
 
     private void checkPermissionsAndGetDeviceLocation() {
@@ -400,7 +422,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
 
     private void checkCurrentUserSelection() {
-        // Get current user selected restaurant id from database
+        // Get current user selected restaurant from database
         UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
             // Get current user selected restaurant from database
             String selectionId = user.getSelectionId();
