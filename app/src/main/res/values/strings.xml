@@ -33,9 +33,11 @@
     <string name="im_user_picture">User picture</string>
 
 
-    <!-- FAB ACTIONS -->
+    <!-- BUTTONS ACTIONS -->
     <string name="fabChecked">Restaurant selected</string>
     <string name="fabUnchecked">Restaurant unselected</string>
+    <string name="btnLikeChecked">Restaurant liked</string>
+    <string name="btnLikeUnchecked">Restaurant unliked</string>
 
     <!-- TAGS -->
     <string name="fab">FAB</string>

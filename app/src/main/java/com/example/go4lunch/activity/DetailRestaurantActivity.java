@@ -1,6 +1,8 @@
 package com.example.go4lunch.activity;
 
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -21,10 +23,10 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.List;
 
 
-public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaurantBinding> implements DetailRestaurantFragment.OnButtonClickedListener {
+public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaurantBinding>
+        implements DetailRestaurantFragment.OnButtonClickedListener {
 
     private String message;
-    private String toastText;   // TODO : Delete after action completion
 
     LikedRestaurantManager likedRestaurantManager = LikedRestaurantManager.getInstance();
 
@@ -37,7 +39,6 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // setContentView(R.layout.activity_detail_restaurant); // TODO : To be deleted cause this activity extends BaseActivity and overrides getViewBinding
         configureAndShowDetailRestaurantFragment();
     }
 
@@ -46,47 +47,32 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
     // --------------
     @Override
     // Binding added as an argument to make it available here
-    public void onButtonClicked(View view, FragmentDetailRestaurantBinding fragmentBinding, String rId, String rName, String rAddress, double rRating, List<Photo> rPhotos, boolean isSelected, boolean isLiked, String uId) {
+    public void onButtonClicked(View view, FragmentDetailRestaurantBinding fragmentBinding,
+                                String rId, String rName, String rAddress, String rPhoneNumber,
+                                String rWebsite, double rRating, List<Photo> rPhotos,
+                                boolean isSelected, boolean isLiked, String uId) {
         // Handle the button click event
         String tag = String.valueOf(view.getTag());
         switch (tag) {
             case "BTN_CALL":
-                callRestaurant();
-                toastText = tag;    // TODO : Delete after action completion
+                if (rPhoneNumber!= null) callRestaurant(rPhoneNumber);
                 break;
             case "BTN_LIKE":
                 updateLike(isLiked, rId, uId);
-                /** Update objects likedRestaurantsList in FirestoreUtils
-                 only to make likes changes available for DetailRestaurant fragment */
-                List<LikedRestaurant> likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
-                toastText = tag;    // TODO : Delete after action completion
                 break;
             case "BTN_WEBSITE":
-                displayRestaurantWebsite();
-                toastText = tag;    // TODO : Delete after action completion
+                if (rWebsite != null) displayRestaurantWebsite(rWebsite);
                 break;
             case "FAB":
-                if (isSelected) {
-                    addSelectionToDatabase(rId);
-                    message = getString(R.string.fabChecked);
-                } else {
-                    removeSelectionFromDatabase(rId);
-                    message = getString(R.string.fabUnchecked);
-                }
-                toastText = tag;    // TODO : Delete after action completion
-                showSnackBar(message);
-
-                /** Update objects workmatesList in FirestoreUtils
-                 only to make selection changes available for Workmates fragment */
-                List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
+                updateSelectionInDatabase(isSelected, rId);
                 break;
         }
-        displayToast(); // TODO : Delete after action completion
     }
 
     private void configureAndShowDetailRestaurantFragment() {
         // Get FragmentManager (Support) and try to find existing instance of fragment in FrameLayout container
-        DetailRestaurantFragment detailRestaurantFragment = (DetailRestaurantFragment) getSupportFragmentManager().findFragmentById(R.id.frameLayoutDetailRestaurant);
+        DetailRestaurantFragment detailRestaurantFragment =
+                (DetailRestaurantFragment) getSupportFragmentManager().findFragmentById(R.id.frameLayoutDetailRestaurant);
         if (detailRestaurantFragment == null) {
             // Create new detail restaurant fragment
             detailRestaurantFragment = new DetailRestaurantFragment();
@@ -97,41 +83,60 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         }
     }
 
-    private void addSelectionToDatabase(String rId) {
-        // Add selected restaurant ID to user document in database
-        UserManager.getInstance().updateSelectionId(rId);
-        UserManager.getInstance().updateSelectionDate(CalendarUtils.getCurrentDate());
+    private void updateSelectionInDatabase(boolean isSelected, String rId) {
+        if (isSelected) {
+            // Add selected restaurant ID to user document in database
+            UserManager.getInstance().updateSelectionId(rId);
+            UserManager.getInstance().updateSelectionDate(CalendarUtils.getCurrentDate());
+            message = getString(R.string.fabChecked);
+        } else {
+            // Remove selected restaurant ID from user document in database
+            UserManager.getInstance().updateSelectionId(null);
+            UserManager.getInstance().updateSelectionDate(null);
+            message = getString(R.string.fabUnchecked);
+        }
+        showSnackBar(message);
+
+        /** Update objects workmatesList in FirestoreUtils
+         only to make selection changes available for Workmates fragment */
+        List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
     }
 
-    private void removeSelectionFromDatabase(String rId) {
-        // Remove selected restaurant ID from user document in database
-        UserManager.getInstance().updateSelectionId(null);
-        UserManager.getInstance().updateSelectionDate(null);
-    }
-
-    private void callRestaurant(){
-        // TODO
+    private void callRestaurant(String rPhoneNumber){
+        /*
+        Intent dialIntent = new Intent(Intent.ACTION_DIAL);
+        dialIntent.setData(Uri.parse("tel:" + rPhoneNumber));
+        startActivity(dialIntent);
+        */
+        startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + rPhoneNumber)));
     }
 
     private void updateLike(boolean isLiked, String rId, String uId){
         if (isLiked) {
             likedRestaurantManager.createLikedRestaurant(rId+uId, rId, uId);
+            message = getString(R.string.btnLikeChecked);
         } else {
             likedRestaurantManager.deleteLikedRestaurant(rId+uId);
+            message = getString(R.string.btnLikeUnchecked);
         }
+        showSnackBar(message);
+
+        /** Update objects likedRestaurantsList in FirestoreUtils
+         only to make likes changes available for DetailRestaurant fragment */
+        List<LikedRestaurant> likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
     }
 
-    private void displayRestaurantWebsite(){
-        // TODO
+    private void displayRestaurantWebsite(String rWebsite){
+        /*
+        Intent webViewIntent = new Intent(Intent.ACTION_VIEW);
+        webViewIntent.setData(Uri.parse(rWebsite));
+        startActivity(webViewIntent);
+        */
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(rWebsite)));
     }
 
     private void showSnackBar(String message) {
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
-
-    private void displayToast() {
-        Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
-    }
-
 
 }

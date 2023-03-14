@@ -51,24 +51,10 @@ import java.util.Map;
  */
 public class DetailRestaurantFragment extends Fragment implements View.OnClickListener {
 
-    /* TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    */
-
-    /* TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    */
-
-
     // Declare callback
     private OnButtonClickedListener mCallback;
-
     // Declare ViewBinding
     private FragmentDetailRestaurantBinding binding;
-
     // Declare View items
     private RecyclerView mRecyclerView;
     private ImageView mImageView;
@@ -80,81 +66,35 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private Button mCallButton;
     private Button mLikeButton;
     private Button mWebsiteButton;
-
-
-    // Declare user
-    private User user;
     // Declare current user id
     private String uid;
-
     // Declare restaurant
     private Restaurant restaurant;
     private String rid;
-
     // Declare current date
     private final String currentDate = CalendarUtils.getCurrentDate();
-
     // Declare selected restaurant
     private String selectionId;
     private String selectionDate;
     private boolean isSelected;
     private boolean isLiked;
-
     // Declare Workmates-Selectors list
     private List<User> selectorsList;
-
     // Declare Workmate-Selector to add to create Workmates-Selectors list
     private User selectorToAdd;
-
     // Declare liked restaurants list
     private List<LikedRestaurant> likedRestaurantsList;
-
     // Initialize Google Maps API key
     private String KEY;
-
 
     // Constructor
     public DetailRestaurantFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DetailRestaurantFragment.
-     */
-    /* TODO: Rename and change types and number of parameters
-    public static DetailRestaurantFragment newInstance(String param1, String param2) {
-        DetailRestaurantFragment fragment = new DetailRestaurantFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-    */
-
     public static DetailRestaurantFragment newInstance() {
         return (new DetailRestaurantFragment());
     }
-
-    /*
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
-        getIntentData();
-        if (restaurant != null) displayRestaurantData();
-    }
-    */
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -191,31 +131,30 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     @Override
     public void onResume() {
         super.onResume();
-
         getSelectorsListAndConfigureRecyclerView();
     }
 
     @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        // uid = savedInstanceState.getString("UID");
-    }
-
-    @Override
     /* Spread the click to the parent activity
-    Binding added as an argument to make it available in the activity
-    */
+    Binding added as an argument to make it available in the activity */
     public void onClick(View v) {
-        if (mSelectionFab.equals(v)) {
-            isSelected = !isSelected;
-            updateSelectionFab();
-            getSelectorsListAndConfigureRecyclerView();
-        } else if (mLikeButton.equals(v)) {
-            isLiked = !isLiked;
-            updateLikeButton();
+        String tag = String.valueOf(v.getTag());
+        switch (tag) {
+            case "BTN_CALL":
+            case "BTN_WEBSITE":
+                break;
+            case "BTN_LIKE":
+                isLiked = !isLiked;
+                updateLikeButton();
+                break;
+            case "FAB":
+                isSelected = !isSelected;
+                updateSelectionFab();
+                getSelectorsListAndConfigureRecyclerView();
+                break;
         }
-
-        mCallback.onButtonClicked(v, binding, restaurant.getId(), restaurant.getName(), restaurant.getAddress(),
+        mCallback.onButtonClicked(v, binding, restaurant.getId(), restaurant.getName(),
+                restaurant.getAddress(), restaurant.getPhoneNumber(), restaurant.getWebsite(),
                 restaurant.getRating(), restaurant.getPhotos(), isSelected, isLiked, uid);
     }
 
@@ -228,13 +167,12 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     }
 
 
-    /*
-    Declare an interface that will be implemented by any container activity for callback
-    Binding added as an argument to make it available in the activity
-    */
+    /* Declare an interface that will be implemented by any container activity for callback
+    Binding added as an argument to make it available in the activity */
     public interface OnButtonClickedListener {
-        void onButtonClicked(View view, FragmentDetailRestaurantBinding binding, String rId, String rName, String rAddress,
-                             double rRating, List<Photo> rPhotos, boolean isSelected, boolean isLiked, String uId);
+        void onButtonClicked(View view, FragmentDetailRestaurantBinding binding, String rId, String rName,
+                             String rAddress, String rPhoneNumber, String rWebsite, double rRating,
+                             List<Photo> rPhotos, boolean isSelected, boolean isLiked, String uId);
     }
 
     // Create callback to parent activity
@@ -253,7 +191,8 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         int emptyListMessageVisibility = (selectorsList.isEmpty()) ? View.VISIBLE : View.GONE;
         mEmptyListMessage.setVisibility(emptyListMessageVisibility);
         // Declare and create adapter
-        DetailRestaurantWorkmateAdapter detailRestaurantWorkmateAdapter = new DetailRestaurantWorkmateAdapter(selectorsList, getString(R.string.joining_text));
+        DetailRestaurantWorkmateAdapter detailRestaurantWorkmateAdapter =
+                new DetailRestaurantWorkmateAdapter(selectorsList, getString(R.string.joining_text));
         // Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(detailRestaurantWorkmateAdapter);
         // Set layout manager to position the items
@@ -279,7 +218,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                 if (task.getResult() != null) {
                     // Check selected restaurant id and date and get users list
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
+                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug.
                         selectorToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
                         boolean isSelector = (restaurantId.equals(selectorToAdd.getSelectionId())
                                         && currentDate.equals(selectorToAdd.getSelectionDate()));
@@ -288,7 +227,6 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                 }
             } else {
                 Log.w("DetailRestaurantFragment", "Error getting documents: ", task.getException());
-                // Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
             }
             configureRecyclerView();
             configureOnClickRecyclerView();
@@ -302,14 +240,14 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 restaurant = (Restaurant) bundle.getSerializable("RESTAURANT");
-                Log.w("DetailRestaurantFragment", "Name of this restaurant : " + restaurant.getName());    // TODO : For debug. To be deleted
-                // Toast.makeText(requireContext(), restaurant.getName(), Toast.LENGTH_SHORT).show();  // TODO : For debug. To be deleted
+                Log.w("DetailRestaurantFragment", "Name of this restaurant : " + restaurant.getName());
             }
         }
     }
 
     private void displayRestaurantData() {
-        if (restaurant.getPhotos() != null) Picasso.get().load(restaurant.getPhotos().get(0).getPhotoUrl(KEY)).into(mImageView);
+        if (restaurant.getPhotos() != null) Picasso.get()
+                .load(restaurant.getPhotos().get(0).getPhotoUrl(KEY)).into(mImageView);
         mTextView1.setText(restaurant.getName());
         mTextView2.setText(restaurant.getAddress());
         mRatingBar.setRating((float) (restaurant.getRating() * 3/5));
@@ -348,7 +286,6 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         isLiked = false;
         if (likedRestaurantsList != null) {
             for (LikedRestaurant likedRestaurant : likedRestaurantsList) {
-                // if (likedRestaurant.getRid().equals(restaurant.getId()) && likedRestaurant.getUid().equals(uid)) {
                 if (rid.equals(likedRestaurant.getRid()) && uid.equals(likedRestaurant.getUid())) {
                     isLiked = true;
                     break;
@@ -367,11 +304,6 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         mLikeButton.setCompoundDrawableTintList(AppCompatResources.getColorStateList(requireContext(), colorId));
         mLikeButton.setTextColor(getResources().getColor(colorId, requireContext().getTheme()));
         mLikeButton.setBackgroundColor(getResources().getColor(backgroundColorId, requireContext().getTheme()));
-
-        // String likeMessage = (isLiked) ? "Restaurant liked" : "Restaurant unliked"; // TODO : For debug. To be deleted
-        // Toast.makeText(requireContext(), likeMessage, Toast.LENGTH_SHORT).show();   // TODO : For debug. To be deleted
     }
-
-
 
 }
