@@ -55,7 +55,7 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         String tag = String.valueOf(view.getTag());
         switch (tag) {
             case "BTN_CALL":
-                if (rPhoneNumber!= null) callRestaurant(rPhoneNumber);
+                if (rPhoneNumber != null) callRestaurant(rPhoneNumber);
                 break;
             case "BTN_LIKE":
                 updateLike(isLiked, rId, uId);

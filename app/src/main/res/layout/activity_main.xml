@@ -21,7 +21,7 @@
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/activity_main_viewpager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"/>
 
         <!-- Add TabLayout to handle tabs
          using 'tabTextAppearance' in order to set text in lowercase into tabs -->
