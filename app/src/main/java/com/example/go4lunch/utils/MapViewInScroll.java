@@ -7,6 +7,13 @@ import android.view.MotionEvent;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapView;
 
+/**
+ * Layout to make MapView properly scrollable inside a ViewPager2. Provided as a solution to the problem
+ * where pages of ViewPager2 have nested scrollable elements that scroll in the same direction as
+ * ViewPager2.
+ * (This solution is different from NestedScrollableHost solution used to to wrap a scrollable component
+ * inside a ViewPager2).
+ */
 public class MapViewInScroll extends MapView {
 
     public MapViewInScroll(Context context) {
