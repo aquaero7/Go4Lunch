@@ -25,6 +25,12 @@ public class OpeningHours implements Serializable {
 
     }
 
+    public OpeningHours(boolean openNow, List<Period> periods, List<String> weekdayText) {
+        this.openNow = openNow;
+        this.periods = periods;
+        this.weekdayText = weekdayText;
+    }
+
 
     // GETTERS
     public boolean isOpenNow() {

@@ -9,7 +9,7 @@ public class OpenClose implements Serializable {
 
     @SerializedName("day")
     @Expose
-    private int day;
+    private long day;
 
     @SerializedName("time")
     @Expose
@@ -19,9 +19,14 @@ public class OpenClose implements Serializable {
     public OpenClose() {
     }
 
+    public OpenClose(long day, String time) {
+        this.day = day;
+        this.time = time;
+    }
+
 
     // GETTERS
-    public int getDay() {
+    public long getDay() {
         return day;
     }
     public String getTime() {
@@ -29,7 +34,7 @@ public class OpenClose implements Serializable {
     }
 
     // SETTERS
-    public void setDay(int day) {
+    public void setDay(long day) {
         this.day = day;
     }
     public void setTime(String time) {

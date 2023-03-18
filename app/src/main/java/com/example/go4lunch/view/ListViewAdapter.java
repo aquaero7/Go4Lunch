@@ -19,20 +19,26 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     private final String STATUS_OPEN;
     private final String STATUS_CLOSED;
     private final String STATUS_OPEN247;
+    private final String STATUS_OPEN24;
     private final String STATUS_OPEN_UNTIL;
     private final String STATUS_OPEN_AT;
+    private final String STATUS_UNKNOWN;
+
     private List<Restaurant> restaurantsList;
 
     // Constructor
-    public ListViewAdapter(List<Restaurant> restaurantsList, String KEY, String STATUS_OPEN, String STATUS_CLOSED,
-                           String STATUS_OPEN247, String STATUS_OPEN_UNTIL, String STATUS_OPEN_AT) {
+    public ListViewAdapter(List<Restaurant> restaurantsList, String KEY, String STATUS_OPEN,
+                           String STATUS_CLOSED, String STATUS_OPEN247, String STATUS_OPEN24,
+                           String STATUS_OPEN_UNTIL, String STATUS_OPEN_AT, String STATUS_UNKNOWN) {
         this.restaurantsList = restaurantsList;
         this.KEY = KEY;
         this.STATUS_OPEN = STATUS_OPEN;
         this.STATUS_CLOSED = STATUS_CLOSED;
         this.STATUS_OPEN247 = STATUS_OPEN247;
+        this.STATUS_OPEN24 = STATUS_OPEN24;
         this.STATUS_OPEN_UNTIL = STATUS_OPEN_UNTIL;
         this.STATUS_OPEN_AT = STATUS_OPEN_AT;
+        this.STATUS_UNKNOWN = STATUS_UNKNOWN;
     }
 
     @NonNull
@@ -50,8 +56,9 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     // Update view holder with restaurants
     @Override
     public void onBindViewHolder(@NonNull ListViewViewHolder viewHolder, int position) {
-        viewHolder.updateWithRestaurants(this.restaurantsList.get(position), this.KEY, this.STATUS_OPEN,
-                this.STATUS_CLOSED, this.STATUS_OPEN247, this.STATUS_OPEN_UNTIL, this.STATUS_OPEN_AT);
+        viewHolder.updateWithRestaurants(this.restaurantsList.get(position), this.KEY,
+                this.STATUS_OPEN, this.STATUS_CLOSED, this.STATUS_OPEN247, this.STATUS_OPEN24,
+                this.STATUS_OPEN_UNTIL, this.STATUS_OPEN_AT, this.STATUS_UNKNOWN);
     }
 
     // Return the total count of restaurants

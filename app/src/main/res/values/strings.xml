@@ -74,8 +74,10 @@
     <string name="status_open">Open</string>
     <string name="status_closed">Closed</string>
     <string name="status_open247">Open 24/7</string>
+    <string name="status_open24">Open all day</string>
     <string name="status_open_until">Open until\ </string>
     <string name="status_open_at">Open at\ </string>
+    <string name="status_unknown">Unknown opening hours</string>
     <string name="choice_text">\ is eating at\ </string>
     <string name="no_choice_text">\ is probably eating somewhere…</string>
     <string name="joining_text">\ is joining!</string>

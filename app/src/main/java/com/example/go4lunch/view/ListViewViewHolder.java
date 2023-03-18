@@ -57,8 +57,10 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         ivPicture = binding.restaurantItemPicture;
     }
 
-    public void updateWithRestaurants(Restaurant restaurant, String KEY, String STATUS_OPEN, String STATUS_CLOSED,
-                                      String STATUS_OPEN247, String STATUS_OPEN_UNTIL, String STATUS_OPEN_AT) {
+    public void updateWithRestaurants(Restaurant restaurant, String KEY, String STATUS_OPEN,
+                                      String STATUS_CLOSED, String STATUS_OPEN247,
+                                      String STATUS_OPEN24, String STATUS_OPEN_UNTIL,
+                                      String STATUS_OPEN_AT, String STATUS_UNKNOWN) {
 
         // Display restaurant name
         tvTitle.setText(restaurant.getName());
@@ -76,8 +78,9 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         // Display selections count
         displaySelectionsCount(restaurant.getId());
         // Display restaurant opening info
-        String information = restaurant.getOpeningInformation();
-        if (information != "") {
+        // String information = restaurant.getOpeningInformation();     // TODO : To be deleted
+        String information = DataProcessingUtils.getOpeningInformation(restaurant);
+        if (!information.isEmpty()) {
             int lim = 7;    // Information must be 7 char length max
             int sep = 3;    // Position of separator between code and schedule
             String infoStart = information.substring(0,sep);
@@ -94,18 +97,24 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
                 case "OP*":
                     tvOpenTime.setText(STATUS_OPEN247);
                     break;
+                case "OPD":
+                    tvOpenTime.setText(STATUS_OPEN24);
+                    break;
                 case "OPU":
                     tvOpenTime.setText(STATUS_OPEN_UNTIL + infoToDisplay);
                     break;
                 case "OPA":
                     tvOpenTime.setText(STATUS_OPEN_AT + infoToDisplay);
                     break;
+                case "???":
+                    tvOpenTime.setText(STATUS_UNKNOWN);
+                    break;
                 default:
-                    tvOpenTime.setText(restaurant.getOpeningInformation());
+                    tvOpenTime.setText(information);
                     break;
             }
         } else {
-            tvOpenTime.setText("");
+            tvOpenTime.setText(STATUS_UNKNOWN);
         }
         // Display restaurant rating
         mRatingBar.setRating((float) (restaurant.getRating() * 3/5));

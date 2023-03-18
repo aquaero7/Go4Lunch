@@ -10,6 +10,9 @@ import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.Location;
+import com.example.go4lunch.model.api.OpenClose;
+import com.example.go4lunch.model.api.OpeningHours;
+import com.example.go4lunch.model.api.Period;
 import com.example.go4lunch.model.api.Photo;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -64,7 +67,8 @@ public class FirestoreUtils {
         String rNationality = Objects.requireNonNull(document.getData().get("nationality")).toString();
         String rAddress = Objects.requireNonNull(document.getData().get("address")).toString();
         double rRating = (double) document.getData().get("rating");
-        String rOpeningInformation = getOpeningInformation(document);
+        // String rOpeningInformation = getOpeningInformation(document);
+        OpeningHours rOpeningHours = getOpeningHours(document);
         int rLikesCount = Integer.parseInt(Objects.requireNonNull(document.getData().get("likesCount")).toString());
         String rPhoneNumber = document.getData().get("phoneNumber") != null ? document.getData().get("phoneNumber").toString() : "";
         String rWebsite = document.getData().get("website") != null ?  document.getData().get("website").toString() : "";
@@ -74,12 +78,12 @@ public class FirestoreUtils {
         List<User> rSelectors = null;
 
         Restaurant restaurantFromData = new Restaurant(rId, rName, rDistance, rPhotos, rNationality, rAddress,
-                rRating, rOpeningInformation, rLikesCount, rPhoneNumber, rWebsite, rGeometry, rSelectors);
+                rRating, rOpeningHours, rLikesCount, rPhoneNumber, rWebsite, rGeometry, rSelectors);
 
         return restaurantFromData;
     }
 
-
+    /*
     public static String getOpeningInformation(QueryDocumentSnapshot document) {
         String openingInformation = "";
         if (document.getData().get("openingHours") != null) {
@@ -144,8 +148,8 @@ public class FirestoreUtils {
                 }
             }
 
-            /*  Built information to display
-                Information must be either 3 char (code) or 7 char (code+schedule) length   */
+            //  Built information to display
+            //  Information must be either 3 char (code) or 7 char (code+schedule) length
             if (openNow) {
                 if (closingTime1.equals("0000") || closingTime2.equals("0000")) {
                     openingInformation = "OP*";                     // Open 24/7
@@ -157,9 +161,9 @@ public class FirestoreUtils {
             } else {
                 if (!closingTime1.isEmpty() || !closingTime2.isEmpty()) {
                     if (currentTime.compareTo(openingTime1) < 0) {
-                        openingInformation = "OPA" + openingTime1;  // Open at
+                        openingInformation = "OPA" + openingTime1;  // Open at...
                     } else if (currentTime.compareTo(openingTime2) < 0) {
-                        openingInformation = "OPA" + openingTime2;  // Open at
+                        openingInformation = "OPA" + openingTime2;  // Open at...
                     } else {
                         openingInformation = "CLO";                 // Closed
                     }
@@ -167,6 +171,82 @@ public class FirestoreUtils {
             }
         }
         return openingInformation;
+    }
+    */
+
+
+    public static OpeningHours getOpeningHours(QueryDocumentSnapshot document) {
+
+        OpeningHours openingHours;
+        Object openingHoursObject = document.getData().get("openingHours");
+
+        if (openingHoursObject != null) {
+            // Initialize openNow
+            boolean openNow = (boolean) ((Map<String, Object>) openingHoursObject).get("openNow");
+
+            // Initialize periods
+            ArrayList periodsList = (ArrayList) ((Map<String, Object>) openingHoursObject).get("periods");
+            List<Period> periods = new ArrayList<>();
+
+            if (periodsList != null) {
+                // Get details for each period p
+                for (int i = 0; i < periodsList.size(); i++) {
+                    long pOpeningDay;
+                    String pOpeningTime;
+                    long pClosingDay;
+                    String pClosingTime;
+                    OpenClose pOpen;
+                    OpenClose pClose;
+                    Period period;
+
+                    Object openObject = ((Map<String, Object>) periodsList.get(i)).get("open");
+                    Object closeObject = ((Map<String, Object>) periodsList.get(i)).get("close");
+                    if (openObject != null) {
+                        pOpeningDay = (long) ((Map<String, Object>) (openObject)).get("day");
+                        pOpeningTime = Objects.requireNonNull(((Map<String, Object>) (openObject)).get("time")).toString();
+                        pOpen = new OpenClose(pOpeningDay, pOpeningTime);
+                    } else {
+                        pOpen = null;
+                    }
+                    if (closeObject != null) {
+                        pClosingDay = (long) ((Map<String, Object>) (closeObject)).get("day");
+                        pClosingTime = Objects.requireNonNull(((Map<String, Object>) (closeObject)).get("time")).toString();
+                        pClose = new OpenClose(pClosingDay, pClosingTime);
+                    } else {
+                        pClose = null;
+                    }
+
+                    period = new Period(pClose, pOpen);
+                    periods.add(period);
+                }
+
+            } else {
+                periods = null;
+            }
+
+            // Initialize weekdayText
+            ArrayList weekdayTextList = (ArrayList) ((Map<String, Object>) openingHoursObject).get("weekdayText");
+            List<String> weekdayText = new ArrayList<>();
+
+            if (weekdayTextList != null) {
+                // Get details for each weekday text
+                for (int i = 0; i < weekdayTextList.size(); i++) {
+                    String item = weekdayTextList.get(i).toString();
+                    weekdayText.add(item);
+                }
+
+            } else {
+                weekdayText = null;
+
+            }
+
+            openingHours = new OpeningHours(openNow, periods, weekdayText);
+
+        } else {
+            openingHours = null;
+        }
+
+        return openingHours;
     }
 
 
