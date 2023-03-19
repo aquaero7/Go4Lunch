@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +35,12 @@ import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
@@ -51,6 +59,7 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -82,6 +91,7 @@ public class MapViewFragment extends Fragment implements
     private static final int DEFAULT_ZOOM = 17;
     private static final int RESTAURANT_ZOOM = 19;
     private List<Restaurant> restaurantsList = new ArrayList<>();
+    private List<User> workmatesList;
     private int selectionsCount;
     private final String currentDate = CalendarUtils.getCurrentDate();
 
@@ -184,7 +194,6 @@ public class MapViewFragment extends Fragment implements
         // Handle actions on menu items
         switch (item.getItemId()) {
             case R.id.menu_activity_main_search:
-                // Toast.makeText(requireContext(), "Click on search button in MapViewFragment", Toast.LENGTH_SHORT).show();   // TODO : To be deleted
                 eventListener.toggleSearchViewVisibility();
                 return true;
             default:
@@ -221,8 +230,8 @@ public class MapViewFragment extends Fragment implements
         // Request for home focus and default zoom
         focusHome = true;
         mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
-        // Refresh restaurant list display
-        if (restaurantsList.isEmpty()) restaurantsList = FirestoreUtils.getRestaurantsList();
+        // Refresh and display restaurant list
+        restaurantsList = FirestoreUtils.getRestaurantsList();
         displayRestaurantsOnMap(restaurantsList);
         return false;
     }
@@ -236,10 +245,10 @@ public class MapViewFragment extends Fragment implements
                 break;
             }
         }
-        return false;
+        return true;
     }
 
-    @SuppressWarnings("MissingPermission")  // Permissions already checked from MainActivity
+    @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
     private void initializeMap() {
         // Check permissions
         locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
@@ -258,7 +267,7 @@ public class MapViewFragment extends Fragment implements
         mGoogleMap.setOnMyLocationButtonClickListener(this);
     }
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission")  // Permissions already checked in MainActivity
     private void displayMap() {
         // Check permissions again to get current location and display MyLocation button if necessary
         locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
@@ -266,16 +275,18 @@ public class MapViewFragment extends Fragment implements
         home = MapsApisUtils.getHome();
         // Display MyLocation button again if necessary
         if (mGoogleMap != null) mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
-
-        // Get restaurants list from Firestore
-        if (restaurantsList.isEmpty()) restaurantsList = FirestoreUtils.getRestaurantsList();
-
         // Display map with or without home focus
-        if (mGoogleMap != null && home != null) {
+        if (mGoogleMap != null) {
             // Set camera position if requested
             if (focusHome) {
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
+                if (home != null && home.latitude != 0 && home.longitude != 0) {
+                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
+                } else {
+                    getUpdatedDataFromApiAndFocusHome();
+                }
             }
+            // Get restaurants list from Firestore
+            restaurantsList = FirestoreUtils.getRestaurantsList();
             // Display restaurants on map
             displayRestaurantsOnMap(restaurantsList);
         }
@@ -285,6 +296,7 @@ public class MapViewFragment extends Fragment implements
 
     @SuppressLint("PotentialBehaviorOverride")  // This remark concerns OnMarkerClickListener below
     private void displayRestaurantsOnMap(List<Restaurant> restaurants) {
+        workmatesList = FirestoreUtils.getWorkmatesList();
         if (restaurants != null) {
             for (Restaurant restaurant : restaurants) {
                 double rLat = restaurant.getGeometry().getLocation().getLat();
@@ -310,29 +322,15 @@ public class MapViewFragment extends Fragment implements
     }
 
     private void getSelectionsCountAndUpdateMarkerIcon(String rId, Marker marker) {
-        // Get workmates list
-        UserManager.getUsersList(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult() != null) {
-                    selectionsCount = 0;
-                    // Get users list
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
-                        // Get workmate in workmates list
-                        User workmate = FirestoreUtils.getUserFromDatabaseDocument(document);
-                        // Check selected restaurant and increase selections count if matches with restaurant id
-                        boolean isSelected = rId.equals(workmate.getSelectionId()) && currentDate.equals(workmate.getSelectionDate());
-                        if (isSelected) selectionsCount += 1;
-                    }
-                    // Update marker color
-                    float markerColor = (selectionsCount > 0) ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_RED;
-                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(markerColor));
-                }
-            } else {
-                Log.w("MapViewFragment", "Error getting documents: ", task.getException());
-                // Toast.makeText(requireContext(), "Error retrieving users list from database", Toast.LENGTH_SHORT).show();    // TODO : For debug
-            }
-        });
+        selectionsCount = 0;
+        for (User workmate : workmatesList) {
+            // For each workmate, check selected restaurant and increase selections count if matches with restaurant id
+            boolean isSelected = rId.equals(workmate.getSelectionId()) && currentDate.equals(workmate.getSelectionDate());
+            if (isSelected) selectionsCount += 1;
+        }
+        // Update marker color
+        float markerColor = (selectionsCount > 0) ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_RED;
+        marker.setIcon(BitmapDescriptorFactory.defaultMarker(markerColor));
     }
 
     // Autocomplete launched from activity
@@ -375,6 +373,42 @@ public class MapViewFragment extends Fragment implements
                 autocompleteCardView.setVisibility(View.GONE);
             }
         });
+    }
+
+    @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
+    private void getUpdatedDataFromApiAndFocusHome() {
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        // Setup parameters of location request
+        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500).build();
+        // Create callback to handle location result
+        LocationCallback locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        // We get the current location...
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        // ...and stop location updates as soon of current location is got
+                        fusedLocationProviderClient.removeLocationUpdates(this);
+                        Snackbar.make(binding.getRoot(), getString(R.string.location_update), Snackbar.LENGTH_LONG).show();
+                        // Initialize home
+                        home = new LatLng(latitude, longitude);
+                        // Set camera position to home
+                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
+                        // Get nearby restaurants list from API
+                        restaurantsList = MapsApisUtils.getRestaurantsFromApi(requireActivity(), home, getString(R.string.MAPS_API_KEY));
+                        // Reinitialize restaurantList in FirestoreUtils to make it available for ListViewFragment
+                        restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
+                        // Display restaurants on map
+                        displayRestaurantsOnMap(restaurantsList);
+                    }
+                }
+            }
+        };
+
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
     }
 
 

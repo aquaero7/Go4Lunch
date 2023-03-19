@@ -22,6 +22,9 @@
     <string name="search_error">Search not implemented on %s.</string>
     <string name="not_found_error">No restaurant found matching with query.</string>
 
+    <!-- MSG -->
+    <string name="location_update">Location updated</string>
+
     <!-- contentDescriptions -->
     <string name="selection_fab">Selection FAB</string>
     <string name="im_detail_restaurant">Restaurant image</string>
@@ -31,7 +34,6 @@
     <string name="ic_app_logo">App logo</string>
     <string name="im_restaurant_auth">Restaurant picture</string>
     <string name="im_user_picture">User picture</string>
-
 
     <!-- BUTTONS ACTIONS -->
     <string name="fabChecked">Restaurant selected</string>

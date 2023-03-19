@@ -3,6 +3,7 @@ package com.example.go4lunch.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,6 +20,11 @@ import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
@@ -56,17 +62,12 @@ public class MapsApisUtils extends FragmentActivity {
         return home;
     }
 
-    /*  // TODO : TO be deleted cause list recovered from Firestore in FirestoreUtils
-    public static List<Restaurant> getRestaurantsList() {
-        return restaurantsList;
-    }
-    */
 
     // USED WITH SOLUTION 1 :
     @SuppressWarnings("MissingPermission")
     // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method in MapsViewFragment
     public static LatLng getDataFromApi(Activity activity, FusedLocationProviderClient fusedLocationProviderClient, String KEY, boolean permissionsGranted) {
-        locationPermissionsGranted = permissionsGranted;
+        locationPermissionsGranted = permissionsGranted;    /** Only to make permissions available in MapsViewUtils */
         try {
             Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
             // Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);
@@ -76,7 +77,6 @@ public class MapsApisUtils extends FragmentActivity {
                     if (lastKnownLocation != null) {
                         latitude = lastKnownLocation.getLatitude();
                         longitude = lastKnownLocation.getLongitude();
-                        // Toast.makeText(activity, "Yep ! Got location !", Toast.LENGTH_SHORT).show();    // TODO : To be deleted
                         // Initialize current location
                         home = new LatLng(latitude, longitude);
                         // Get nearby restaurants list from API
@@ -101,6 +101,7 @@ public class MapsApisUtils extends FragmentActivity {
 
         return home;
     }
+
 
     // Get restaurants list from API
     public static List<Restaurant> getRestaurantsFromApi(Context context, LatLng latLng, String apiKey) {
