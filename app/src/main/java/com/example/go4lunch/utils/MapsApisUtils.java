@@ -45,8 +45,6 @@ public class MapsApisUtils extends FragmentActivity {
     private static final int DEFAULT_RADIUS = 1000; // Distance in meters
     private static boolean locationPermissionsGranted;
     private static List<Restaurant> restaurantsList = new ArrayList<>();
-    private static double latitude;
-    private static double longitude;
     private static LatLng home;
 
 
@@ -62,45 +60,18 @@ public class MapsApisUtils extends FragmentActivity {
         return home;
     }
 
-
-    // USED WITH SOLUTION 1 :
-    @SuppressWarnings("MissingPermission")
-    // Permissions already checked in checkPermissionsAndLoadMap() method, called in onResume() method in MapsViewFragment
-    public static LatLng getDataFromApi(Activity activity, FusedLocationProviderClient fusedLocationProviderClient, String KEY, boolean permissionsGranted) {
-        locationPermissionsGranted = permissionsGranted;    /** Only to make permissions available in MapsViewUtils */
-        try {
-            Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-            // Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);
-            locationResult.addOnCompleteListener(activity, task -> {
-                if (task.isSuccessful()) {
-                    Location lastKnownLocation = task.getResult();
-                    if (lastKnownLocation != null) {
-                        latitude = lastKnownLocation.getLatitude();
-                        longitude = lastKnownLocation.getLongitude();
-                        // Initialize current location
-                        home = new LatLng(latitude, longitude);
-                        // Get nearby restaurants list from API
-                        restaurantsList = getRestaurantsFromApi(activity, home, KEY);
-                    } else {
-                        latitude = DEF_LATITUDE;
-                        longitude = DEF_LONGITUDE;
-                        // Initialize default location
-                        home = new LatLng(latitude, longitude);
-                        Toast.makeText(activity, R.string.info_no_current_location, Toast.LENGTH_SHORT).show();
-                        Log.w("getDeviceLocation", "Exception: %s", task.getException());
-                    }
-                }
-                else {
-                    Log.w("getDeviceLocation", "Exception: %s", task.getException());
-                }
-            });
-
-        } catch (SecurityException e) {
-            Log.w("Exception: %s", e.getMessage(), e);
-        }
-
-        return home;
+    public static void setPermissions(boolean granted) {
+        locationPermissionsGranted = granted;
     }
+
+    public static void setHome(LatLng latLng) {
+        home = latLng;
+    }
+
+    public static void setRestaurantsList(List<Restaurant> restaurants) {
+        restaurantsList = restaurants;
+    }
+
 
 
     // Get restaurants list from API

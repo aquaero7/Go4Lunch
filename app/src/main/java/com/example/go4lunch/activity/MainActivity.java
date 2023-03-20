@@ -25,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -372,11 +371,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         uid = userManager.getCurrentUserId();
     }
 
-    private void getLocationDataFromApi() {
-        // Get current location
-        home = MapsApisUtils.getDataFromApi(this, fusedLocationProviderClient, MAPS_API_KEY, locationPermissionsGranted);
-        /** Also initialize objects restaurantsList and workmatesList in FirestoreUtils
-            to make them available for fragments */
+    private void initializeListsInUtils() {
+        /** Initialize list objects in FirestoreUtils to make them available for fragments */
         restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
         workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
         likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
@@ -392,17 +388,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 /** Fine location permission granted */
                 Log.w("ActivityResultLauncher", "Fine location permission was granted by user");
                 locationPermissionsGranted = true;
-                getLocationDataFromApi();
+                initializeListsInUtils();
             } else if (coarseLocationGranted != null && coarseLocationGranted) {
                 /** Coarse location permission granted */
                 Log.w("ActivityResultLauncher", "Only coarse location permission was granted by user");
                 locationPermissionsGranted = true;
-                getLocationDataFromApi();
+                initializeListsInUtils();
             } else {
                 /** No location permission granted */
                 Log.w("ActivityResultLauncher", "No location permission was granted by user");
                 locationPermissionsGranted = false;
             }
+            MapsApisUtils.setPermissions(locationPermissionsGranted);
         });
 
         // Check and request permissions
@@ -417,7 +414,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             /** Permissions granted */
             Log.w("checkPermissions", "Permissions granted");
             locationPermissionsGranted = true;
-            getLocationDataFromApi();
+            MapsApisUtils.setPermissions(locationPermissionsGranted);
+            initializeListsInUtils();
         }
     }
 

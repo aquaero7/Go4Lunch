@@ -7,6 +7,7 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -52,6 +53,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
@@ -252,46 +254,108 @@ public class MapViewFragment extends Fragment implements
     private void initializeMap() {
         // Check permissions
         locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
-        // Get current location
-        home = MapsApisUtils.getHome();
-        // Display MyLocation button if permissions are granted
-        mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
-        // Set camera default zoom
-        mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
-        // Other settings
-        mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
+        if (mGoogleMap != null) {
+            // Display MyLocation button if permissions are granted
+            mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
+            // Set camera default zoom
+            mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
+            // Other settings
+            mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
+            // Set listener to my location button in order to know if home focus is requested
+            mGoogleMap.setOnMyLocationButtonClickListener(this);
+        }
         // Request for home focus at first display
         focusHome = true;
-        // Set listener to my location button in order to know if home focus is requested
-        mGoogleMap.setOnMyLocationButtonClickListener(this);
     }
 
     @SuppressLint("MissingPermission")  // Permissions already checked in MainActivity
     private void displayMap() {
-        // Check permissions again to get current location and display MyLocation button if necessary
-        locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
-        // Get current location again
-        home = MapsApisUtils.getHome();
-        // Display MyLocation button again if necessary
-        if (mGoogleMap != null) mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
-        // Display map with or without home focus
-        if (mGoogleMap != null) {
-            // Set camera position if requested
-            if (focusHome) {
-                if (home != null && home.latitude != 0 && home.longitude != 0) {
-                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
-                } else {
-                    getUpdatedDataFromApiAndFocusHome();
+        // Get data from API and display map with or without home focus
+        if (mGoogleMap != null) getDataFromApiAndFocusHome();
+    }
+
+    @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
+    public void getDataFromApiAndFocusHome() {
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        try {
+            Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+            // Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);
+            locationResult.addOnCompleteListener(requireActivity(), task -> {
+                if (task.isSuccessful()) {
+                    Location lastKnownLocation = task.getResult();
+                    if (lastKnownLocation != null) {
+                        // Get the current location...
+                        double latitude = lastKnownLocation.getLatitude();
+                        double longitude = lastKnownLocation.getLongitude();
+                        // Initialize home
+                        home = new LatLng(latitude, longitude);
+                        // Initialize home in MapsApisUtils to make it available for ListViewFragment
+                        MapsApisUtils.setHome(home);
+                        // Set camera position to home if requested
+                        if (focusHome) {
+                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
+                            // No more home focus after first display (except if MyLocationButton is triggered)
+                            focusHome = false;
+                        }
+                        // Get nearby restaurants list from API
+                        restaurantsList = MapsApisUtils.getRestaurantsFromApi(requireActivity(), home, getString(R.string.MAPS_API_KEY));
+                        // Reinitialize restaurantList in FirestoreUtils to make it available for ListViewFragment
+                        restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
+                        // Display restaurants on map
+                        displayRestaurantsOnMap(restaurantsList);
+                    } else {
+                        getUpdatedDataFromApiAndFocusHome();
+                    }
+                }
+                else {
+                    Log.w("getDeviceLocation", "Exception: %s", task.getException());
+                }
+            });
+
+        } catch (SecurityException e) {
+            Log.w("Exception: %s", e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
+    private void getUpdatedDataFromApiAndFocusHome() {
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        // Setup parameters of location request
+        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500).build();
+        // Create callback to handle location result
+        LocationCallback locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        // Get the current location...
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        // ...and stop location updates as soon of current location is got
+                        fusedLocationProviderClient.removeLocationUpdates(this);
+                        Snackbar.make(binding.getRoot(), getString(R.string.location_update), Snackbar.LENGTH_LONG).show();
+                        // Initialize home
+                        home = new LatLng(latitude, longitude);
+                        // Set camera position to home if requested
+                        if (focusHome) {
+                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
+                            // No more home focus after first display (except if MyLocationButton is triggered)
+                            focusHome = false;
+                        }
+                        // Get nearby restaurants list from API
+                        restaurantsList = MapsApisUtils.getRestaurantsFromApi(requireActivity(), home, getString(R.string.MAPS_API_KEY));
+                        // Reinitialize restaurantList in FirestoreUtils to make it available for ListViewFragment
+                        restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
+                        // Display restaurants on map
+                        displayRestaurantsOnMap(restaurantsList);
+                    }
                 }
             }
-            // Get restaurants list from Firestore
-            restaurantsList = FirestoreUtils.getRestaurantsList();
-            // Display restaurants on map
-            displayRestaurantsOnMap(restaurantsList);
-        }
-        // No more home focus after first display (except if MyLocationButton is triggered)
-        focusHome = false;
+        };
+
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
     }
 
     @SuppressLint("PotentialBehaviorOverride")  // This remark concerns OnMarkerClickListener below
@@ -373,42 +437,6 @@ public class MapViewFragment extends Fragment implements
                 autocompleteCardView.setVisibility(View.GONE);
             }
         });
-    }
-
-    @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
-    private void getUpdatedDataFromApiAndFocusHome() {
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        // Setup parameters of location request
-        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500).build();
-        // Create callback to handle location result
-        LocationCallback locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                for (Location location : locationResult.getLocations()) {
-                    if (location != null) {
-                        // We get the current location...
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        // ...and stop location updates as soon of current location is got
-                        fusedLocationProviderClient.removeLocationUpdates(this);
-                        Snackbar.make(binding.getRoot(), getString(R.string.location_update), Snackbar.LENGTH_LONG).show();
-                        // Initialize home
-                        home = new LatLng(latitude, longitude);
-                        // Set camera position to home
-                        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
-                        // Get nearby restaurants list from API
-                        restaurantsList = MapsApisUtils.getRestaurantsFromApi(requireActivity(), home, getString(R.string.MAPS_API_KEY));
-                        // Reinitialize restaurantList in FirestoreUtils to make it available for ListViewFragment
-                        restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
-                        // Display restaurants on map
-                        displayRestaurantsOnMap(restaurantsList);
-                    }
-                }
-            }
-        };
-
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
     }
 
 
