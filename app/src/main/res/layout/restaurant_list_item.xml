@@ -17,7 +17,7 @@
         android:paddingHorizontal="4dp"
         android:textStyle="bold"
         android:textColor="@color/black"
-        android:maxWidth="280dp"
+        android:maxWidth="264dp"
         android:maxLines="1"
         android:singleLine="true"
         android:ellipsize="marquee"
@@ -28,7 +28,7 @@
         android:id="@+id/restaurant_item_distance"
         android:layout_width="wrap_content"
         android:layout_height="28dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginEnd="4dp"
         android:gravity="bottom"
         android:paddingHorizontal="4dp"
         android:textColor="@color/grey_fab"
@@ -37,45 +37,19 @@
 
     <!-- Line 2 -->
     <TextView
-        android:id="@+id/restaurant_item_country"
+        android:id="@+id/restaurant_item_address"
         android:layout_width="wrap_content"
         android:layout_height="28dp"
         android:layout_marginStart="4dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="4dp"
         android:textColor="@color/black"
-        android:maxWidth="80dp"
+        android:maxWidth="264dp"
         android:maxLines="1"
         android:singleLine="true"
         android:ellipsize="marquee"
         app:layout_constraintTop_toBottomOf="@id/restaurant_item_title"
         app:layout_constraintStart_toStartOf="parent"/>
-
-    <TextView
-        android:id="@+id/separator"
-        android:layout_width="wrap_content"
-        android:layout_height="28dp"
-        android:layout_marginStart="0dp"
-        android:gravity="center_vertical"
-        android:text="@string/hyphen"
-        android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@id/restaurant_item_title"
-        app:layout_constraintStart_toEndOf="@id/restaurant_item_country"/>
-
-    <TextView
-        android:id="@+id/restaurant_item_address"
-        android:layout_width="wrap_content"
-        android:layout_height="28dp"
-        android:layout_marginStart="0dp"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="4dp"
-        android:textColor="@color/black"
-        android:maxWidth="184dp"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:ellipsize="marquee"
-        app:layout_constraintTop_toBottomOf="@id/restaurant_item_title"
-        app:layout_constraintStart_toEndOf="@id/separator"/>
 
     <ImageView
         android:id="@+id/restaurant_item_workmate_logo"
@@ -108,11 +82,11 @@
         android:gravity="top"
         android:paddingHorizontal="4dp"
         android:textColor="@color/black"
-        android:maxWidth="280dp"
+        android:maxWidth="264dp"
         android:maxLines="1"
         android:singleLine="true"
         android:ellipsize="marquee"
-        app:layout_constraintTop_toBottomOf="@id/restaurant_item_country"
+        app:layout_constraintTop_toBottomOf="@id/restaurant_item_address"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <RatingBar

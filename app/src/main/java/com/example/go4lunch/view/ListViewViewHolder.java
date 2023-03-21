@@ -1,13 +1,16 @@
 package com.example.go4lunch.view;
 
+import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
@@ -23,15 +26,16 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ListViewViewHolder extends RecyclerView.ViewHolder {
 
     private final TextView tvTitle;
     private final TextView tvDistance;
-    private final TextView tvCountry;
     private final TextView tvAddress;
     private final TextView tvSelectionsCount;
     private final TextView tvOpenTime;
@@ -48,7 +52,6 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
 
         tvTitle = binding.restaurantItemTitle;
         tvDistance = binding.restaurantItemDistance;
-        tvCountry = binding.restaurantItemCountry;
         tvAddress = binding.restaurantItemAddress;
         ivWorkmateLogo = binding.restaurantItemWorkmateLogo;
         tvSelectionsCount = binding.restaurantItemSelectionsCount;
@@ -65,12 +68,14 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         // Display restaurant name
         tvTitle.setText(restaurant.getName());
         // Display restaurant distance
-        // String distance = restaurant.getDistance() + "m";    // TODO : To be deleted
-        String distance = DataProcessingUtils.calculateRestaurantDistance(restaurant, MapsApisUtils.getHome()) + "m";
+        String distance;
+        int dist  = DataProcessingUtils.calculateRestaurantDistance(restaurant, MapsApisUtils.getHome());
+        if (dist < 10000) {
+            distance = dist + "m";
+        } else {
+            distance = dist / 1000 + "km";
+        }
         tvDistance.setText(distance);
-        // Display restaurant country                                                       // TODO
-        // tvCountry.setText(restaurant.getNationality());
-        tvCountry.setText("Frenchy");
         // Display restaurant address
         tvAddress.setText(restaurant.getAddress());
         // Display workmate logo
@@ -78,7 +83,6 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         // Display selections count
         displaySelectionsCount(restaurant.getId());
         // Display restaurant opening info
-        // String information = restaurant.getOpeningInformation();     // TODO : To be deleted
         String information = DataProcessingUtils.getOpeningInformation(restaurant);
         if (!information.isEmpty()) {
             int lim = 7;    // Information must be 7 char length max
@@ -119,10 +123,9 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         // Display restaurant rating
         mRatingBar.setRating((float) (restaurant.getRating() * 3/5));
         // Display restaurant picture
-        // ivPicture.setImageResource(R.drawable.im_detail_restaurant);
         if (restaurant.getPhotos() != null) Picasso.get().load(restaurant.getPhotos().get(0).getPhotoUrl(KEY)).into(ivPicture);
-        // Set text scrolling and adapt fields max size in line 2
-        ResizeAndScroll();
+        // Setup text scrolling
+        setupTextScrolling();
     }
 
     private void displaySelectionsCount(String rId) {
@@ -158,51 +161,14 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
-    private void ResizeAndScroll() {
-
-        ////////////
-        // Resize //
-        ////////////
-
-        // Adjust max sizes in line 2 according to each text length
-        final int TEXT_SIZE_FACTOR = 8; // Size of a character in dp
-        final int RESIZING_LENGTH_LIMIT = 16;   // Limit for tvCountry to allow resizing
-        // Convert width in px into width in dp and apply TEXT_SIZE_FACTOR to convert width in dp into length
-        int tvCountryDefaultMaxTextLength = (int) ((tvCountry.getMaxWidth() / tvCountry.getContext().getResources().getDisplayMetrics().density + 0.5f) / TEXT_SIZE_FACTOR) - 1;
-        int tvAddressDefaultMaxTextLength = (int) ((tvAddress.getMaxWidth() / tvAddress.getContext().getResources().getDisplayMetrics().density + 0.5f) / TEXT_SIZE_FACTOR) - 1;
-        int tvCountryTextLength = tvCountry.getText().length();
-        // Calculate length delta
-        int deltaLength = tvCountryTextLength - tvCountryDefaultMaxTextLength;
-
-        // Allow resizing only if new length is shorter than the new length limit
-        if( deltaLength > 0 && tvCountryTextLength <= RESIZING_LENGTH_LIMIT) {
-
-            // Increase tvCountry max width by the delta to fit better or totally to the text
-            // Convert length into width in dp
-            int newTvCountryMaxWidthInDp = (tvCountryTextLength + 1) * TEXT_SIZE_FACTOR;
-            // Convert width in dp into width in px
-            int newTvCountryMaxWidthInPx = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, newTvCountryMaxWidthInDp, tvCountry.getResources().getDisplayMetrics()));
-            // Set new width max
-            tvCountry.setMaxWidth(newTvCountryMaxWidthInPx);
-
-            // Decrease tvAddress max width by the same delta so as not to overflow the screen
-            // Convert length into width in dp
-            int newTvAddressMaxWidthInDp = (tvAddressDefaultMaxTextLength - deltaLength + 1) * TEXT_SIZE_FACTOR;
-            // Convert width in dp into width in px
-            int newTvAddressMaxWidthInPx = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, newTvAddressMaxWidthInDp, tvAddress.getResources().getDisplayMetrics()));
-            // Set new width max
-            tvAddress.setMaxWidth(newTvAddressMaxWidthInPx);
-        }
-
-        ////////////
-        // Scroll //
-        ////////////
-
+    private void setupTextScrolling() {
         // Set TextView selected for text scrolling
-        List<TextView> fields = Arrays.asList(tvTitle, tvCountry, tvAddress, tvOpenTime);
-        for (TextView field : fields) {
-            field.setSelected(true);
+        List<TextView> tvFields = Arrays.asList(tvTitle, tvAddress);
+        for (TextView tvField : tvFields) {
+            tvField.setSelected(true);
         }
     }
+
+
 
 }

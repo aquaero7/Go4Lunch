@@ -271,8 +271,14 @@ public class MapViewFragment extends Fragment implements
 
     @SuppressLint("MissingPermission")  // Permissions already checked in MainActivity
     private void displayMap() {
-        // Get data from API and display map with or without home focus
-        if (mGoogleMap != null) getDataFromApiAndFocusHome();
+        if (mGoogleMap != null) {
+            /* If necessary, display again MyLocation button if permissions are granted
+               (sometimes it is and I don't know why) */
+            locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
+            mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
+            // Get data from API and display map with or without home focus
+            getDataFromApiAndFocusHome();
+        }
     }
 
     @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
