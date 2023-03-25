@@ -61,7 +61,7 @@ public class FirestoreUtils {
 
     // Get restaurant data from Firestore with given document and create restaurant
     public static Restaurant getRestaurantFromDatabaseDocument(QueryDocumentSnapshot document) {
-        String rId = Objects.requireNonNull(document.getData().get("id")).toString();
+        String rId = Objects.requireNonNull(document.getData().get("rid")).toString();
         String rName = Objects.requireNonNull(document.getData().get("name")).toString();
         List<Photo> rPhotos = getPhotos(document);
         String rAddress = Objects.requireNonNull(document.getData().get("address")).toString();

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class RestaurantWithDistance implements Serializable {
 
-    private String id;
+    private String rid;
     private String name;
     @Nullable private List<Photo> photos;
     private String address;
@@ -24,10 +24,10 @@ public class RestaurantWithDistance implements Serializable {
     private long distance;
 
     // Constructor
-    public RestaurantWithDistance(String id, String name, @Nullable List<Photo> photos,
-                      String address, double rating, @Nullable OpeningHours openingHours,
-                      @Nullable String phoneNumber, @Nullable String website, Geometry geometry, long distance) {
-        this.id = id;
+    public RestaurantWithDistance(String rid, String name, @Nullable List<Photo> photos,
+                                  String address, double rating, @Nullable OpeningHours openingHours,
+                                  @Nullable String phoneNumber, @Nullable String website, Geometry geometry, long distance) {
+        this.rid = rid;
         this.name = name;
         this.photos = photos;
         this.address = address;
@@ -41,8 +41,8 @@ public class RestaurantWithDistance implements Serializable {
 
 
     // GETTERS
-    public String getId() {
-        return id;
+    public String getRid() {
+        return rid;
     }
     public String getName() {
         return name;
@@ -74,8 +74,8 @@ public class RestaurantWithDistance implements Serializable {
 
 
     // SETTERS
-    public void setId(String id) {
-        this.id = id;
+    public void setRid(String rid) {
+        this.rid = rid;
     }
     public void setName(String name) {
         this.name = name;

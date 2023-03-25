@@ -3,12 +3,9 @@ package com.example.go4lunch.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,13 +19,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
@@ -69,7 +66,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     // Declare current user id
     private String uid;
     // Declare restaurant
-    private Restaurant restaurant;
+    private RestaurantWithDistance restaurant;
     private String rid;
     // Declare current date
     private final String currentDate = CalendarUtils.getCurrentDate();
@@ -153,7 +150,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                 getSelectorsListAndConfigureRecyclerView();
                 break;
         }
-        mCallback.onButtonClicked(v, binding, restaurant.getId(), restaurant.getName(),
+        mCallback.onButtonClicked(v, binding, restaurant.getRid(), restaurant.getName(),
                 restaurant.getAddress(), restaurant.getPhoneNumber(), restaurant.getWebsite(),
                 restaurant.getRating(), restaurant.getPhotos(), isSelected, isLiked, uid);
     }
@@ -211,14 +208,14 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     }
 
     private void getSelectorsListAndConfigureRecyclerView() {
-        String restaurantId = restaurant.getId();
+        String restaurantId = restaurant.getRid();
         selectorsList = new ArrayList<>();
         UserManager.getUsersList(task -> {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
                     // Check selected restaurant id and date and get users list
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug.
+                        Map<String, Object> userData = document.getData(); // Map data for debug.
                         selectorToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
                         boolean isSelector = (restaurantId.equals(selectorToAdd.getSelectionId())
                                         && currentDate.equals(selectorToAdd.getSelectionDate()));
@@ -239,7 +236,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         if (intent != null) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
-                restaurant = (Restaurant) bundle.getSerializable("RESTAURANT");
+                restaurant = (RestaurantWithDistance) bundle.getSerializable("RESTAURANT");
                 Log.w("DetailRestaurantFragment", "Name of this restaurant : " + restaurant.getName());
             }
         }
@@ -263,7 +260,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
             selectionId = user.getSelectionId();
             selectionDate = user.getSelectionDate();
             // Get the id of this restaurant
-            String restaurantId = restaurant.getId();
+            String restaurantId = restaurant.getRid();
             // Update selection status
             isSelected = (restaurantId.equals(selectionId)) && (currentDate.equals(selectionDate));
 
@@ -280,7 +277,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
     private void setupLikeButton() {
         // Check in database if this restaurant is liked by current user
-        rid = restaurant.getId();
+        rid = restaurant.getRid();
         uid = UserManager.getInstance().getCurrentUserId();
         likedRestaurantsList = FirestoreUtils.getLikedRestaurantsList();
         // Update like status

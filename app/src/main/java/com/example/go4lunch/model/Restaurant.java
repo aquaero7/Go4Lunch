@@ -15,7 +15,7 @@ public class Restaurant implements Serializable {
 
     @SerializedName("place_id")
     @Expose
-    private String id;
+    private String rid;
 
     @SerializedName("name")
     @Expose
@@ -54,10 +54,10 @@ public class Restaurant implements Serializable {
     public Restaurant() {}
 
     // Constructor
-    public Restaurant(String id, String name, @Nullable List<Photo> photos,
+    public Restaurant(String rid, String name, @Nullable List<Photo> photos,
                       String address, double rating, @Nullable OpeningHours openingHours,
                       @Nullable String phoneNumber, @Nullable String website, Geometry geometry) {
-        this.id = id;
+        this.rid = rid;
         this.name = name;
         this.photos = photos;
         this.address = address;
@@ -70,8 +70,8 @@ public class Restaurant implements Serializable {
 
 
     // GETTERS
-    public String getId() {
-        return id;
+    public String getRid() {
+        return rid;
     }
     public String getName() {
         return name;
@@ -100,8 +100,8 @@ public class Restaurant implements Serializable {
 
 
     // SETTERS
-    public void setId(String id) {
-        this.id = id;
+    public void setRid(String rid) {
+        this.rid = rid;
     }
     public void setName(String name) {
         this.name = name;

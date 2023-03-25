@@ -159,7 +159,7 @@ public class DataProcessingUtils {
             int distance = calculateRestaurantDistance(restaurant, home);
 
             RestaurantWithDistance restaurantWithDistance
-                    = new RestaurantWithDistance(restaurant.getId(), restaurant.getName(),
+                    = new RestaurantWithDistance(restaurant.getRid(), restaurant.getName(),
                     restaurant.getPhotos(), restaurant.getAddress(), restaurant.getRating(),
                     restaurant.getOpeningHours(), restaurant.getPhoneNumber(),
                     restaurant.getWebsite(), restaurant.getGeometry(), distance);

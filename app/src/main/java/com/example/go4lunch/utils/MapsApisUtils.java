@@ -100,7 +100,7 @@ public class MapsApisUtils extends FragmentActivity {
 
     private static void getRestaurantDetailsFromApi(Restaurant nearbyRestaurant, LatLng latLng, String apiKey, Context context) {
 
-        String id = nearbyRestaurant.getId();
+        String rId = nearbyRestaurant.getRid();
         String name = nearbyRestaurant.getName();
         double rating = nearbyRestaurant.getRating();
         OpeningHours openingHours = nearbyRestaurant.getOpeningHours(); // Can be commented if openingHours come from nearby api
@@ -108,7 +108,7 @@ public class MapsApisUtils extends FragmentActivity {
         Geometry geometry = nearbyRestaurant.getGeometry();
 
         // Call Place Details API
-        Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(id,
+        Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(rId,
                 "formatted_address,formatted_phone_number,website,opening_hours",
                 apiKey
         );
@@ -124,11 +124,11 @@ public class MapsApisUtils extends FragmentActivity {
                 OpeningHours openingHours = restaurantDetails.getOpeningHours();    // Can be commented to make openingHours come from nearby api
 
                 /** Add restaurant to current restaurants list */
-                restaurantsList.add(new Restaurant(id, name, photos, address, rating, openingHours,
+                restaurantsList.add(new Restaurant(rId, name, photos, address, rating, openingHours,
                         phoneNumber, website, geometry));
 
                 /** Create or update restaurant in Firebase */
-                RestaurantManager.getInstance().createRestaurant(id, name, photos, address, rating,
+                RestaurantManager.getInstance().createRestaurant(rId, name, photos, address, rating,
                         openingHours, phoneNumber, website, geometry);
             }
 

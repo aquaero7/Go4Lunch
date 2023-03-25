@@ -7,12 +7,10 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,15 +18,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
-import com.example.go4lunch.manager.RestaurantManager;
-import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
@@ -62,11 +57,9 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 
@@ -242,8 +235,14 @@ public class MapViewFragment extends Fragment implements
     public boolean onMarkerClick(@NonNull Marker marker) {
         String refId = marker.getTag().toString();
         for (Restaurant restaurant : restaurantsList) {
-            if(restaurant.getId().equals(refId)) {
-                launchDetailRestaurantActivity(restaurant);
+            if(restaurant.getRid().equals(refId)) {
+                RestaurantWithDistance restaurantWithDistance = new RestaurantWithDistance(restaurant.getRid(),
+                        restaurant.getName(), restaurant.getPhotos(), restaurant.getAddress(),
+                        restaurant.getRating(), restaurant.getOpeningHours(),
+                        restaurant.getPhoneNumber(), restaurant.getWebsite(), restaurant.getGeometry(),
+                        DataProcessingUtils.calculateRestaurantDistance(restaurant, home));
+
+                launchDetailRestaurantActivity(restaurantWithDistance);
                 break;
             }
         }
@@ -371,7 +370,7 @@ public class MapViewFragment extends Fragment implements
             for (Restaurant restaurant : restaurants) {
                 double rLat = restaurant.getGeometry().getLocation().getLat();
                 double rLng = restaurant.getGeometry().getLocation().getLng();
-                String rId = restaurant.getId();
+                String rId = restaurant.getRid();
 
                 Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                         .position(new LatLng(rLat, rLng))
@@ -383,7 +382,7 @@ public class MapViewFragment extends Fragment implements
         }
     }
 
-    private void launchDetailRestaurantActivity(Restaurant restaurant) {
+    private void launchDetailRestaurantActivity(RestaurantWithDistance restaurant) {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurant);
@@ -423,7 +422,7 @@ public class MapViewFragment extends Fragment implements
                 String placeId = place.getId();
                 Log.i("MapViewFragment", "Place: " + placeId);
                 for (Restaurant restaurant : restaurantsList) {
-                    if (Objects.equals(restaurant.getId(), placeId)) {
+                    if (Objects.equals(restaurant.getRid(), placeId)) {
                         double lat = restaurant.getGeometry().getLocation().getLat();
                         double lng = restaurant.getGeometry().getLocation().getLng();
                         Log.i("MapViewFragment", "Place: " + placeId + ", " + lat + ", " + lng);

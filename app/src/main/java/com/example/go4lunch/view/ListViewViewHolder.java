@@ -78,7 +78,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         ivWorkmateLogo.setImageResource(R.drawable.ic_outline_person_black_24);
 
         // Display selections count
-        displaySelectionsCount(restaurant.getId());
+        displaySelectionsCount(restaurant.getRid());
 
         // Display restaurant opening info
         String information = DataProcessingUtils.getOpeningInformation(restaurant);

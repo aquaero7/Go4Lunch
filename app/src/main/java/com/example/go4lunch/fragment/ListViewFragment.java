@@ -141,7 +141,6 @@ public class ListViewFragment extends Fragment {
     private void configureOnClickRecyclerView(){
         ItemClickSupport.addTo(mRecyclerView, R.layout.restaurant_list_item)
                 .setOnItemClickListener((recyclerView, position, v) -> {
-                    Log.w("TAG", "Position : "+position);       // TODO : To be deleted
                     if (restaurantsListToDisplay.size() != 0) {
                         RestaurantWithDistance mRestaurantWithDistance = restaurantsListToDisplay.get(position);
                         launchDetailRestaurantActivity(mRestaurantWithDistance);

@@ -10,14 +10,6 @@ public class LikedRestaurant {
     public LikedRestaurant() {
     }
 
-    /*  // TODO : To be deleted
-    // Constructor used to create liked restaurant in database
-    public LikedRestaurant(String rid, String uid) {
-        this.rid = rid;
-        this.uid = uid;
-    }
-    */
-
     // Constructor used to create and read liked restaurant from database
     public LikedRestaurant(String id, String rid, String uid) {
         this.id = id;
@@ -29,11 +21,9 @@ public class LikedRestaurant {
     public String getId() {
         return id;
     }
-
     public String getRid() {
         return rid;
     }
-
     public String getUid() {
         return uid;
     }
@@ -42,12 +32,11 @@ public class LikedRestaurant {
     public void setId(String id) {
         this.id = id;
     }
-
     public void setRid(String rid) {
         this.rid = rid;
     }
-
     public void setUid(String uid) {
         this.uid = uid;
     }
+    
 }
