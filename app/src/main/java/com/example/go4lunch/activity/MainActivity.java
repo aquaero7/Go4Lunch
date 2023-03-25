@@ -37,8 +37,10 @@ import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
+import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
@@ -132,7 +134,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Create a new FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         // Check permissions and get device location
-        checkPermissionsAndGetDeviceLocation();
+        checkPermissions();
 
         // Initialize SearchView and setup listener
         searchView = binding.includedToolbar.searchView;
@@ -190,7 +192,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         int id = item.getItemId();
         switch (id){
             case R.id.activity_main_drawer_lunch:
-                checkCurrentUserSelection();
+                checkCurrentUserSelectionAndLaunchActivity();
                 break;
             case R.id.activity_main_drawer_settings:
                 launchSettingActivity();
@@ -297,7 +299,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
                 switch (fmt.getTag()) {
                     case "f0":
-                        // Toast.makeText(MainActivity.this, "Query is : " + query, Toast.LENGTH_SHORT).show();    // TODO : To be deleted
                         ((MapViewFragment)fmt).launchAutocomplete(query);
                         searchView.setQuery("", false);
                         break;
@@ -327,7 +328,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 switch (fmt.getTag()) {
                     case "f0":
                         if (newText.length() == 3) {
-                            // Toast.makeText(MainActivity.this, "Query is : " + newText, Toast.LENGTH_SHORT).show();  // TODO : To be deleted
                             searchView.setQuery("", false);
                             searchView.setVisibility(View.GONE);
                             ((MapViewFragment)fmt).launchAutocomplete(newText);
@@ -337,7 +337,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                         ((ListViewFragment)fmt).filterList(newText);
                         break;
                     case "f2":
-                        // showSnackBar(String.format(getString(R.string.search_error), tabTitles[pager.getCurrentItem()]));   // TODO : To be deleted
                         break;
                 }
                 return false;
@@ -378,7 +377,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
     }
 
-    private void checkPermissionsAndGetDeviceLocation() {
+    private void checkPermissions() {
         // This is the result of the user answer to permissions request
         ActivityResultContracts.RequestMultiplePermissions permissionsContract = new ActivityResultContracts.RequestMultiplePermissions();
         requestPermissionsLauncher = registerForActivityResult(permissionsContract, result -> {
@@ -421,7 +420,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         }
     }
 
-    private void checkCurrentUserSelection() {
+    private void checkCurrentUserSelectionAndLaunchActivity() {
         // Get current user selected restaurant from database
         UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
             // Get current user selected restaurant from database
@@ -433,7 +432,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 RestaurantManager.getRestaurantData(selectionId)
                         .addOnSuccessListener(restaurant -> {
                             Log.w("MainActivity", "success task getRestaurantData");
-                            launchDetailRestaurantActivity(restaurant);
+                            home = MapsApisUtils.getHome();
+                            int distance = (home != null) ?
+                                    DataProcessingUtils.calculateRestaurantDistance(restaurant, home) : 0;
+
+                            RestaurantWithDistance restaurantWithDistance =
+                                    new RestaurantWithDistance(restaurant.getRid(), restaurant.getName(),
+                                            restaurant.getPhotos(), restaurant.getAddress(),
+                                            restaurant.getRating(), restaurant.getOpeningHours(),
+                                            restaurant.getPhoneNumber(), restaurant.getWebsite(),
+                                            restaurant.getGeometry(), distance);
+
+                            launchDetailRestaurantActivity(restaurantWithDistance);
                         })
                         .addOnFailureListener(e -> Log.w("MainActivity", e.getMessage()));
             } else {
@@ -442,7 +452,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         });
     }
 
-    private void launchDetailRestaurantActivity(Restaurant restaurant) {
+    private void launchDetailRestaurantActivity(RestaurantWithDistance restaurant) {
         Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurant);
