@@ -1,9 +1,6 @@
 package com.example.go4lunch.utils;
 
-import android.app.Activity;
 import android.content.Context;
-import android.location.Location;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,14 +16,7 @@ import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 
@@ -42,7 +32,7 @@ public class MapsApisUtils extends FragmentActivity {
 
     private static final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
     private static final double DEF_LONGITUDE = 0;  //VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
-    private static final int DEFAULT_RADIUS = 1000; // Distance in meters
+    private static final int DEFAULT_RADIUS = 1000; /** Distance in meters */
     private static boolean locationPermissionsGranted;
     private static List<Restaurant> restaurantsList = new ArrayList<>();
     private static LatLng home;
@@ -71,7 +61,6 @@ public class MapsApisUtils extends FragmentActivity {
     public static void setRestaurantsList(List<Restaurant> restaurants) {
         restaurantsList = restaurants;
     }
-
 
 
     // Get restaurants list from API
@@ -117,8 +106,6 @@ public class MapsApisUtils extends FragmentActivity {
         OpeningHours openingHours = nearbyRestaurant.getOpeningHours(); // Can be commented if openingHours come from nearby api
         List<Photo> photos = nearbyRestaurant.getPhotos();
         Geometry geometry = nearbyRestaurant.getGeometry();
-        // long distance = DataProcessingUtils.calculateRestaurantDistance(nearbyRestaurant, latLng);
-        long distance = 0;
 
         // Call Place Details API
         Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(id,
@@ -128,24 +115,21 @@ public class MapsApisUtils extends FragmentActivity {
         call2.enqueue(new Callback<GmapsRestaurantDetailsPojo>() {
             @Override
             public void onResponse(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Response<GmapsRestaurantDetailsPojo> response2) {
-                // Gson gson = new Gson();
-                // String res = gson.toJson(response2.body());
                 GmapsRestaurantDetailsPojo placeDetails = response2.body();
                 Restaurant restaurantDetails = placeDetails.getRestaurantDetails();
 
-                String nationality = "";    // TODO : Where to get this information ?
                 String address = restaurantDetails.getAddress();
                 String phoneNumber = restaurantDetails.getPhoneNumber();
                 String website = restaurantDetails.getWebsite();
                 OpeningHours openingHours = restaurantDetails.getOpeningHours();    // Can be commented to make openingHours come from nearby api
 
                 /** Add restaurant to current restaurants list */
-                restaurantsList.add(new Restaurant(id, name, distance, photos,
-                        nationality, address, rating, openingHours, phoneNumber, website, geometry));
+                restaurantsList.add(new Restaurant(id, name, photos, address, rating, openingHours,
+                        phoneNumber, website, geometry));
 
                 /** Create or update restaurant in Firebase */
-                RestaurantManager.getInstance().createRestaurant(id, name, distance, photos,
-                        nationality, address, rating, openingHours, phoneNumber, website, geometry);
+                RestaurantManager.getInstance().createRestaurant(id, name, photos, address, rating,
+                        openingHours, phoneNumber, website, geometry);
             }
 
             @Override
@@ -156,6 +140,7 @@ public class MapsApisUtils extends FragmentActivity {
         });
     }
 
+
     public static void initializeAutocompleteSupportFragment(AutocompleteSupportFragment autocompleteFragment) {
         // Specify the types of place data to return.
         // autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
@@ -165,8 +150,5 @@ public class MapsApisUtils extends FragmentActivity {
         // Specify the country of place data to return.
         autocompleteFragment.setCountries("FR");
     }
-
-
-
 
 }

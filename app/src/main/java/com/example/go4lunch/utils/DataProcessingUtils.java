@@ -4,6 +4,7 @@ package com.example.go4lunch.utils;
 import android.util.Log;
 
 import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Period;
 import com.google.android.gms.maps.model.LatLng;
@@ -21,24 +22,20 @@ public class DataProcessingUtils {
         double restaurantLat = restaurant.getGeometry().getLocation().getLat();
         double restaurantLng = restaurant.getGeometry().getLocation().getLng();
         LatLng restaurantLatLng = new LatLng(restaurantLat, restaurantLng);
-        // Distance in meters
         double distance = SphericalUtil.computeDistanceBetween(currentLatLng, restaurantLatLng);
 
-        return (int) distance;
+        return (int) distance;  /** Distance in meters */
     }
 
-    public static String getOpeningInformation(Restaurant restaurant) {
+    public static String getOpeningInformation(RestaurantWithDistance restaurant) {
         // Built information to display
 
         String openingInformation = "";
-
         if (restaurant.getOpeningHours() != null) {
             // Possibility of several opening and closing periods in a day
             /** Information must be either 3 char (code) or 7 char (code+schedule) length */
 
-            // boolean openNow = restaurant.getOpeningHours().isOpenNow(); // TODO : To be calculated instead
             boolean openNow;
-
             long currentDayOfWeek = CalendarUtils.getCurrentDayOfWeek();
             String currentTime = CalendarUtils.getCurrentTime();
 
@@ -156,16 +153,24 @@ public class DataProcessingUtils {
     }
 
 
-    public static List<Restaurant> updateRestaurantsListWithDistances(List<Restaurant> restaurantsList, LatLng home) {
+    public static List<RestaurantWithDistance> updateRestaurantsListWithDistances(List<Restaurant> restaurantsList, LatLng home) {
+        List<RestaurantWithDistance> restaurants = new ArrayList();
         for (Restaurant restaurant : restaurantsList) {
-            int distance =  calculateRestaurantDistance(restaurant, home);
-            restaurant.setDistance(distance);
+            int distance = calculateRestaurantDistance(restaurant, home);
+
+            RestaurantWithDistance restaurantWithDistance
+                    = new RestaurantWithDistance(restaurant.getId(), restaurant.getName(),
+                    restaurant.getPhotos(), restaurant.getAddress(), restaurant.getRating(),
+                    restaurant.getOpeningHours(), restaurant.getPhoneNumber(),
+                    restaurant.getWebsite(), restaurant.getGeometry(), distance);
+
+            restaurants.add(restaurantWithDistance);
         }
-        return restaurantsList;
+        return restaurants;
     }
 
     public static LatLngBounds calculateBounds(LatLng home, int radius) {
-        // Distances in meters / Angles in radians
+        /** Distances in meters / Angles in radians */
         double earthRadius = 6371e3;
         double earthCircle = 2 * Math.PI * earthRadius;
         double latHome = home.latitude;
@@ -187,31 +192,34 @@ public class DataProcessingUtils {
         return new LatLngBounds(sw, ne);
     }
 
-    public static void sortByDistanceAndName (List<Restaurant> restaurantsList) {
-        Collections.sort(restaurantsList, Restaurant.comparatorName);
-        Collections.sort(restaurantsList, Restaurant.comparatorDistance);
+
+    public static void sortByDistanceAndName (List<RestaurantWithDistance> restaurantsWithDistance) {
+        Collections.sort(restaurantsWithDistance, RestaurantWithDistance.comparatorName);
+        Collections.sort(restaurantsWithDistance, RestaurantWithDistance.comparatorDistance);
     }
+
 
     public static void sortByName(List<User> workmatesList) {
         Collections.sort(workmatesList, User.comparatorName);
     }
 
+
     public static void sortByAscendingOpeningTime(List<Period> periods) {
-        /* Using Comparator */
+        // Using Comparator
         periods.sort(Comparator.comparing(o -> o.getOpen().getTime()));
         // periods.sort(Comparator.comparing(o -> o.getOpen().getTime(), Comparator.naturalOrder()));
 
-        /* Or without using Comparator */
+        // Or without using Comparator
         // periods.sort((o1, o2) -> o1.getOpen().getTime().compareTo(o2.getOpen().getTime()));
     }
 
+
     public static void sortByDescendingOpeningTime(List<Period> periods) {
-        /* Using Comparator */
+        // Using Comparator
         periods.sort(Comparator.comparing(o -> o.getOpen().getTime(), Comparator.reverseOrder()));
 
-        /* Or without using Comparator */
+        // Or without using Comparator
         // periods.sort((o1, o2) -> o2.getOpen().getTime().compareTo(o1.getOpen().getTime()));
     }
-
 
 }

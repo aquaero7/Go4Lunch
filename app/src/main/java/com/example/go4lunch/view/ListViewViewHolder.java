@@ -1,36 +1,28 @@
 package com.example.go4lunch.view;
 
-import android.os.Build;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.RestaurantListItemBinding;
 import com.example.go4lunch.manager.UserManager;
-import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
-import com.example.go4lunch.utils.MapsApisUtils;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
-
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class ListViewViewHolder extends RecyclerView.ViewHolder {
 
@@ -60,28 +52,34 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         ivPicture = binding.restaurantItemPicture;
     }
 
-    public void updateWithRestaurants(Restaurant restaurant, String KEY, String STATUS_OPEN,
+
+    public void updateWithRestaurants(RestaurantWithDistance restaurant, String KEY, String STATUS_OPEN,
                                       String STATUS_CLOSED, String STATUS_OPEN247,
                                       String STATUS_OPEN24, String STATUS_OPEN_UNTIL,
                                       String STATUS_OPEN_AT, String STATUS_UNKNOWN) {
 
         // Display restaurant name
         tvTitle.setText(restaurant.getName());
+
         // Display restaurant distance
         String distance;
-        int dist  = DataProcessingUtils.calculateRestaurantDistance(restaurant, MapsApisUtils.getHome());
+        int dist = (int) restaurant.getDistance();
         if (dist < 10000) {
             distance = dist + "m";
         } else {
             distance = dist / 1000 + "km";
         }
         tvDistance.setText(distance);
+
         // Display restaurant address
         tvAddress.setText(restaurant.getAddress());
+
         // Display workmate logo
         ivWorkmateLogo.setImageResource(R.drawable.ic_outline_person_black_24);
+
         // Display selections count
         displaySelectionsCount(restaurant.getId());
+
         // Display restaurant opening info
         String information = DataProcessingUtils.getOpeningInformation(restaurant);
         if (!information.isEmpty()) {
@@ -120,13 +118,18 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         } else {
             tvOpenTime.setText(STATUS_UNKNOWN);
         }
+
         // Display restaurant rating
         mRatingBar.setRating((float) (restaurant.getRating() * 3/5));
+
         // Display restaurant picture
         if (restaurant.getPhotos() != null) Picasso.get().load(restaurant.getPhotos().get(0).getPhotoUrl(KEY)).into(ivPicture);
+
         // Setup text scrolling
         setupTextScrolling();
+
     }
+
 
     private void displaySelectionsCount(String rId) {
         // Get workmates list
@@ -136,7 +139,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
                     int selectionsCount = 0;
                     // Get users list
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> userData = document.getData(); // TODO : Map data for debug. To be deleted
+                        Map<String, Object> userData = document.getData(); // Map data for debug.
                         // Get workmate in workmates list
                         User workmate = FirestoreUtils.getUserFromDatabaseDocument(document);
                         // Check selected restaurant id and date and increase selections count if matches with restaurant id
@@ -159,7 +162,9 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
                 Log.w("ListViewViewHolder", "Error getting documents: ", task.getException());
             }
         });
+
     }
+
 
     private void setupTextScrolling() {
         // Set TextView selected for text scrolling
@@ -168,7 +173,5 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
             tvField.setSelected(true);
         }
     }
-
-
 
 }

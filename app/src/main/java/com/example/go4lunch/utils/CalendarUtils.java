@@ -1,9 +1,6 @@
 package com.example.go4lunch.utils;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -15,6 +12,7 @@ public class CalendarUtils {
         Calendar calendar = Calendar.getInstance();
         return calendar.get(Calendar.DAY_OF_WEEK) - 1;
     }
+
 
     // Get current formatted time
     public static String getCurrentTime() {
@@ -28,9 +26,10 @@ public class CalendarUtils {
         return hod + min;
     }
 
+
     public static String getCurrentDate() {
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.FRANCE);
         Date date = calendar.getTime();
         return sdf.format(date);
     }

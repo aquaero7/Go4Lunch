@@ -399,6 +399,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 Log.w("ActivityResultLauncher", "No location permission was granted by user");
                 locationPermissionsGranted = false;
             }
+            /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment */
             MapsApisUtils.setPermissions(locationPermissionsGranted);
         });
 
@@ -414,8 +415,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             /** Permissions granted */
             Log.w("checkPermissions", "Permissions granted");
             locationPermissionsGranted = true;
-            MapsApisUtils.setPermissions(locationPermissionsGranted);
             initializeListsInUtils();
+            /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment */
+            MapsApisUtils.setPermissions(locationPermissionsGranted);
         }
     }
 

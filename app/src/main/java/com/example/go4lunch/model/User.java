@@ -2,12 +2,8 @@ package com.example.go4lunch.model;
 
 import androidx.annotation.Nullable;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.List;
 
 public class User implements Serializable {
 
@@ -22,6 +18,7 @@ public class User implements Serializable {
     // Empty constructor to allow firebase to cast document to object model
     public User() {}
 
+    // API constructor
     public User(String uid, String username, @Nullable String userEmail, @Nullable String userUrlPicture) {
         this.uid = uid;
         this.username = username;
@@ -31,6 +28,7 @@ public class User implements Serializable {
         this.selectionDate = null;
     }
 
+    // Full constructor
     public User(String uid, String username, @Nullable String userEmail, @Nullable String userUrlPicture,
                 String selectionId, @Nullable String selectionDate) {
         this.uid = uid;
@@ -82,6 +80,9 @@ public class User implements Serializable {
     public void setSelectionDate(@Nullable String selectionDate) {
         this.selectionDate = selectionDate;
     }
+
+
+    // SORTS
 
     // Comparator for sort by name
     public static Comparator<User> comparatorName = Comparator.comparing(User::getUsername);

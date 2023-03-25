@@ -1,19 +1,12 @@
 package com.example.go4lunch.manager;
 
-import androidx.annotation.NonNull;
-
 import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.repository.RestaurantRepository;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
@@ -42,33 +35,13 @@ public class RestaurantManager {
 
     // Create restaurant in Firestore
 
-    // Method for database constructor
-    public void createRestaurant(String id, String name, long distance, List<Photo> photos, String nationality,
-                                 String address, double rating, OpeningHours openingHours, int likesCount,
-                                 String phoneNumber, String website, Geometry geometry, List<User> selectors) {
+    // Constructor
+    public void createRestaurant(String id, String name, List<Photo> photos, String address,
+                                 double rating, OpeningHours openingHours, String phoneNumber,
+                                 String website, Geometry geometry) {
 
-        restaurantRepository.createRestaurant(id, name, distance, photos, nationality, address, rating,
-                                                openingHours, likesCount, phoneNumber, website, geometry, selectors);
-    }
-
-    // Method for API constructor
-    public void createRestaurant(String id, String name, long distance, List<Photo> photos, String nationality,
-                                 String address, double rating, OpeningHours openingHours,
-                                 String phoneNumber, String website, Geometry geometry) {
-
-        restaurantRepository.createRestaurant(id, name, distance, photos, nationality, address, rating,
+        restaurantRepository.createRestaurant(id, name, photos, address, rating,
                 openingHours, phoneNumber, website, geometry);
-    }
-
-
-    // TODO : For test. To be deleted
-    public void createRestaurant(){
-        restaurantRepository.createRestaurant();
-    }
-
-    // TODO : For test. To be deleted
-    public void createRestaurant(String id, String name) {
-        restaurantRepository.createRestaurant(id, name);
     }
 
     // Get the restaurants list from Firestore
@@ -78,7 +51,8 @@ public class RestaurantManager {
 
     // Get the restaurant data from Firestore and cast it to a Restaurant model Object
     public static Task<Restaurant> getRestaurantData(String id){
-        return RestaurantRepository.getRestaurantData(id).continueWith(task -> task.getResult().toObject(Restaurant.class));
+        return RestaurantRepository.getRestaurantData(id)
+                .continueWith(task -> task.getResult().toObject(Restaurant.class));
     }
 
     // Clear the restaurants collection

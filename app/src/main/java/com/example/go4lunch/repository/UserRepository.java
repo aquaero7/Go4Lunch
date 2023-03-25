@@ -44,8 +44,7 @@ public class UserRepository {
         }
     }
 
-    @Nullable
-    public FirebaseUser getCurrentUser(){
+    @Nullable public FirebaseUser getCurrentUser(){
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
@@ -54,8 +53,7 @@ public class UserRepository {
     }
 
     // Get current user ID
-    @Nullable
-    public String getCurrentUserUID() {
+    @Nullable public String getCurrentUserUID() {
         FirebaseUser user = getCurrentUser();
         return (user != null)? user.getUid() : null;
     }
@@ -77,13 +75,17 @@ public class UserRepository {
 
             // If the current user already exist in Firestore, we get his data from Firestore
             Task<DocumentSnapshot> userData = getCurrentUserData();
-            userData.continueWith(task -> task.getResult().toObject(User.class)).addOnSuccessListener(user -> {
+            userData.continueWith(task -> task.getResult().toObject(User.class))
+                    .addOnSuccessListener(user -> {
                 if (user != null) {
                     // If the current user already exist in Firestore, we update his data
                     getUsersCollection().document(uid)
-                            .update(USER_ID, uid, USER_NAME, username, USER_EMAIL, userEmail, USER_URL_PICTURE, userUrlPicture)
-                            .addOnSuccessListener(command -> Log.w("UserRepository", "Update successful"))
-                            .addOnFailureListener(e -> Log.w("UserRepository", "Update failed. Message : " + e.getMessage()));
+                            .update(USER_ID, uid, USER_NAME, username, USER_EMAIL, userEmail,
+                                    USER_URL_PICTURE, userUrlPicture)
+                            .addOnSuccessListener(command -> Log.w("UserRepository",
+                                    "Update successful"))
+                            .addOnFailureListener(e -> Log.w("UserRepository",
+                                    "Update failed. Message : " + e.getMessage()));
                     Log.w("UserRepository", "User already exists");
                 } else {
                     // If the current user doesn't exist in Firestore, we create this user

@@ -28,7 +28,6 @@ public class RestaurantRepository {
 
     // Firestore
     private static final String COLLECTION_RESTAURANTS = "restaurants";
-    private static final String COLLECTION_USERS = "users";
 
     public RestaurantRepository() {
     }
@@ -53,98 +52,21 @@ public class RestaurantRepository {
 
     // Create restaurant in Firestore
 
-    // Method for database constructor
-    public void createRestaurant(String id, String name, long distance, List<Photo> photos, String nationality,
-                                 String address, double rating, OpeningHours openingHours, int likesCount,
-                                 String phoneNumber, String website, Geometry geometry, List<User> selectors) {
+    // Constructor
+    public void createRestaurant(String id, String name, List<Photo> photos, String address,
+                                 double rating, OpeningHours openingHours, String phoneNumber,
+                                 String website, Geometry geometry) {
 
-        Restaurant restaurantToCreate = new Restaurant(id, name, distance, photos, nationality,
-                address, rating, openingHours, likesCount, phoneNumber, website, geometry, selectors);
-
-        getRestaurantsCollection().document(id).set(restaurantToCreate);
-
-    }
-
-    // Method for API constructor
-    public void createRestaurant(String id, String name, long distance, List<Photo> photos, String nationality,
-                                 String address, double rating, OpeningHours openingHours,
-                                 String phoneNumber, String website, Geometry geometry) {
-
-        Restaurant restaurantToCreate = new Restaurant(id, name, distance, photos, nationality,
-                address, rating, openingHours, phoneNumber, website, geometry);
+        Restaurant restaurantToCreate = new Restaurant(id, name, photos, address, rating,
+                openingHours, phoneNumber, website, geometry);
 
         getRestaurantsCollection().document(id).set(restaurantToCreate);
-
     }
-
-
-    // TODO : For test. To be deleted
-    public void createRestaurant() {
-        /*
-        String id = "ID1";  // TODO : Get data from API
-        String name = "Name for test";  // TODO : Get data from API
-        long distance = 0;  // TODO : Get data from API
-        List<Photo> photos = null;  // TODO : Get data from API
-        String nationality = "";  // TODO : Get data from API
-        String address = "";  // TODO : Get data from API
-        double rating = 0.0;  // TODO : Get data from API
-        OpeningHours openingHours = null;  // TODO : Get data from API
-        int likesCount = 0;  // TODO : Get data from database
-        String phoneNumber = "";  // TODO : Get data from API
-        String website = "";  // TODO : Get data from API
-        Geometry geometry = null; // TODO : Get data from API
-        List<User> selectors = null;    // TODO : Get data from database
-
-        Restaurant restaurantToCreate = new Restaurant(id, name, distance, photos, nationality,
-                address, rating, openingHours, likesCount, phoneNumber, website, geometry, selectors);
-
-        getRestaurantsCollection().document(id).set(restaurantToCreate);    // Create ou update a document with nothing given
-        */
-
-        // getRestaurantsCollection().add(restaurantToCreate);  // Create a document with new automatic ID
-        // getRestaurantsCollection().document(id).update("name", name);    // Update a field of a document with given ID
-
-
-        /* If the restaurant already exist in Firestore, we get his hole data
-        Task<DocumentSnapshot> restaurantData = getRestaurantData();
-        restaurantData.addOnSuccessListener(documentSnapshot -> {
-            // this.getRestaurantsCollection().document(id).set(restaurantToCreate);   // Create ou update a document with given ID
-            this.getRestaurantsCollection().add(restaurantToCreate);  // Create a document with new automatic ID
-            // this.getRestaurantsCollection().document(id).update("name", name);    // Update a field of a document with given ID
-        });
-        */
-    }
-
-    // TODO : For test. To be deleted
-    public void createRestaurant(String id, String name) {
-        /*
-        // String id = "ID1";  // TODO : Get data from API
-        // String name = "";  // TODO : Get data from API
-        long distance = 0;  // TODO : Get data from API
-        List<Photo> photos = null;  // TODO : Get data from API
-        String nationality = "";  // TODO : Get data from API
-        String address = "";  // TODO : Get data from API
-        double rating = 0.0;  // TODO : Get data from API
-        OpeningHours openingHours = null;  // TODO : Get data from API
-        int likesCount = 0;  // TODO : Get data from database
-        String phoneNumber = "";  // TODO : Get data from API
-        String website = "";  // TODO : Get data from API
-        Geometry geometry = null; // TODO : Get data from API
-        List<User> selectors = null;    // TODO : Get data from database
-
-        Restaurant restaurantToCreate = new Restaurant(id, name, distance, photos, nationality,
-                address, rating, openingHours, likesCount, phoneNumber, website, geometry, selectors);
-
-        getRestaurantsCollection().document(id).set(restaurantToCreate);    // Create or update a document with given ID and nane
-        */
-    }
-
 
     // Get restaurants list from Firestore
     public static void getRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
         getRestaurantsCollection().get().addOnCompleteListener(listener);
     }
-
 
     // Get restaurant data from Firestore
     public static Task<DocumentSnapshot> getRestaurantData(String id) {

@@ -5,58 +5,28 @@ import androidx.annotation.Nullable;
 import com.example.go4lunch.model.api.Geometry;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Photo;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.List;
 
-public class Restaurant implements Serializable {
+public class RestaurantWithDistance implements Serializable {
 
-    @SerializedName("place_id")
-    @Expose
     private String id;
-
-    @SerializedName("name")
-    @Expose
     private String name;
-
-    @SerializedName("photos")
-    @Expose
     @Nullable private List<Photo> photos;
-
-    @SerializedName("formatted_address")
-    @Expose
     private String address;
-
-    @SerializedName("rating")
-    @Expose
     private double rating;
-
-    @SerializedName("opening_hours")
-    @Expose
     @Nullable private OpeningHours openingHours;
-
-    @SerializedName("formatted_phone_number")
-    @Expose
     @Nullable private String phoneNumber;
-
-    @SerializedName("website")
-    @Expose
     @Nullable private String website;
-
-    @SerializedName("geometry")
-    @Expose
     private Geometry geometry;
-
-
-    // Empty constructor to allow firebase to cast document to object model
-    public Restaurant() {}
+    private long distance;
 
     // Constructor
-    public Restaurant(String id, String name, @Nullable List<Photo> photos,
+    public RestaurantWithDistance(String id, String name, @Nullable List<Photo> photos,
                       String address, double rating, @Nullable OpeningHours openingHours,
-                      @Nullable String phoneNumber, @Nullable String website, Geometry geometry) {
+                      @Nullable String phoneNumber, @Nullable String website, Geometry geometry, long distance) {
         this.id = id;
         this.name = name;
         this.photos = photos;
@@ -66,6 +36,7 @@ public class Restaurant implements Serializable {
         this.phoneNumber = phoneNumber;
         this.website = website;
         this.geometry = geometry;
+        this.distance = distance;
     }
 
 
@@ -97,6 +68,9 @@ public class Restaurant implements Serializable {
     public Geometry getGeometry() {
         return geometry;
     }
+    public long getDistance() {
+        return distance;
+    }
 
 
     // SETTERS
@@ -127,5 +101,17 @@ public class Restaurant implements Serializable {
     public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
     }
+    public void setDistance(long distance) {
+        this.distance = distance;
+    }
+
+
+    // SORTS
+
+    // Comparator for sort by distance
+    public static Comparator<RestaurantWithDistance> comparatorDistance = (o1, o2) -> (int) (o1.getDistance() - o2.getDistance());
+
+    // Comparator for sort by name
+    public static Comparator<RestaurantWithDistance> comparatorName = Comparator.comparing(RestaurantWithDistance::getName);
 
 }

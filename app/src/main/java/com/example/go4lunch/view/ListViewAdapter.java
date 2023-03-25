@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.RestaurantWithDistance;
 
 import java.util.List;
 
@@ -24,10 +24,11 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     private final String STATUS_OPEN_AT;
     private final String STATUS_UNKNOWN;
 
-    private List<Restaurant> restaurantsList;
+    private List<RestaurantWithDistance> restaurantsList;
+
 
     // Constructor
-    public ListViewAdapter(List<Restaurant> restaurantsList, String KEY, String STATUS_OPEN,
+    public ListViewAdapter(List<RestaurantWithDistance> restaurantsList, String KEY, String STATUS_OPEN,
                            String STATUS_CLOSED, String STATUS_OPEN247, String STATUS_OPEN24,
                            String STATUS_OPEN_UNTIL, String STATUS_OPEN_AT, String STATUS_UNKNOWN) {
         this.restaurantsList = restaurantsList;
@@ -41,6 +42,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
         this.STATUS_UNKNOWN = STATUS_UNKNOWN;
     }
 
+
     @NonNull
     @Override
     public ListViewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -50,8 +52,8 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
         View view = inflater.inflate(R.layout.restaurant_list_item, parent, false);
 
         return new ListViewViewHolder(view);
-
     }
+
 
     // Update view holder with restaurants
     @Override
@@ -60,6 +62,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
                 this.STATUS_OPEN, this.STATUS_CLOSED, this.STATUS_OPEN247, this.STATUS_OPEN24,
                 this.STATUS_OPEN_UNTIL, this.STATUS_OPEN_AT, this.STATUS_UNKNOWN);
     }
+
 
     // Return the total count of restaurants
     @Override
