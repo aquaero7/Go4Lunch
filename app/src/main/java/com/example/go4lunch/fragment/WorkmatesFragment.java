@@ -179,7 +179,8 @@ public class WorkmatesFragment extends Fragment {
     }
 
     private void getWorkmatesListAndConfigureRecyclerView() {
-        workmatesList = FirestoreUtils.getWorkmatesList();
+        // workmatesList = FirestoreUtils.getWorkmatesList();   // TODO
+        workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
         DataProcessingUtils.sortByName(workmatesList);
         configureRecyclerView();
         configureOnClickRecyclerView();

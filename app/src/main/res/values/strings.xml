@@ -84,7 +84,16 @@
     <string name="no_choice_text">\ is probably eating somewhere…</string>
     <string name="joining_text">\ is joining!</string>
 
+    <!-- NOTIFICATION SERVICE -->
+    <string name="notification_title">It\'s time to go for lunch!</string>
+    <string name="notification_body_header">This restaurant is looking forward to welcoming you for lunch:</string>
+    <string name="none_joining_text">None of your workmates is joining.</string>
+    <string name="workmates_joining_text">The following workmates are joining:</string>
+    <string name="greeting">Enjoy your meal!</string>
+
+    <!--******************-->
     <!-- NOT TRANSLATABLE -->
+    <!--******************-->
 
     <!-- SEPARATORS -->
     <string name="hyphen">-</string>
@@ -95,5 +104,8 @@
 
     <!-- GOOGLE MAPS -->
     <string name="MAPS_API_KEY" translatable="false">@string/maps_api_key</string>
+
+    <!-- NOTIFICATION SERVICE -->
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 
 </resources>

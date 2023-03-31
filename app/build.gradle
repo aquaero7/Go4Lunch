@@ -73,6 +73,8 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:latest.release')  // currently 30.3.1
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation 'com.google.firebase:firebase-analytics'
+    // Messaging
+    implementation 'com.google.firebase:firebase-messaging'
     // Firestore
     implementation 'com.google.firebase:firebase-firestore'
 

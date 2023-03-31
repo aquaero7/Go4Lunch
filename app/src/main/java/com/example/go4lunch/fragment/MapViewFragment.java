@@ -365,7 +365,8 @@ public class MapViewFragment extends Fragment implements
 
     @SuppressLint("PotentialBehaviorOverride")  // This remark concerns OnMarkerClickListener below
     private void displayRestaurantsOnMap(List<Restaurant> restaurants) {
-        workmatesList = FirestoreUtils.getWorkmatesList();
+        // workmatesList = FirestoreUtils.getWorkmatesList();   // TODO
+        workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
         if (restaurants != null) {
             for (Restaurant restaurant : restaurants) {
                 double rLat = restaurant.getGeometry().getLocation().getLat();

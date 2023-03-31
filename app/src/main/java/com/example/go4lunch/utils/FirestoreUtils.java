@@ -33,12 +33,12 @@ public class FirestoreUtils {
         return restaurantsList;
     }
 
-    // Get current workmates list
+    // Get current workmates list   // TODO
     public static List<User> getWorkmatesList() {
         return workmatesList;
     }
 
-    // Get current liked restaurants list
+    // Get current liked restaurants list   // TODO
     public static List<LikedRestaurant> getLikedRestaurantsList() {
         return likedRestaurantsList;
     }
@@ -264,6 +264,24 @@ public class FirestoreUtils {
             }
         });
         return likedRestaurantsList;
+    }
+
+    public static User getCurrentUserFromDatabaseDocument() {
+        final User[] currentUser = new User[1];
+        UserManager.getInstance().getCurrentUserData()
+                .addOnSuccessListener(user -> {
+                    String uId = user.getUid();
+                    String uName = user.getUsername();
+                    String uEmail = user.getUserEmail();
+                    String uUrlPicture = user.getUserUrlPicture();
+                    String selectionId = user.getSelectionId();
+                    String selectionDate = user.getSelectionDate();
+                    currentUser[0] = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate);
+                })
+
+                .addOnFailureListener(e -> Log.w("FirestoreUtils", e.getMessage()));
+
+        return currentUser[0];
     }
 
 }
