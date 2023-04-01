@@ -294,8 +294,8 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         // Check in database if this restaurant is liked by current user
         rid = restaurant.getRid();
         uid = UserManager.getInstance().getCurrentUserId();
-        // likedRestaurantsList = FirestoreUtils.getLikedRestaurantsList(); // TODO
-        likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
+        likedRestaurantsList = FirestoreUtils.getLikedRestaurantsList();
+        // likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
         // Update like status
         isLiked = false;
         if (likedRestaurantsList != null) {

@@ -21,6 +21,7 @@
     <string name="choice_error">No restaurants selected.\nPlease choose one before!</string>
     <string name="search_error">Search feature not implemented on %s.</string>
     <string name="not_found_error">No restaurant found matching with query.</string>
+    <string name="no_selection_error">No restaurant selected by this workmate.</string>
 
     <!-- MSG -->
     <string name="location_update">Location updated</string>

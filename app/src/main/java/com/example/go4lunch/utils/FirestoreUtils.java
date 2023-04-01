@@ -44,6 +44,16 @@ public class FirestoreUtils {
         return restaurantsList;
     }
 
+    // Get liked restaurants list
+    public static List<LikedRestaurant> getLikedRestaurantsList() {
+        return likedRestaurantsList;
+    }
+
+    // Get workmates list
+    public static List<User> getWorkmatesList() {
+        return workmatesList;
+    }
+
 
     // Get user data from Firestore with given document and create user
     public static User getUserFromDatabaseDocument(QueryDocumentSnapshot document) {

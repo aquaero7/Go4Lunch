@@ -1,6 +1,7 @@
 package com.example.go4lunch.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,15 +19,22 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.activity.MainActivity;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
 import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.Restaurant;
+import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.ItemClickSupport;
+import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.view.WorkmateAdapter;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -50,6 +58,8 @@ public class WorkmatesFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     */
+
+    private FragmentWorkmatesBinding binding;
 
     // Declare RecyclerView
     private RecyclerView mRecyclerView;
@@ -105,7 +115,7 @@ public class WorkmatesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        FragmentWorkmatesBinding binding = FragmentWorkmatesBinding.inflate(inflater, container, false);
+        binding = FragmentWorkmatesBinding.inflate(inflater, container, false);
 
         mRecyclerView = binding.rvWorkmates;
 
@@ -167,24 +177,64 @@ public class WorkmatesFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    // Configure item click on RecyclerView // Unused
+    // Configure item click on RecyclerView
     private void configureOnClickRecyclerView(){
         ItemClickSupport.addTo(mRecyclerView, R.layout.workmate_list_item)
-                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-                    @Override
-                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                        Log.w("TAG", "Position : "+position);
+                .setOnItemClickListener((recyclerView, position, v) -> {
+                    Log.w("TAG", "Position : "+position);   // TODO : To be deleted
+                    if (workmatesList.size() != 0) {
+                        // Get workmate
+                        User workmate = workmatesList.get(position);
+                        // Get workmate selection
+                        String rId = workmate.getSelectionId();
+                        String selectionDate = workmate.getSelectionDate();
+                        String currentDate = CalendarUtils.getCurrentDate();
+                        // If a restaurant is selected, get it from restaurants list and launch detail activity
+                        if (rId != null && currentDate.equals(selectionDate)) {
+                            RestaurantWithDistance restaurantWithDistance = getSelectedRestaurant(rId);
+                            launchDetailRestaurantActivity(restaurantWithDistance);
+                        } else {
+                            Snackbar.make(binding.getRoot(), getString(R.string.no_selection_error), Snackbar.LENGTH_LONG).show();
+                        }
                     }
                 });
     }
 
     private void getWorkmatesListAndConfigureRecyclerView() {
-        // workmatesList = FirestoreUtils.getWorkmatesList();   // TODO
-        workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
+        workmatesList = FirestoreUtils.getWorkmatesList();
+        // workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
         DataProcessingUtils.sortByName(workmatesList);
         configureRecyclerView();
         configureOnClickRecyclerView();
     }
 
+    private RestaurantWithDistance getSelectedRestaurant(String rId) {
+        List<Restaurant> restaurants = FirestoreUtils.getRestaurantsList();
+        RestaurantWithDistance selectedRestaurant = null;
+        for (Restaurant restaurant : restaurants) {
+            if (rId.equals(restaurant.getRid())) {
+                LatLng home = MapsApisUtils.getHome();
+                int distance = (home != null) ?
+                        DataProcessingUtils.calculateRestaurantDistance(restaurant, home) : 0;
+
+                selectedRestaurant = new RestaurantWithDistance(
+                        restaurant.getRid(), restaurant.getName(),
+                        restaurant.getPhotos(), restaurant.getAddress(),
+                        restaurant.getRating(), restaurant.getOpeningHours(),
+                        restaurant.getPhoneNumber(), restaurant.getWebsite(),
+                        restaurant.getGeometry(), distance);
+                break;
+            }
+        }
+        return selectedRestaurant;
+    }
+
+    private void launchDetailRestaurantActivity(RestaurantWithDistance restaurantWithDistance) {
+        Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("RESTAURANT", restaurantWithDistance);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
 
 }

@@ -255,6 +255,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 searchView.setQuery("", false);
                 searchView.setVisibility(View.GONE);
 
+                initializeListsInUtils();   // TODO : To delete if refresh makes issues occur
             }
 
             @Override

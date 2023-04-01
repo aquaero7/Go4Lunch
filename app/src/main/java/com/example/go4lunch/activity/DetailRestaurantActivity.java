@@ -96,14 +96,14 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
             // Remove selected restaurant ID from user document in database
             UserManager.getInstance().updateSelectionId(null);
             UserManager.getInstance().updateSelectionDate(null);
-            /** Update objects in FirestoreUtils to make it available for notifications */
+            /** Update object currentUser in FirestoreUtils to make it available for notifications */
             FirestoreUtils.updateCurrentUser(null, null);
             message = getString(R.string.fabUnchecked);
         }
         showSnackBar(message);
 
-        /** Update objects workmatesList in FirestoreUtils
-         only to make selection changes available for Workmates fragment */
+        /** Update object workmatesList in FirestoreUtils
+         only to make selection changes available for fragments */
         List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
     }
 
@@ -126,9 +126,10 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         }
         showSnackBar(message);
 
-        /** Update objects likedRestaurantsList in FirestoreUtils
-         only to make likes changes available for DetailRestaurant fragment */
+        /** Update objects likedRestaurantsList and workmatesLists in FirestoreUtils
+         only to make likes changes available for fragments */
         List<LikedRestaurant> likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
+        List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
     }
 
     private void displayRestaurantWebsite(String rWebsite){
