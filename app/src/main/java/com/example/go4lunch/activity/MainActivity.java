@@ -93,6 +93,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private static List<Restaurant> restaurantsList;            // To make it available for fragments in FirestoreUtils
     private static List<User> workmatesList;                    // To make it available for fragments in FirestoreUtils
     private static List<LikedRestaurant> likedRestaurantsList;  // To make it available for fragments in FirestoreUtils
+    private User currentUser;                                   // To make it available for fragments in FirestoreUtils
 
     private Fragment fmt;
     private SearchView searchView;
@@ -371,7 +372,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
 
     private void initializeListsInUtils() {
-        /** Initialize list objects in FirestoreUtils to make them available for fragments */
+        /** Initialize data objects in FirestoreUtils to make them available for fragments */
+        currentUser = FirestoreUtils.getCurrentUserFromDatabaseDocument();
         restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
         workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
         likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
@@ -420,7 +422,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         }
     }
 
-    private void checkCurrentUserSelectionAndLaunchActivity() {
+    // TODO : To be deleted
+    /*
+    private void OLD_checkCurrentUserSelectionAndLaunchActivity() {
         // Get current user selected restaurant from database
         UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
             // Get current user selected restaurant from database
@@ -450,6 +454,36 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 showSnackBar(getString(R.string.choice_error));
             }
         });
+    }
+    */
+
+    private void checkCurrentUserSelectionAndLaunchActivity() {
+        // Get current user selected restaurant
+        String selectionId = FirestoreUtils.getCurrentUser().getSelectionId();
+        String selectionDate = FirestoreUtils.getCurrentUser().getSelectionDate();
+        boolean isSelected = selectionId != null && currentDate.equals(selectionDate);
+        if (isSelected) {
+            // Get selected restaurant from restaurants collection in database
+            RestaurantManager.getRestaurantData(selectionId)
+                    .addOnSuccessListener(restaurant -> {
+                        Log.w("MainActivity", "success task getRestaurantData");
+                        home = MapsApisUtils.getHome();
+                        int distance = (home != null) ?
+                                DataProcessingUtils.calculateRestaurantDistance(restaurant, home) : 0;
+
+                        RestaurantWithDistance restaurantWithDistance =
+                                new RestaurantWithDistance(restaurant.getRid(), restaurant.getName(),
+                                        restaurant.getPhotos(), restaurant.getAddress(),
+                                        restaurant.getRating(), restaurant.getOpeningHours(),
+                                        restaurant.getPhoneNumber(), restaurant.getWebsite(),
+                                        restaurant.getGeometry(), distance);
+
+                        launchDetailRestaurantActivity(restaurantWithDistance);
+                    })
+                    .addOnFailureListener(e -> Log.w("MainActivity", e.getMessage()));
+        } else {
+            showSnackBar(getString(R.string.choice_error));
+        }
     }
 
     private void launchDetailRestaurantActivity(RestaurantWithDistance restaurant) {

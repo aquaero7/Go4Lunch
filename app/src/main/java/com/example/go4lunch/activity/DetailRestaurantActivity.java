@@ -86,13 +86,18 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
     private void updateSelectionInDatabase(boolean isSelected, String rId) {
         if (isSelected) {
             // Add selected restaurant ID to user document in database
+            String currentDate = CalendarUtils.getCurrentDate();
             UserManager.getInstance().updateSelectionId(rId);
-            UserManager.getInstance().updateSelectionDate(CalendarUtils.getCurrentDate());
+            UserManager.getInstance().updateSelectionDate(currentDate);
+            /** Update objects in FirestoreUtils to make it available for notifications */
+            FirestoreUtils.updateCurrentUser(rId, currentDate);
             message = getString(R.string.fabChecked);
         } else {
             // Remove selected restaurant ID from user document in database
             UserManager.getInstance().updateSelectionId(null);
             UserManager.getInstance().updateSelectionDate(null);
+            /** Update objects in FirestoreUtils to make it available for notifications */
+            FirestoreUtils.updateCurrentUser(null, null);
             message = getString(R.string.fabUnchecked);
         }
         showSnackBar(message);

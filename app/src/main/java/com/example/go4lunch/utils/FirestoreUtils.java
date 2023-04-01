@@ -26,21 +26,22 @@ public class FirestoreUtils {
     private static List<Restaurant> restaurantsList = new ArrayList<>();
     private static List<User> workmatesList = new ArrayList<>();
     private static List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
+    private static User currentUser;
 
+    // Get current user
+    public static User getCurrentUser() {
+        return currentUser;
+    }
+
+    // Update current user
+    public static void updateCurrentUser(String selectionId, String selectionDate) {
+        currentUser.setSelectionId(selectionId);
+        currentUser.setSelectionDate(selectionDate);
+    }
 
     // Get current restaurants list
     public static List<Restaurant> getRestaurantsList() {
         return restaurantsList;
-    }
-
-    // Get current workmates list   // TODO
-    public static List<User> getWorkmatesList() {
-        return workmatesList;
-    }
-
-    // Get current liked restaurants list   // TODO
-    public static List<LikedRestaurant> getLikedRestaurantsList() {
-        return likedRestaurantsList;
     }
 
 
@@ -267,7 +268,6 @@ public class FirestoreUtils {
     }
 
     public static User getCurrentUserFromDatabaseDocument() {
-        final User[] currentUser = new User[1];
         UserManager.getInstance().getCurrentUserData()
                 .addOnSuccessListener(user -> {
                     String uId = user.getUid();
@@ -276,12 +276,13 @@ public class FirestoreUtils {
                     String uUrlPicture = user.getUserUrlPicture();
                     String selectionId = user.getSelectionId();
                     String selectionDate = user.getSelectionDate();
-                    currentUser[0] = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate);
+
+                    currentUser = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate);
                 })
-
-                .addOnFailureListener(e -> Log.w("FirestoreUtils", e.getMessage()));
-
-        return currentUser[0];
+                .addOnFailureListener(e -> {
+                    Log.w("FirestoreUtils", e.getMessage());
+                });
+        return currentUser;
     }
 
 }

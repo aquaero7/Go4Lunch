@@ -253,7 +253,9 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         setupLikeButton();
     }
 
-    private void setupSelectionFab() {
+    // TODO : To be deleted
+    /*
+    private void OLD_setupSelectionFab() {
         // Get current user selected restaurant id from database
         UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
             // Get current user selected restaurant id from database
@@ -266,6 +268,19 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
             updateSelectionFab();
         });
+    }
+    */
+
+    private void setupSelectionFab() {
+        // Get current user selected restaurant id
+        selectionId = FirestoreUtils.getCurrentUser().getSelectionId();
+        selectionDate = FirestoreUtils.getCurrentUser().getSelectionDate();
+        // Get the id of this restaurant
+        String restaurantId = restaurant.getRid();
+        // Update selection status
+        isSelected = (restaurantId.equals(selectionId)) && (currentDate.equals(selectionDate));
+
+        updateSelectionFab();
     }
 
     private void updateSelectionFab() {
