@@ -62,11 +62,11 @@ android {
 dependencies {
 
     // FOR TOOLBAR
-    implementation 'androidx.appcompat:appcompat:1.5.1' // Also needed for ViewPager
-    implementation 'com.google.android.material:material:1.7.0' // Also needed for TabLayout, Navigation Drawer and SnackBar
+    implementation 'androidx.appcompat:appcompat:1.5.1' // Also needed for ViewPager    // Do not update with sdk < 33
+    implementation 'com.google.android.material:material:1.8.0' // Also needed for TabLayout, Navigation Drawer and SnackBar
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1' // Needed for Recyclerview
+    implementation 'androidx.recyclerview:recyclerview:1.2.1' // Needed for Recyclerview    // Do not update with sdk < 33
 
     // FIREBASE
     // Import the Firebase BoM

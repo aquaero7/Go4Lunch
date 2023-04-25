@@ -24,7 +24,9 @@
         <activity
             android:name=".activity.AuthActivity"
             android:exported="true"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="LockedOrientationActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,11 +41,13 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:exported="false"
+            android:screenOrientation="behind"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".activity.DetailRestaurantActivity"
             android:exported="false"
+            android:screenOrientation="behind"
             android:theme="@style/AppTheme.NoActionBar" />
 
 
@@ -58,12 +62,16 @@
         <activity
             android:name=".activity.MainActivity"
             android:exported="true"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="LockedOrientationActivity">
             <!-- intent-filter to be deleted cause this is not the activity launched at start -->
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <!-- NOTIFICATION SERVICE -->

@@ -147,6 +147,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
             case "FAB":
                 isSelected = !isSelected;
                 updateSelectionFab();
+                updateSelectionInFirestoreUtils();
                 getSelectorsListAndConfigureRecyclerView();
                 break;
         }
@@ -207,6 +208,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                 });
     }
 
+    /*  // Replaced with access from FirestoreUtils
     private void getSelectorsListAndConfigureRecyclerView() {
         String restaurantId = restaurant.getRid();
         selectorsList = new ArrayList<>();
@@ -229,6 +231,25 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
             configureOnClickRecyclerView();
         });
     }
+    */
+
+    //
+    private void getSelectorsListAndConfigureRecyclerView() {
+        String restaurantId = restaurant.getRid();
+        selectorsList = new ArrayList<>();
+        List<User> workmates = FirestoreUtils.getWorkmatesList();
+
+        // Check selected restaurant id and date
+        for (User workmate : workmates) {
+            boolean isSelector = (restaurantId.equals(workmate.getSelectionId())
+                    && currentDate.equals(workmate.getSelectionDate()));
+            if (isSelector) selectorsList.add(workmate);
+        }
+
+        configureRecyclerView();
+        configureOnClickRecyclerView();
+    }
+    //
 
     // Get restaurant from calling activity
     private void getIntentData() {
@@ -293,7 +314,8 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private void setupLikeButton() {
         // Check in database if this restaurant is liked by current user
         rid = restaurant.getRid();
-        uid = UserManager.getInstance().getCurrentUserId();
+        // uid = UserManager.getInstance().getCurrentUserId();  // TODO : To be deleted
+        uid = FirestoreUtils.getCurrentUser().getUid();
         likedRestaurantsList = FirestoreUtils.getLikedRestaurantsList();
         // likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
         // Update like status
@@ -318,6 +340,18 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         mLikeButton.setCompoundDrawableTintList(AppCompatResources.getColorStateList(requireContext(), colorId));
         mLikeButton.setTextColor(getResources().getColor(colorId, requireContext().getTheme()));
         mLikeButton.setBackgroundColor(getResources().getColor(backgroundColorId, requireContext().getTheme()));
+    }
+
+    private void updateSelectionInFirestoreUtils() {
+        if (isSelected) {
+            /** Update objects in FirestoreUtils to make them available for notifications */
+            FirestoreUtils.updateCurrentUser(restaurant.getRid(), currentDate);
+            FirestoreUtils.updateWorkmatesList(restaurant.getRid(), currentDate);
+        } else {
+            /** Update objects in FirestoreUtils to make them available for notifications */
+            FirestoreUtils.updateCurrentUser(null, null);
+            FirestoreUtils.updateWorkmatesList(null, null);
+        }
     }
 
 }

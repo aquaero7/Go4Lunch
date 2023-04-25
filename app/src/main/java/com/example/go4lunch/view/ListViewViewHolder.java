@@ -130,7 +130,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-
+    /*  // Replaced with access from FirestoreUtils
     private void displaySelectionsCount(String rId) {
         // Get workmates list
         UserManager.getUsersList(task -> {
@@ -163,6 +163,29 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
+    }
+    */
+
+    private void displaySelectionsCount(String rId) {
+        int selectionsCount = 0;
+        // Get workmates list
+        List<User> workmates = FirestoreUtils.getWorkmatesList();
+        for (User workmate : workmates) {
+            // Check selected restaurant id and date and increase selections count if matches with restaurant id
+            boolean isSelected = rId.equals(workmate.getSelectionId())
+                    && currentDate.equals(workmate.getSelectionDate());
+            if (isSelected) selectionsCount += 1;
+        }
+        // Display selections count
+        if (selectionsCount > 0) {
+            ivWorkmateLogo.setVisibility(View.VISIBLE);
+            tvSelectionsCount.setVisibility(View.VISIBLE);
+        } else {
+            ivWorkmateLogo.setVisibility(View.INVISIBLE);
+            tvSelectionsCount.setVisibility(View.INVISIBLE);
+        }
+        String workmatesCount = "(" + selectionsCount + ")";
+        tvSelectionsCount.setText(workmatesCount);
     }
 
 

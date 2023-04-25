@@ -276,10 +276,26 @@ public class MapViewFragment extends Fragment implements
             locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
             mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
             // Get data from API and display map with or without home focus
-            getDataFromApiAndFocusHome();
+            //getDataFromApiAndFocusHome();
+            // Set Focus to home
+            setFocusToHome();
+            // Display restaurants
+            restaurantsList = FirestoreUtils.getRestaurantsList();
+            displayRestaurantsOnMap(restaurantsList);
         }
     }
 
+    private void setFocusToHome() {
+        home = MapsApisUtils.getHome();
+        // Set camera position to home if requested
+        if (focusHome) {
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
+            // No more home focus after first display (except if MyLocationButton is triggered)
+            focusHome = false;
+        }
+    }
+
+    /*  // TODO : To be deleted
     @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
     public void getDataFromApiAndFocusHome() {
         FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
@@ -343,6 +359,8 @@ public class MapViewFragment extends Fragment implements
                         Snackbar.make(binding.getRoot(), getString(R.string.location_update), Snackbar.LENGTH_LONG).show();
                         // Initialize home
                         home = new LatLng(latitude, longitude);
+                        // Initialize home in MapsApisUtils to make it available for ListViewFragment
+                        MapsApisUtils.setHome(home);
                         // Set camera position to home if requested
                         if (focusHome) {
                             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
@@ -362,11 +380,10 @@ public class MapViewFragment extends Fragment implements
 
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
     }
+    */
 
     @SuppressLint("PotentialBehaviorOverride")  // This remark concerns OnMarkerClickListener below
     private void displayRestaurantsOnMap(List<Restaurant> restaurants) {
-        // workmatesList = FirestoreUtils.getWorkmatesList();   // TODO
-        workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
         if (restaurants != null) {
             for (Restaurant restaurant : restaurants) {
                 double rLat = restaurant.getGeometry().getLocation().getLat();
@@ -392,6 +409,8 @@ public class MapViewFragment extends Fragment implements
     }
 
     private void getSelectionsCountAndUpdateMarkerIcon(String rId, Marker marker) {
+        workmatesList = FirestoreUtils.getWorkmatesList();
+        // workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();   // TODO : May not keep coherence between fragments
         selectionsCount = 0;
         for (User workmate : workmatesList) {
             // For each workmate, check selected restaurant and increase selections count if matches with restaurant id

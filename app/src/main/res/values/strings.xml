@@ -24,6 +24,7 @@
     <string name="no_selection_error">No restaurant selected by this workmate.</string>
 
     <!-- MSG -->
+    <string name="location_provision">Location provided</string>
     <string name="location_update">Location updated</string>
 
     <!-- contentDescriptions -->

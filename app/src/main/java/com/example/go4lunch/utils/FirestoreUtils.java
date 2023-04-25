@@ -2,6 +2,8 @@ package com.example.go4lunch.utils;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.example.go4lunch.manager.LikedRestaurantManager;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
@@ -14,7 +16,10 @@ import com.example.go4lunch.model.api.OpenClose;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Period;
 import com.example.go4lunch.model.api.Photo;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,31 +32,83 @@ public class FirestoreUtils {
     private static List<User> workmatesList = new ArrayList<>();
     private static List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private static User currentUser;
+    private static boolean currentUserLogStatus;
+    // private static boolean taskCompleted;    // TODO : To be deleted
 
-    // Get current user
-    public static User getCurrentUser() {
-        return currentUser;
+    /*  // TODO : To be deleted
+    public static boolean isTaskCompleted() {
+        return  taskCompleted;
     }
+    */
 
-    // Update current user
     public static void updateCurrentUser(String selectionId, String selectionDate) {
         currentUser.setSelectionId(selectionId);
         currentUser.setSelectionDate(selectionDate);
     }
 
-    // Get current restaurants list
+    public static void updateWorkmatesList(String selectionId, String selectionDate) {
+        for (User workmate : workmatesList) {
+            if (currentUser.getUid().equals(workmate.getUid())) {
+                workmate.setSelectionId(selectionId);
+                workmate.setSelectionDate(selectionDate);
+                break;
+            }
+        }
+    }
+
+    public static void updateLikedRestaurantsList(boolean isLiked, String rId, String uId) {
+        if (isLiked) {
+            // Add liked restaurant to list
+            likedRestaurantsList.add(new LikedRestaurant(rId+uId, rId, uId));
+        } else {
+            // Remove liked restaurant from list
+            for (LikedRestaurant likedRestaurant : likedRestaurantsList) {
+                if ((rId+uId).equals(likedRestaurant.getId())) {
+                    likedRestaurantsList.remove(likedRestaurant);
+                    break;
+                }
+            }
+        }
+    }
+
+    public static boolean isCurrentUserLogged() {
+        return currentUserLogStatus;
+    }
+
+    public static User getCurrentUser() {
+        return currentUser;
+    }
+
     public static List<Restaurant> getRestaurantsList() {
         return restaurantsList;
     }
 
-    // Get liked restaurants list
+    public static List<User> getWorkmatesList() {
+        return workmatesList;
+    }
+
     public static List<LikedRestaurant> getLikedRestaurantsList() {
         return likedRestaurantsList;
     }
 
-    // Get workmates list
-    public static List<User> getWorkmatesList() {
-        return workmatesList;
+    public static void setCurrentUserLogStatus(boolean logStatus) {
+        currentUserLogStatus = logStatus;
+    }
+
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
+
+    public static void setRestaurantsList(List<Restaurant> restaurants) {
+        restaurantsList = restaurants;
+    }
+
+    public static void setWorkmatesList(List<User> workmates) {
+        workmatesList = workmates;
+    }
+
+    public static void setLikedRestaurantsList(List<LikedRestaurant> likedRestaurants) {
+        likedRestaurantsList = likedRestaurants;
     }
 
 
@@ -215,11 +272,13 @@ public class FirestoreUtils {
     }
 
 
+    /*  // TODO : To be deleted
     // Get restaurants list from Firestore
     public static List<Restaurant> getRestaurantsListFromDatabaseDocument() {
         RestaurantManager.getRestaurantsList(task -> {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
+                    taskCompleted = false;
                     // Get restaurants list
                     restaurantsList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
@@ -227,6 +286,7 @@ public class FirestoreUtils {
                         Restaurant restaurantToAdd = FirestoreUtils.getRestaurantFromDatabaseDocument(document);
                         restaurantsList.add(restaurantToAdd);
                     }
+                    taskCompleted = true;
                 }
             } else {
                 Log.d("FirestoreUtils", "Error getting documents: ", task.getException());
@@ -241,6 +301,7 @@ public class FirestoreUtils {
         UserManager.getUsersList(task -> {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
+                    taskCompleted = false;
                     // Get users list
                     workmatesList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
@@ -248,6 +309,7 @@ public class FirestoreUtils {
                         User workmateToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
                         workmatesList.add(workmateToAdd);
                     }
+                    taskCompleted = true;
                 }
             } else {
                 Log.w("FirestoreUtils", "Error getting documents: ", task.getException());
@@ -262,6 +324,7 @@ public class FirestoreUtils {
         LikedRestaurantManager.getLikedRestaurantsList(task -> {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
+                    taskCompleted = false;
                     // Get liked restaurants list
                     likedRestaurantsList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
@@ -269,6 +332,7 @@ public class FirestoreUtils {
                         LikedRestaurant likedRestaurantToAdd = FirestoreUtils.getLikedRestaurantFromDatabaseDocument(document);
                         likedRestaurantsList.add(likedRestaurantToAdd);
                     }
+                    taskCompleted = true;
                 }
             } else {
                 Log.d("FirestoreUtils", "Error getting documents: ", task.getException());
@@ -294,5 +358,6 @@ public class FirestoreUtils {
                 });
         return currentUser;
     }
+    */
 
 }

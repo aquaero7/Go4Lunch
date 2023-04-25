@@ -89,22 +89,26 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
             String currentDate = CalendarUtils.getCurrentDate();
             UserManager.getInstance().updateSelectionId(rId);
             UserManager.getInstance().updateSelectionDate(currentDate);
-            /** Update objects in FirestoreUtils to make it available for notifications */
-            FirestoreUtils.updateCurrentUser(rId, currentDate);
+            /** Update objects in FirestoreUtils to make them available for notifications */    // TODO : To be deleted cause done in DetailRestaurantFragment
+            // FirestoreUtils.updateCurrentUser(rId, currentDate);  // TODO : To be deleted cause done in DetailRestaurantFragment
+            // FirestoreUtils.updateWorkmatesList(rId, currentDate);    // TODO : To be deleted cause done in DetailRestaurantFragment
             message = getString(R.string.fabChecked);
         } else {
             // Remove selected restaurant ID from user document in database
             UserManager.getInstance().updateSelectionId(null);
             UserManager.getInstance().updateSelectionDate(null);
-            /** Update object currentUser in FirestoreUtils to make it available for notifications */
-            FirestoreUtils.updateCurrentUser(null, null);
+            /** Update objects in FirestoreUtils to make them available for notifications */    // TODO : To be deleted cause done in DetailRestaurantFragment
+            // FirestoreUtils.updateCurrentUser(null, null);    // TODO : To be deleted cause done in DetailRestaurantFragment
+            // FirestoreUtils.updateWorkmatesList(null, null);  // TODO : To be deleted cause done in DetailRestaurantFragment
             message = getString(R.string.fabUnchecked);
         }
         showSnackBar(message);
 
+        /*  // TODO : To be deleted
         /** Update object workmatesList in FirestoreUtils
-         only to make selection changes available for fragments */
+         only to make selection changes available for fragments //
         List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
+        */
     }
 
     private void callRestaurant(String rPhoneNumber){
@@ -126,10 +130,14 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         }
         showSnackBar(message);
 
+        /*  // TODO : To be deleted
         /** Update objects likedRestaurantsList and workmatesLists in FirestoreUtils
-         only to make likes changes available for fragments */
+         only to make likes changes available for fragments //
         List<LikedRestaurant> likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
-        List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
+        // List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
+        */
+        /** Update object likedRestaurantsList in FirestoreUtils to make it available for fragments */
+        FirestoreUtils.updateLikedRestaurantsList(isLiked,rId, uId);
     }
 
     private void displayRestaurantWebsite(String rWebsite){

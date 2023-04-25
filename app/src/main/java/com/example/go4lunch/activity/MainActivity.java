@@ -57,7 +57,7 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, EventListener {
 
-    private static Activity mActivity;
+    // private static Activity mActivity;
 
     // For Navigation Drawer design
     private Toolbar toolbar;
@@ -84,16 +84,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private TextView userName;
     private TextView userEmail;
 
-    private String MAPS_API_KEY;
-    private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-    private ActivityResultLauncher<String[]> requestPermissionsLauncher;
-    private static FusedLocationProviderClient fusedLocationProviderClient;
-    private static boolean locationPermissionsGranted;
-    private static LatLng home;
-    private static List<Restaurant> restaurantsList;            // To make it available for fragments in FirestoreUtils
-    private static List<User> workmatesList;                    // To make it available for fragments in FirestoreUtils
-    private static List<LikedRestaurant> likedRestaurantsList;  // To make it available for fragments in FirestoreUtils
-    private User currentUser;                                   // To make it available for fragments in FirestoreUtils
+    // private String MAPS_API_KEY;
+    // private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    // private ActivityResultLauncher<String[]> requestPermissionsLauncher;
+    // private static FusedLocationProviderClient fusedLocationProviderClient;
+    // private static boolean locationPermissionsGranted;
+    // private static LatLng home;
+    // private static List<Restaurant> restaurantsList;            // To make it available for fragments in FirestoreUtils
+    // private static List<User> workmatesList;                    // To make it available for fragments in FirestoreUtils
+    // private static List<LikedRestaurant> likedRestaurantsList;  // To make it available for fragments in FirestoreUtils
+    // private User currentUser;                                   // To make it available for fragments in FirestoreUtils
 
     private Fragment fmt;
     private SearchView searchView;
@@ -113,11 +113,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mActivity = this;
-        MAPS_API_KEY = getString(R.string.MAPS_API_KEY);
+        // mActivity = this;
+        // MAPS_API_KEY = getString(R.string.MAPS_API_KEY);
 
         // Get current user Id
-        getCurrentUserId();
+        //getCurrentUserId();
 
         // Get the toolbar view
         this.configureToolbar();
@@ -133,9 +133,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         this.configureProgressBar();
 
         // Create a new FusedLocationProviderClient.
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        // fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         // Check permissions and get device location
-        checkPermissions();
+        // checkPermissions();
 
         // Initialize SearchView and setup listener
         searchView = binding.includedToolbar.searchView;
@@ -148,6 +148,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         super.onResume();
     }
 
+    /*
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -159,6 +160,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         super.onRestoreInstanceState(savedInstanceState);
         if (uid.isEmpty()) uid = savedInstanceState.getString("UID");
     }
+    */
 
     @Override
     public void toggleSearchViewVisibility() {
@@ -254,8 +256,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             public void onTabUnselected(TabLayout.Tab tab) {
                 searchView.setQuery("", false);
                 searchView.setVisibility(View.GONE);
-
-                initializeListsInUtils();   // TODO : To delete if refresh makes issues occur
             }
 
             @Override
@@ -283,7 +283,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         userName = navigationView.getHeaderView(0).findViewById(R.id.user_name);
         userEmail = navigationView.getHeaderView(0).findViewById(R.id.user_email);
         updateUIWithUserData();
-
     }
 
     // Configure progressBar
@@ -368,12 +367,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
      * ---------------------
      */
 
+    /*
     private void getCurrentUserId() {
         uid = userManager.getCurrentUserId();
     }
 
     private void initializeListsInUtils() {
-        /** Initialize data objects in FirestoreUtils to make them available for fragments */
+        /** Initialize data objects in FirestoreUtils to make them available for fragments //
         currentUser = FirestoreUtils.getCurrentUserFromDatabaseDocument();
         restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
         workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
@@ -387,21 +387,21 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             Boolean fineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
             Boolean coarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION,false);
             if (fineLocationGranted != null && fineLocationGranted) {
-                /** Fine location permission granted */
+                /** Fine location permission granted //
                 Log.w("ActivityResultLauncher", "Fine location permission was granted by user");
                 locationPermissionsGranted = true;
                 initializeListsInUtils();
             } else if (coarseLocationGranted != null && coarseLocationGranted) {
-                /** Coarse location permission granted */
+                /** Coarse location permission granted //
                 Log.w("ActivityResultLauncher", "Only coarse location permission was granted by user");
                 locationPermissionsGranted = true;
                 initializeListsInUtils();
             } else {
-                /** No location permission granted */
+                /** No location permission granted //
                 Log.w("ActivityResultLauncher", "No location permission was granted by user");
                 locationPermissionsGranted = false;
             }
-            /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment */
+            /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment //
             MapsApisUtils.setPermissions(locationPermissionsGranted);
         });
 
@@ -410,51 +410,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             /** Permissions not granted
              *  Request permissions to user.
-             *  The registered ActivityResultCallback gets the result of this(these) request(s). */
+             *  The registered ActivityResultCallback gets the result of this(these) request(s). //
             Log.w("checkPermissions", "Permissions not granted");
             requestPermissionsLauncher.launch(PERMISSIONS);
         } else {
-            /** Permissions granted */
+            /** Permissions granted //
             Log.w("checkPermissions", "Permissions granted");
             locationPermissionsGranted = true;
             initializeListsInUtils();
-            /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment */
+            /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment //
             MapsApisUtils.setPermissions(locationPermissionsGranted);
         }
-    }
-
-    // TODO : To be deleted
-    /*
-    private void OLD_checkCurrentUserSelectionAndLaunchActivity() {
-        // Get current user selected restaurant from database
-        UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
-            // Get current user selected restaurant from database
-            String selectionId = user.getSelectionId();
-            String selectionDate = user.getSelectionDate();
-            boolean isSelected = selectionId != null && currentDate.equals(selectionDate);
-            if (isSelected) {
-                // Get selected restaurant from restaurants collection in database
-                RestaurantManager.getRestaurantData(selectionId)
-                        .addOnSuccessListener(restaurant -> {
-                            Log.w("MainActivity", "success task getRestaurantData");
-                            home = MapsApisUtils.getHome();
-                            int distance = (home != null) ?
-                                    DataProcessingUtils.calculateRestaurantDistance(restaurant, home) : 0;
-
-                            RestaurantWithDistance restaurantWithDistance =
-                                    new RestaurantWithDistance(restaurant.getRid(), restaurant.getName(),
-                                            restaurant.getPhotos(), restaurant.getAddress(),
-                                            restaurant.getRating(), restaurant.getOpeningHours(),
-                                            restaurant.getPhoneNumber(), restaurant.getWebsite(),
-                                            restaurant.getGeometry(), distance);
-
-                            launchDetailRestaurantActivity(restaurantWithDistance);
-                        })
-                        .addOnFailureListener(e -> Log.w("MainActivity", e.getMessage()));
-            } else {
-                showSnackBar(getString(R.string.choice_error));
-            }
-        });
     }
     */
 
@@ -468,7 +434,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             RestaurantManager.getRestaurantData(selectionId)
                     .addOnSuccessListener(restaurant -> {
                         Log.w("MainActivity", "success task getRestaurantData");
-                        home = MapsApisUtils.getHome();
+                        LatLng home = MapsApisUtils.getHome();
                         int distance = (home != null) ?
                                 DataProcessingUtils.calculateRestaurantDistance(restaurant, home) : 0;
 
@@ -504,6 +470,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         userManager.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
     }
 
+    /*  // Replaced with access from FirestoreUtils using User model instead of FirebaseUser model
+
     // Update user information
     private void updateUIWithUserData(){
         if(userManager.isCurrentUserLogged()){
@@ -533,6 +501,39 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         userName.setText(username);
         userEmail.setText(email);
     }
+    */
+
+    // Update user information
+    private void updateUIWithUserData(){
+        // if(userManager.isCurrentUserLogged()){   // TODO : To be deleted
+        if(FirestoreUtils.isCurrentUserLogged()){
+            User user = FirestoreUtils.getCurrentUser();
+            if(user.getUserUrlPicture() != null){
+                setProfilePicture(user.getUserUrlPicture());
+            }
+            setTextUserData(user);
+        }
+    }
+
+    // Update user picture
+    private void setProfilePicture(String profilePictureUrl){
+        userPicture.setImageTintList(null);
+        Glide.with(this)
+                .load(profilePictureUrl)
+                .apply(RequestOptions.circleCropTransform())
+                .into(userPicture);
+    }
+
+    // Update user name and email
+    private void setTextUserData(User user){
+        //Get email & username from User
+        String email = TextUtils.isEmpty(user.getUserEmail()) ? getString(R.string.info_no_email_found) : user.getUserEmail();
+        String username = TextUtils.isEmpty(user.getUsername()) ? getString(R.string.info_no_username_found) : user.getUsername();
+        //Update views with data
+        userName.setText(username);
+        userEmail.setText(email);
+    }
+
 
     private void closeActivity() {
         Intent intent = new Intent();
@@ -580,13 +581,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private WorkmatesFragment mWorkmatesFragment;
     */
 
-    /*  // TODO : To be deleted cause transferred to MapViewFragment
-    // Declare the AutocompleteSupportFragment.
-    private FragmentAutocompleteBinding fragmentAutocompleteBinding;
-    private CardView autocompleteCardView;
-    private AutocompleteSupportFragment autocompleteFragment;
-    */
-
 
     /** To be commented if menu is handled in fragments */
     /*
@@ -605,8 +599,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Handle actions on menu items
         switch (item.getItemId()) {
             case R.id.menu_activity_main_search:
-                Toast.makeText(this, "Click on search button in MainActivity", Toast.LENGTH_LONG).show();   // TODO : To be deleted
-                // configureAutocompleteSupportFragment();  // TODO : To be deleted
                 // toggleVisibility(autocompleteCardView);
                 // if (autocompleteCardView.getVisibility() == View.VISIBLE) MapsApisUtils.configureAutocompleteSupportFragment(autocompleteFragment, this);
                 toggleVisibility(searchView);
@@ -617,53 +609,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         }
     }
     */
-
-
-    /*  // TODO : To be deleted cause transferred to MapViewFragment
-    // Configure AutocompleteSupportFragment
-    private void configureAutocompleteSupportFragment() {
-
-        // Specify the limitation to only show results within the defined region
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        LatLng home = MapsApisUtils.getDeviceLocation(true, fusedLocationProviderClient, this);
-        int radius = MapsApisUtils.getDefaultRadius();
-        LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, radius);
-        autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
-
-
-        // Get current tab
-        String currentTabName = tabs.getTabAt(tabs.getSelectedTabPosition()).getText().toString();
-        // Display autocomplete search menu only for Map and List Views
-        if (currentTabName.equals(MAP_VIEW_TAB_TITLE) || currentTabName.equals(LIST_VIEW_TAB_TITLE)) {
-            toggleVisibility(autocompleteCardView);
-            if (autocompleteCardView.getVisibility() == View.VISIBLE) {
-
-                // Set up a PlaceSelectionListener to handle the response.
-                autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-                    @Override
-                    public void onPlaceSelected(@NonNull Place place) {
-                        // TODO: Get info about the selected place.
-                        LatLng latLng = place.getLatLng();
-                        double latitude = latLng.latitude;
-                        double longitude = latLng.longitude;
-                        Log.i("MainActivity", "Place: " + place.getName() + ", " + place.getId() + ", " + latitude + ", " + longitude);
-                    }
-
-                    @Override
-                    public void onError(@NonNull Status status) {
-                        // TODO: Handle the error.
-                        Log.i("MainActivity", "An error occurred: " + status);
-                    }
-
-                });
-
-            }
-
-        }
-
-    }
-    */
-
 
 
     /**

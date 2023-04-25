@@ -31,7 +31,7 @@
         android:layout_marginEnd="4dp"
         android:gravity="bottom"
         android:paddingHorizontal="4dp"
-        android:textColor="@color/grey_fab"
+        android:textColor="@color/medium_grey"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@id/restaurant_item_picture"/>
 

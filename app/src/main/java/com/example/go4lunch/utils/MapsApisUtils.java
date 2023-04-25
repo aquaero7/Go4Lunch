@@ -65,7 +65,7 @@ public class MapsApisUtils extends FragmentActivity {
 
     // Get restaurants list from API
     public static List<Restaurant> getRestaurantsFromApi(Context context, LatLng latLng, String apiKey) {
-
+        home = latLng;
         // Call Place Nearby Search API
         Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient().getPlaces("restaurant", latLng.latitude + "," + latLng.longitude, DEFAULT_RADIUS, apiKey);
         call1.enqueue(new Callback<GmapsRestaurantPojo>() {
@@ -80,7 +80,6 @@ public class MapsApisUtils extends FragmentActivity {
                     restaurantsList.clear();
                     for (Restaurant nearbyRestaurant : nearbyRestaurants) {
                         getRestaurantDetailsFromApi(nearbyRestaurant, latLng, apiKey, context);
-
                     }
                 } else {
                     Log.w("MapsApisUtils", "Empty nearby restaurants list");

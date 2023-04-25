@@ -45,7 +45,7 @@ public class ListViewFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private ListViewAdapter listViewAdapter;
 
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    // private FusedLocationProviderClient fusedLocationProviderClient;
     private LatLng home;
     private List<Restaurant> restaurantsList;
     private List<RestaurantWithDistance> restaurantsListWithDistances;
@@ -75,7 +75,7 @@ public class ListViewFragment extends Fragment {
         mRecyclerView = binding.rvListView;
 
         // Create a new FusedLocationProviderClient.
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        // fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
         /** To use if menu is handled in fragment
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
@@ -151,6 +151,7 @@ public class ListViewFragment extends Fragment {
     private void getRestaurantsListAndConfigureRecyclerView() {
         home = MapsApisUtils.getHome();
         restaurantsList = FirestoreUtils.getRestaurantsList();
+        // restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();   // TODO : May not keep coherence between fragments
         restaurantsListWithDistances = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
         DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistances);
         if (!filterIsOn) restaurantsListToDisplay.addAll(restaurantsListWithDistances);

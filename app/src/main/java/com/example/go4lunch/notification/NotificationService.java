@@ -116,7 +116,8 @@ public class NotificationService extends FirebaseMessagingService {
 
     private void getSelectorsList() {
         selectorsList = new ArrayList<>();
-        List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
+        // List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
+        List<User> workmatesList = FirestoreUtils.getWorkmatesList();
         for (User workmate : workmatesList) {
             // Check selected restaurant id and date and get users list
             boolean isSelector = (selectionId.equals(workmate.getSelectionId())
@@ -127,7 +128,8 @@ public class NotificationService extends FirebaseMessagingService {
     }
 
     private void getSelectedRestaurantData() {
-        List<Restaurant> restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
+        // List<Restaurant> restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
+        List<Restaurant> restaurantsList = FirestoreUtils.getRestaurantsList();
         for (Restaurant restaurant : restaurantsList) {
             if (selectionId.equals(restaurant.getRid())) {
                 rName = restaurant.getName();

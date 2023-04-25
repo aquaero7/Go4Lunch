@@ -15,6 +15,7 @@
     <color name="green_fab">#FF00AA00</color>
     <color name="grey_fab">#FFCCCCCC</color>
     <color name="light_grey">#FFCCCCCC</color>
+    <color name="medium_grey">#FF999999</color>
     <color name="dark_grey">#FF333333</color>
     <color name="user_grey">#DDDDDDDD</color>
     <color name="blue">#FF2266AA</color>
