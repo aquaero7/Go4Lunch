@@ -78,7 +78,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     // Declare Workmates-Selectors list
     private List<User> selectorsList;
     // Declare Workmate-Selector to add to create Workmates-Selectors list
-    private User selectorToAdd;
+    // private User selectorToAdd; // TODO : To be deleted
     // Declare liked restaurants list
     private List<LikedRestaurant> likedRestaurantsList;
     // Initialize Google Maps API key

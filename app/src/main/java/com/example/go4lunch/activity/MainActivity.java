@@ -70,11 +70,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private final String MAP_VIEW_TAB_TITLE = "Map View";
     private final String LIST_VIEW_TAB_TITLE = "List View";
     private final String WORKMATES_TAB_TITLE = "Workmates";
-    private final String [] tabTitles={     // Initialize title list
+
+    // Initialize title list
+    private final String [] tabTitles={
             MAP_VIEW_TAB_TITLE,
             LIST_VIEW_TAB_TITLE,
             WORKMATES_TAB_TITLE};
-    int[] tabIcons = {                      // Initialize icon list
+
+    // Initialize icon list
+    int[] tabIcons = {
             R.drawable.ic_baseline_map_black_24,
             R.drawable.ic_baseline_view_list_black_24,
             R.drawable.ic_baseline_group_black_24
