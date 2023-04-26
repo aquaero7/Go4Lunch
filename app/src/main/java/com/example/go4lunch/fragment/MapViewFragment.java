@@ -276,12 +276,12 @@ public class MapViewFragment extends Fragment implements
             locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
             mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
             // Get data from API and display map with or without home focus
-            //getDataFromApiAndFocusHome();
-            // Set Focus to home
-            setFocusToHome();
+            //getDataFromApiAndFocusHome(); // TODO : To be deleted
             // Display restaurants
             restaurantsList = FirestoreUtils.getRestaurantsList();
             displayRestaurantsOnMap(restaurantsList);
+            // Set Focus to home
+            setFocusToHome();
         }
     }
 
