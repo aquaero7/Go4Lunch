@@ -5,5 +5,4 @@ public interface EventListener {
     void toggleSearchViewVisibility();
 
 
-
 }

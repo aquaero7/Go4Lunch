@@ -1,20 +1,17 @@
 package com.example.go4lunch.activity;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -33,27 +30,22 @@ import com.example.go4lunch.fragment.ListViewFragment;
 import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
+import com.example.go4lunch.manager.LikedRestaurantManager;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
-import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
-import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, EventListener {
 
@@ -87,6 +79,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private ImageView userPicture;
     private TextView userName;
     private TextView userEmail;
+    private AlertDialog.Builder builder;
+    private AlertDialog dialog;
+    String message;
 
     // private String MAPS_API_KEY;
     // private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -106,6 +101,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private String uid;
 
     private final UserManager userManager = UserManager.getInstance();
+    private final LikedRestaurantManager likedRestaurantManager = LikedRestaurantManager.getInstance();
 
 
     @Override
@@ -207,6 +203,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             case R.id.activity_main_drawer_logout:
                 logout();
                 break;
+            case R.id.activity_main_drawer_delete_account:
+                dialog.show();
+                break;
             default:
                 break;
         }
@@ -281,6 +280,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void configureNavigationView(){
         this.navigationView = binding.activityMainNavView;
         navigationView.setNavigationItemSelectedListener(this);
+        buildConfirmationDialog();
 
         // Call user information update
         userPicture = navigationView.getHeaderView(0).findViewById(R.id.user_picture);
@@ -470,12 +470,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         startActivity(intent);
     }
 
-    private void logout(){
-        userManager.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
-    }
-
-    /*  // Replaced with access from FirestoreUtils using User model instead of FirebaseUser model
-
     // Update user information
     private void updateUIWithUserData(){
         if(userManager.isCurrentUserLogged()){
@@ -505,39 +499,56 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         userName.setText(username);
         userEmail.setText(email);
     }
-    */
 
-    // Update user information
-    private void updateUIWithUserData(){
-        // if(userManager.isCurrentUserLogged()){   // TODO : To be deleted
-        if(FirestoreUtils.isCurrentUserLogged()){
-            User user = FirestoreUtils.getCurrentUser();
-            if(user.getUserUrlPicture() != null){
-                setProfilePicture(user.getUserUrlPicture());
-            }
-            setTextUserData(user);
+    private void buildConfirmationDialog() {
+        // Create the builder with no specific theme setting
+        builder = new AlertDialog.Builder(this);
+        // Create the builder with a specific theme setting (i.e. for all buttons text color)
+        // builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
+        // Add the buttons
+        builder .setPositiveButton(R.string.ok, (dialog, which) -> {
+                    message = getString(R.string.message_ok);
+                    showSnackBar(message);
+                    deleteAccountAndLogout();
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
+                    message = getString(R.string.message_cancel);
+                    showSnackBar(message);
+                })
+        // Chain together various setter methods to set the dialog characteristics
+                .setTitle(R.string.dialog_title)
+                .setMessage(R.string.dialog_message);
+        // Create the AlertDialog
+        dialog = builder.create();
+        // Set color for each button text (so, no need to set theme when building AlertDialog)
+        dialog.setOnShowListener(dialogInterface -> {
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.green_fab));
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(R.color.red));
+        });
+    }
+
+    private void logout(){
+        userManager.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
+    }
+
+    private void deleteAccountAndLogout() {
+        // TODO
+        uid = userManager.getCurrentUserId();
+        // Delete current user's likes from Firestore liked restaurants collection
+        for (LikedRestaurant likedRestaurant : FirestoreUtils.getLikedRestaurantsList()) {
+            if (likedRestaurant.getUid().equals(uid))
+                likedRestaurantManager.deleteLikedRestaurant(likedRestaurant.getId());
         }
+        // Delete current user from Firestore users collection
+        userManager.deleteUser(uid);
+        // Delete current user from Firebase and logout
+        userManager.deleteFirebaseUser(MainActivity.this)
+                .addOnSuccessListener(aVoid -> {
+                    message = getString(R.string.deletion_confirmation);
+                    showSnackBar(message);
+                    logout();
+                });
     }
-
-    // Update user picture
-    private void setProfilePicture(String profilePictureUrl){
-        userPicture.setImageTintList(null);
-        Glide.with(this)
-                .load(profilePictureUrl)
-                .apply(RequestOptions.circleCropTransform())
-                .into(userPicture);
-    }
-
-    // Update user name and email
-    private void setTextUserData(User user){
-        //Get email & username from User
-        String email = TextUtils.isEmpty(user.getUserEmail()) ? getString(R.string.info_no_email_found) : user.getUserEmail();
-        String username = TextUtils.isEmpty(user.getUsername()) ? getString(R.string.info_no_username_found) : user.getUsername();
-        //Update views with data
-        userName.setText(username);
-        userEmail.setText(email);
-    }
-
 
     private void closeActivity() {
         Intent intent = new Intent();

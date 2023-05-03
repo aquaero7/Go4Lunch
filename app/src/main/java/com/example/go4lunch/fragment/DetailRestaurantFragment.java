@@ -40,12 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link DetailRestaurantFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class DetailRestaurantFragment extends Fragment implements View.OnClickListener {
 
     // Declare callback
@@ -345,12 +339,12 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private void updateSelectionInFirestoreUtils() {
         if (isSelected) {
             /** Update objects in FirestoreUtils to make them available for notifications */
-            FirestoreUtils.updateCurrentUser(restaurant.getRid(), currentDate);
-            FirestoreUtils.updateWorkmatesList(restaurant.getRid(), currentDate);
+            FirestoreUtils.updateCurrentUser("SEL", restaurant.getRid(), currentDate);
+            FirestoreUtils.updateWorkmatesList("SEL", restaurant.getRid(), currentDate);
         } else {
             /** Update objects in FirestoreUtils to make them available for notifications */
-            FirestoreUtils.updateCurrentUser(null, null);
-            FirestoreUtils.updateWorkmatesList(null, null);
+            FirestoreUtils.updateCurrentUser("SEL", null, null);
+            FirestoreUtils.updateWorkmatesList("SEL", null, null);
         }
     }
 

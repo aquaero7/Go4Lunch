@@ -25,6 +25,7 @@ import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
+import com.example.go4lunch.repository.UserRepository;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
@@ -39,8 +40,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -286,8 +291,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         // SUCCESS
         if (result.getResultCode() == RESULT_OK) {
             showSnackBar(getString(R.string.connection_succeed));
-            // Create user into Firestore
-            userManager.createUser();
+            // Create user in Firestore
+            createUser();
 
             /*  // TODO : To be deleted
             /** Initialize objects in FirestoreUtils to make them available for fragments //
@@ -295,8 +300,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
             List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
             */
 
-            // Update Firestore utils then launch application
-            updateUtilsAndStartApp();
         } else {
             // ERRORS
             if (response == null) {
@@ -343,6 +346,52 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         binding.buttonLogin.setText(userManager.isCurrentUserLogged() ? getString(R.string.start_button) : getString(R.string.login_button));
     }
 
+    private void createUser() {
+        FirebaseUser cUser = userManager.getCurrentUser();
+        if(cUser != null){
+            // Data from FirebaseAuth
+            final String USER_ID = "uid";
+            String userUrlPicture = (cUser.getPhotoUrl() != null) ? cUser.getPhotoUrl().toString() : null;
+            final String USER_NAME = "username";
+            String username = cUser.getDisplayName();
+            final String USER_EMAIL = "userEmail";
+            String userEmail = cUser.getEmail();
+            final String USER_URL_PICTURE = "userUrlPicture";
+            String uid = cUser.getUid();
+
+            // If the current user already exist in Firestore, we get his data from Firestore
+            userManager.getCurrentUserData().addOnSuccessListener(user -> {
+                if (user != null) {
+                    // If the current user already exist in Firestore, we update his data
+                    Log.w("AuthActivity", "User already exists and will be updated");
+                    UserManager.getUsersCollection().document(uid)
+                            .update(USER_ID, uid, USER_NAME, username, USER_EMAIL, userEmail,
+                                    USER_URL_PICTURE, userUrlPicture)
+                            .addOnSuccessListener(command -> {
+                                Log.w("AuthActivity","Update successful");
+                                // Update Firestore utils then launch application
+                                updateUtilsAndStartApp();
+                            })
+                            .addOnFailureListener(e -> Log.w("AuthActivity",
+                                    "Update failed. Message : " + e.getMessage()));
+                } else {
+                    // If the current user doesn't exist in Firestore, we create this user
+                    Log.w("AuthActivity", "User doesn't exist and will be created");
+                    User userToCreate = new User(uid, username, userEmail, userUrlPicture);
+                    UserManager.getUsersCollection().document(uid)
+                            .set(userToCreate)
+                            .addOnSuccessListener(command -> {
+                                Log.w("AuthActivity","Creation successful");
+                                // Update Firestore utils then launch application
+                                updateUtilsAndStartApp();
+                            })
+                            .addOnFailureListener(e -> Log.w("AuthActivity",
+                                    "Creation failed. Message : " + e.getMessage()));
+                }
+            });
+        }
+    }
+
     private void updateUtilsAndStartApp() {
         // Call step 1/4: Update current user in FirestoreUtils
         updateCurrentUserInFirestoreUtils();
@@ -352,7 +401,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         FirestoreUtils.setCurrentUserLogStatus(userManager.isCurrentUserLogged());
 
         // Get current user from database document
-        // UserManager.getInstance().getCurrentUserData()   // TODO : To be deleted
         userManager.getCurrentUserData()
                 .addOnSuccessListener(user -> {
                     String uId = user.getUid();
@@ -361,9 +409,11 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                     String uUrlPicture = user.getUserUrlPicture();
                     String selectionId = user.getSelectionId();
                     String selectionDate = user.getSelectionDate();
+                    String searchRadiusPrefs = user.getSearchRadiusPrefs();
+                    String notificationsPrefs = user.getNotificationsPrefs();
 
                     // Update currentUser in FirestoreUtils
-                    FirestoreUtils.setCurrentUser(new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate));
+                    FirestoreUtils.setCurrentUser(new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate, searchRadiusPrefs, notificationsPrefs));
                     // Call step 2/4: Update current user in FirestoreUtils
                     updateRestaurantsListInFirestoreUtils();
                 })

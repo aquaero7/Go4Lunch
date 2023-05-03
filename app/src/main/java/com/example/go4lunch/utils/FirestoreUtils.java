@@ -41,17 +41,57 @@ public class FirestoreUtils {
     }
     */
 
-    public static void updateCurrentUser(String selectionId, String selectionDate) {
-        currentUser.setSelectionId(selectionId);
-        currentUser.setSelectionDate(selectionDate);
+    public static void updateCurrentUser(String tag, String selectionId, String selectionDate) {
+        if (Objects.equals(tag, "SEL")) {
+            currentUser.setSelectionId(selectionId);
+            currentUser.setSelectionDate(selectionDate);
+        } else {
+            Log.e("FirestoreUtils", "Wrong tag for selection");
+        }
     }
 
-    public static void updateWorkmatesList(String selectionId, String selectionDate) {
+    public static void updateCurrentUser(String tag, String value) {
+        switch (tag) {
+            case "RAD":
+                currentUser.setSearchRadiusPrefs(value);
+                break;
+            case "NOT":
+                currentUser.setNotificationsPrefs(value);
+                break;
+            default:
+                Log.e("FirestoreUtils", "Wrong tag for search radius or notifications");
+        }
+    }
+
+    public static void updateWorkmatesList(String tag, String selectionId, String selectionDate) {
         for (User workmate : workmatesList) {
             if (currentUser.getUid().equals(workmate.getUid())) {
-                workmate.setSelectionId(selectionId);
-                workmate.setSelectionDate(selectionDate);
-                break;
+                if (Objects.equals(tag, "SEL")) {
+                    workmate.setSelectionId(selectionId);
+                    workmate.setSelectionDate(selectionDate);
+                    break;
+                } else {
+                    Log.e("FirestoreUtils", "Wrong tag for selection");
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void updateWorkmatesList(String tag, String value) {
+        for (User workmate : workmatesList) {
+            if (currentUser.getUid().equals(workmate.getUid())) {
+                switch (tag) {
+                    case "RAD":
+                        workmate.setSearchRadiusPrefs(value);
+                        break;
+                    case "NOT":
+                        workmate.setNotificationsPrefs(value);
+                        break;
+                    default:
+                        Log.e("FirestoreUtils", "Wrong tag for search radius or notifications");
+                        break;
+                }
             }
         }
     }
@@ -120,8 +160,10 @@ public class FirestoreUtils {
         String uUrlPicture = ((document.getData().get("userUrlPicture")) != null) ? document.getData().get("userUrlPicture").toString() : null;
         String selectionId = ((document.getData().get("selectionId")) != null) ? document.getData().get("selectionId").toString() : null;
         String selectionDate = ((document.getData().get("selectionDate")) != null) ? document.getData().get("selectionDate").toString() : null;
+        String searchRadiusPrefs = ((document.getData().get("searchRadiusPrefs")) != null) ? document.getData().get("searchRadiusPrefs").toString() : null;
+        String notificationsPrefs = ((document.getData().get("notificationsPrefs")) != null) ? document.getData().get("notificationsPrefs").toString() : null;
 
-        User userFromData = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate);
+        User userFromData = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate, searchRadiusPrefs, notificationsPrefs);
 
         return userFromData;
     }

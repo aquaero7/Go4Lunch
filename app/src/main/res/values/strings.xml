@@ -7,6 +7,10 @@
     <string name="search_menu">Search</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="drawer_menu_lunch">YOUR LUNCH</string>
+    <string name="drawer_menu_settings">SETTINGS</string>
+    <string name="drawer_menu_logout">LOGOUT</string>
+    <string name="drawer_menu_delete_account">DELETE ACCOUNT</string>
     <string name="call_button">CALL</string>
     <string name="like_button">LIKE</string>
     <string name="website_button">WEBSITE</string>
@@ -23,7 +27,7 @@
     <string name="not_found_error">No restaurant found matching with query.</string>
     <string name="no_selection_error">No restaurant selected by this workmate.</string>
 
-    <!-- MSG -->
+    <!-- LOCATION -->
     <string name="location_provision">Location provided</string>
     <string name="location_update">Location updated</string>
 
@@ -42,12 +46,19 @@
     <string name="fabUnchecked">Restaurant unselected</string>
     <string name="btnLikeChecked">Restaurant liked</string>
     <string name="btnLikeUnchecked">Restaurant unliked</string>
+    <string name="searchRadiusPrefsSaved">Search radius preference saved</string>
+    <string name="searchRadiusPrefsDeleted">Search radius preference deleted.\nDefault applied</string>
+    <string name="switchChecked">Notifications enabled</string>
+    <string name="switchUnchecked">Notifications disabled</string>
 
     <!-- TAGS -->
     <string name="fab">FAB</string>
     <string name="call">BTN_CALL</string>
     <string name="like">BTN_LIKE</string>
     <string name="website">BTN_WEBSITE</string>
+    <string name="save">BTN_SAVE</string>
+    <string name="notification">SW_NOTIFICATION</string>
+    <string name="account">BTN_ACCOUNT</string>
 
     <!-- LOGIN -->
     <string name="title_activity_login">LoginActivity</string>
@@ -92,6 +103,23 @@
     <string name="none_joining_text">None of your workmates is joining.</string>
     <string name="workmates_joining_text">The following workmates are joining:</string>
     <string name="greeting">Enjoy your meal!</string>
+
+    <!-- SETTINGS -->
+    <string name="settings_title">SETTINGS</string>
+    <string name="settings_radius">Search radius in km \n(for this device) :</string>
+    <string name="settings_button_save">SAVE</string>
+    <string name="settings_notification">Disable/Enable notifications\n(for current user) :</string>
+    <string name="settings_radius_edit_text_hint">km</string>
+
+    <!-- DIALOG -->
+    <string name="dialog_title">Delete your account ?</string>
+    <string name="dialog_message">Your account will be deleted\nand you will be logged off!</string>
+    <string name="ok">DELETE</string>
+    <string name="cancel">DISMISS</string>
+    <string name="message_ok">Deleting account and logging out…</string>
+    <string name="message_cancel">Action canceled!</string>
+    <string name="deletion_confirmation">Account deleted!</string>
+
 
     <!--******************-->
     <!-- NOT TRANSLATABLE -->

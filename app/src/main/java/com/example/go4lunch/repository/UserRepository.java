@@ -28,6 +28,8 @@ public class UserRepository {
     private static final String USER_URL_PICTURE = "userUrlPicture";
     private static final String SELECTION_ID_FIELD = "selectionId";
     private static final String SELECTION_DATE_FIELD = "selectionDate";
+    private static final String SEARCH_RADIUS_PREFS = "searchRadiusPrefs";
+    private static final String NOTIFICATIONS_PREFS = "notificationsPrefs";
 
     private UserRepository() { }
 
@@ -52,6 +54,10 @@ public class UserRepository {
         return AuthUI.getInstance().signOut(context);
     }
 
+    public Task<Void> deleteFirebaseUser(Context context){
+        return AuthUI.getInstance().delete(context);
+    }
+
     // Get current user ID
     @Nullable public String getCurrentUserUID() {
         FirebaseUser user = getCurrentUser();
@@ -59,7 +65,7 @@ public class UserRepository {
     }
 
     // Get the Collection Reference
-    private static CollectionReference getUsersCollection(){
+    public static CollectionReference getUsersCollection(){
         return FirebaseFirestore.getInstance().collection(COLLECTION_USERS);
     }
 
@@ -79,6 +85,7 @@ public class UserRepository {
                     .addOnSuccessListener(user -> {
                 if (user != null) {
                     // If the current user already exist in Firestore, we update his data
+                    Log.w("UserRepository", "User already exists and will be updated");
                     getUsersCollection().document(uid)
                             .update(USER_ID, uid, USER_NAME, username, USER_EMAIL, userEmail,
                                     USER_URL_PICTURE, userUrlPicture)
@@ -86,13 +93,16 @@ public class UserRepository {
                                     "Update successful"))
                             .addOnFailureListener(e -> Log.w("UserRepository",
                                     "Update failed. Message : " + e.getMessage()));
-                    Log.w("UserRepository", "User already exists");
                 } else {
                     // If the current user doesn't exist in Firestore, we create this user
-                    // This method erases selectionId field
+                    Log.w("UserRepository", "User doesn't exist and will be created");
                     User userToCreate = new User(uid, username, userEmail, userUrlPicture);
-                    getUsersCollection().document(uid).set(userToCreate);
-                    Log.w("UserRepository", "User didn't exist and has been created");
+                    getUsersCollection().document(uid)
+                            .set(userToCreate)
+                            .addOnSuccessListener(command -> Log.w("UserRepository",
+                                    "Creation successful"))
+                            .addOnFailureListener(e -> Log.w("UserRepository",
+                                    "Creation failed. Message : " + e.getMessage()));
                 }
             });
         }
@@ -107,7 +117,8 @@ public class UserRepository {
     public Task<DocumentSnapshot> getCurrentUserData(){
         String uid = this.getCurrentUserUID();
         if(uid != null){
-            return this.getUsersCollection().document(uid).get();
+            // return this.getUsersCollection().document(uid).get();
+            return getUsersCollection().document(uid).get();
         }else{
             return null;
         }
@@ -116,7 +127,8 @@ public class UserRepository {
     // Get User Data from Firestore
     public Task<DocumentSnapshot> getUserData(String uid){
         if(uid != null){
-            return this.getUsersCollection().document(uid).get();
+            // return this.getUsersCollection().document(uid).get();
+            return getUsersCollection().document(uid).get();
         }else{
             return null;
         }
@@ -126,7 +138,8 @@ public class UserRepository {
     public Task<Void> updateSelectionId(String selectionId) {
         String uid = this.getCurrentUserUID();
         if(uid != null){
-            return this.getUsersCollection().document(uid).update(SELECTION_ID_FIELD, selectionId);
+            // return this.getUsersCollection().document(uid).update(SELECTION_ID_FIELD, selectionId);
+            return getUsersCollection().document(uid).update(SELECTION_ID_FIELD, selectionId);
         }else{
             return null;
         }
@@ -136,10 +149,37 @@ public class UserRepository {
     public Task<Void> updateSelectionDate(String selectionDate) {
         String uid = this.getCurrentUserUID();
         if(uid != null){
-            return this.getUsersCollection().document(uid).update(SELECTION_DATE_FIELD, selectionDate);
+            // return this.getUsersCollection().document(uid).update(SELECTION_DATE_FIELD, selectionDate);
+            return getUsersCollection().document(uid).update(SELECTION_DATE_FIELD, selectionDate);
         }else{
             return null;
         }
+    }
+
+    // Update selection date
+    public Task<Void> updateSearchRadiusPrefs(String searchRadiusPrefs) {
+        String uid = this.getCurrentUserUID();
+        if(uid != null){
+            // return this.getUsersCollection().document(uid).update(SEARCH_RADIUS_PREFS, searchRadiusPrefs);
+            return getUsersCollection().document(uid).update(SEARCH_RADIUS_PREFS, searchRadiusPrefs);
+        }else{
+            return null;
+        }
+    }
+
+    // Update selection date
+    public Task<Void> updateNotificationsPrefs(String notificationsPrefs) {
+        String uid = this.getCurrentUserUID();
+        if(uid != null){
+            // return this.getUsersCollection().document(uid).update(NOTIFICATIONS_PREFS, notificationsPrefs);
+            return getUsersCollection().document(uid).update(NOTIFICATIONS_PREFS, notificationsPrefs);
+        }else{
+            return null;
+        }
+    }
+
+    public void deleteUser (String id) {
+        getUsersCollection().document(id).delete();
     }
 
 }

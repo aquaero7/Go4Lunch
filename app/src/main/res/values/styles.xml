@@ -63,4 +63,11 @@
         <item name="android:textColorHint">@android:color/darker_gray</item>
     </style>
 
+    <!-- ALERT DIALOG THEME -->
+    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="android:colorAccent">@color/red</item>
+    </style>
+
+
+
 </resources>

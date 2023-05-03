@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.go4lunch.databinding.ActivityDetailRestaurantBinding;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
@@ -13,8 +12,6 @@ import com.example.go4lunch.fragment.DetailRestaurantFragment;
 import com.example.go4lunch.R;
 import com.example.go4lunch.manager.LikedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
-import com.example.go4lunch.model.LikedRestaurant;
-import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
@@ -58,7 +55,7 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
                 if (rPhoneNumber != null) callRestaurant(rPhoneNumber);
                 break;
             case "BTN_LIKE":
-                updateLike(isLiked, rId, uId);
+                updateLikeInDatabase(isLiked, rId, uId);
                 break;
             case "BTN_WEBSITE":
                 if (rWebsite != null) displayRestaurantWebsite(rWebsite);
@@ -120,7 +117,7 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + rPhoneNumber)));
     }
 
-    private void updateLike(boolean isLiked, String rId, String uId){
+    private void updateLikeInDatabase(boolean isLiked, String rId, String uId){
         if (isLiked) {
             likedRestaurantManager.createLikedRestaurant(rId+uId, rId, uId);
             message = getString(R.string.btnLikeChecked);

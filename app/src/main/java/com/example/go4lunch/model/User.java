@@ -11,8 +11,10 @@ public class User implements Serializable {
     private String username;
     @Nullable private String userEmail;
     @Nullable private String userUrlPicture;
-    private String selectionId;
+    @Nullable private String selectionId;
     @Nullable private String selectionDate;
+    @Nullable private String searchRadiusPrefs;
+    @Nullable private String notificationsPrefs;
 
 
     // Empty constructor to allow firebase to cast document to object model
@@ -26,17 +28,22 @@ public class User implements Serializable {
         this.userUrlPicture = userUrlPicture;
         this.selectionId = null;
         this.selectionDate = null;
+        this.searchRadiusPrefs = null;
+        this.notificationsPrefs = null;
     }
 
     // Full constructor
     public User(String uid, String username, @Nullable String userEmail, @Nullable String userUrlPicture,
-                String selectionId, @Nullable String selectionDate) {
+                @Nullable String selectionId, @Nullable String selectionDate,
+                @Nullable String searchRadiusPrefs, @Nullable String notificationsPrefs) {
         this.uid = uid;
         this.username = username;
         this.userEmail = userEmail;
         this.userUrlPicture = userUrlPicture;
         this.selectionId = selectionId;
         this.selectionDate = selectionDate;
+        this.searchRadiusPrefs = searchRadiusPrefs;
+        this.notificationsPrefs = notificationsPrefs;
     }
 
 
@@ -53,11 +60,17 @@ public class User implements Serializable {
     @Nullable public String getUserUrlPicture() {
         return userUrlPicture;
     }
-    public String getSelectionId() {
+    @Nullable public String getSelectionId() {
         return selectionId;
     }
     @Nullable public String getSelectionDate() {
         return selectionDate;
+    }
+    @Nullable public String getSearchRadiusPrefs() {
+        return searchRadiusPrefs;
+    }
+    @Nullable public String getNotificationsPrefs() {
+        return notificationsPrefs;
     }
 
 
@@ -74,11 +87,17 @@ public class User implements Serializable {
     public void setUserUrlPicture(@Nullable String userUrlPicture) {
         this.userUrlPicture = userUrlPicture;
     }
-    public void setSelectionId(String selectionId) {
+    public void setSelectionId(@Nullable String selectionId) {
         this.selectionId = selectionId;
     }
     public void setSelectionDate(@Nullable String selectionDate) {
         this.selectionDate = selectionDate;
+    }
+    public void setSearchRadiusPrefs(@Nullable String searchRadiusPrefs) {
+        this.searchRadiusPrefs = searchRadiusPrefs;
+    }
+    public void setNotificationsPrefs(@Nullable String notificationsPrefs) {
+        this.notificationsPrefs = notificationsPrefs;
     }
 
 

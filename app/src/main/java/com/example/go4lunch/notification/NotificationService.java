@@ -61,8 +61,8 @@ public class NotificationService extends FirebaseMessagingService {
                 getSelectorsList();
                 // Create notification body text
                 createNotificationBodyText();
-                // Send notification with message
-                sendLunchNotification();
+                // Send notification with message if preferences parameter is set true
+                if (Boolean.parseBoolean(FirestoreUtils.getCurrentUser().getNotificationsPrefs())) sendLunchNotification();
             }
         }
     }

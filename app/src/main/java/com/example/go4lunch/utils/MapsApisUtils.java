@@ -32,14 +32,15 @@ public class MapsApisUtils extends FragmentActivity {
 
     private static final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
     private static final double DEF_LONGITUDE = 0;  //VLB  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
-    private static final int DEFAULT_RADIUS = 1000; /** Distance in meters */
+    private static final String DEFAULT_RADIUS = "1"; /** Distance in km */
+    private static String searchRadius; /** Distance in km */
     private static boolean locationPermissionsGranted;
     private static List<Restaurant> restaurantsList = new ArrayList<>();
     private static LatLng home;
 
 
-    public static int getDefaultRadius() {
-        return DEFAULT_RADIUS;
+    public static String getSearchRadius() {
+        return (searchRadius != null) ? searchRadius : DEFAULT_RADIUS;
     }
 
     public static boolean arePermissionsGranted() {
@@ -50,6 +51,10 @@ public class MapsApisUtils extends FragmentActivity {
         return home;
     }
 
+    public static void setSearchRadius(String radius) {
+        searchRadius = radius;
+    }
+
     public static void setPermissions(boolean granted) {
         locationPermissionsGranted = granted;
     }
@@ -58,16 +63,19 @@ public class MapsApisUtils extends FragmentActivity {
         home = latLng;
     }
 
+    /* // TODO : To be deleted
     public static void setRestaurantsList(List<Restaurant> restaurants) {
         restaurantsList = restaurants;
     }
+    */
 
 
     // Get restaurants list from API
     public static List<Restaurant> getRestaurantsFromApi(Context context, LatLng latLng, String apiKey) {
         home = latLng;
         // Call Place Nearby Search API
-        Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient().getPlaces("restaurant", latLng.latitude + "," + latLng.longitude, DEFAULT_RADIUS, apiKey);
+        Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient()
+                .getPlaces("restaurant", latLng.latitude + "," + latLng.longitude, Integer.parseInt(getSearchRadius())*1000, apiKey);
         call1.enqueue(new Callback<GmapsRestaurantPojo>() {
             @Override
             public void onResponse(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Response<GmapsRestaurantPojo> response1) {
