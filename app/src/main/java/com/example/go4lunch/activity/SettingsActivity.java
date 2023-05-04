@@ -28,7 +28,6 @@ public class SettingsActivity extends BaseActivity<ActivitySettingsBinding>
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // setContentView(R.layout.activity_settings);  TODO : To be deleted cause replaced by getViewBinding()
         configureAndShowSettingsFragment();
     }
 

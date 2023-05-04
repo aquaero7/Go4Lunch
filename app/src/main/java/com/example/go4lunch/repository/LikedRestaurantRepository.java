@@ -50,7 +50,7 @@ public class LikedRestaurantRepository {
         getLikedRestaurantsCollection().get().addOnCompleteListener(listener);
     }
 
-    // Get liked restaurant data from Firestore
+    /* Get liked restaurant data from Firestore
     public static Task<DocumentSnapshot> getLikedRestaurantData(String id) {
         if(id != null) {
             return getLikedRestaurantsCollection().document(id).get();
@@ -58,13 +58,14 @@ public class LikedRestaurantRepository {
             return null;
         }
     }
+    */
 
     // Delete liked restaurant in Firestore
     public void deleteLikedRestaurant(String id) {
         getLikedRestaurantsCollection().document(id).delete();
     }
 
-    // Clear the liked restaurants collection
+    /* Clear the liked restaurants collection
     public static void clearLikedRestaurantsCollection() {
         getLikedRestaurantsList(task -> {
             if (task.isSuccessful()) {
@@ -77,5 +78,6 @@ public class LikedRestaurantRepository {
             }
         });
     }
+    */
 
 }

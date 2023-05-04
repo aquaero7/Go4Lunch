@@ -111,13 +111,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                         /** Get nearby restaurants list from API to initialize database */
                         List<Restaurant> nearbyRestaurantsList = MapsApisUtils
                                 .getRestaurantsFromApi(this, home, getString(R.string.MAPS_API_KEY));
-
-                        /*  // TODO : To be deleted
-                        /** Initialize lists in FirestoreUtils to make them available for fragments //
-                        List<Restaurant> restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
-                        List<LikedRestaurant> likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
-                        */
-
                     } else {
                         getUpdatedDataFromApi();
                     }
@@ -157,13 +150,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                         /** Get nearby restaurants list from API to initialize database */
                         List<Restaurant> nearbyRestaurantsList = MapsApisUtils
                                 .getRestaurantsFromApi(getApplicationContext(), home, getString(R.string.MAPS_API_KEY));
-
-                        /*  // TODO : To be deleted
-                        /** Initialize lists in FirestoreUtils to make them available for fragments //
-                        List<Restaurant> restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
-                        List<LikedRestaurant> likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
-                        */
-
                     }
                 }
             }
@@ -220,13 +206,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         // Login Button
         binding.buttonLogin.setOnClickListener(view -> {
             if(userManager.isCurrentUserLogged()){
-
-                /*  // TODO : To be deleted
-                /** Initialize objects in FirestoreUtils to make them available for fragments //
-                User currentUser = FirestoreUtils.getCurrentUserFromDatabaseDocument();
-                List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
-                */
-
                 // Update Firestore utils then launch application
                 updateUtilsAndStartApp();
             }else{
@@ -293,13 +272,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
             showSnackBar(getString(R.string.connection_succeed));
             // Create user in Firestore
             createUser();
-
-            /*  // TODO : To be deleted
-            /** Initialize objects in FirestoreUtils to make them available for fragments //
-            User currentUser = FirestoreUtils.getCurrentUserFromDatabaseDocument();
-            List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
-            */
-
         } else {
             // ERRORS
             if (response == null) {
@@ -493,6 +465,5 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
             }
         });
     }
-
 
 }

@@ -35,6 +35,7 @@ import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
+import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.EventListener;
@@ -83,17 +84,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private AlertDialog dialog;
     String message;
 
-    // private String MAPS_API_KEY;
-    // private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-    // private ActivityResultLauncher<String[]> requestPermissionsLauncher;
-    // private static FusedLocationProviderClient fusedLocationProviderClient;
-    // private static boolean locationPermissionsGranted;
-    // private static LatLng home;
-    // private static List<Restaurant> restaurantsList;            // To make it available for fragments in FirestoreUtils
-    // private static List<User> workmatesList;                    // To make it available for fragments in FirestoreUtils
-    // private static List<LikedRestaurant> likedRestaurantsList;  // To make it available for fragments in FirestoreUtils
-    // private User currentUser;                                   // To make it available for fragments in FirestoreUtils
-
     private Fragment fmt;
     private SearchView searchView;
 
@@ -113,12 +103,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // mActivity = this;
-        // MAPS_API_KEY = getString(R.string.MAPS_API_KEY);
-
-        // Get current user Id
-        //getCurrentUserId();
-
         // Get the toolbar view
         this.configureToolbar();
 
@@ -132,11 +116,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Configure progressBar
         this.configureProgressBar();
 
-        // Create a new FusedLocationProviderClient.
-        // fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        // Check permissions and get device location
-        // checkPermissions();
-
         // Initialize SearchView and setup listener
         searchView = binding.includedToolbar.searchView;
         this.configureSearchViewListener(searchView);
@@ -147,20 +126,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     protected void onResume() {
         super.onResume();
     }
-
-    /*
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("UID", uid);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (uid.isEmpty()) uid = savedInstanceState.getString("UID");
-    }
-    */
 
     @Override
     public void toggleSearchViewVisibility() {
@@ -321,12 +286,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                /*  // TODO : For debug : To be deleted
-                int testId = getSupportFragmentManager().findFragmentById(pager.getCurrentItem()).getId();
-                String testTag = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem()).getTag();
-                MapViewFragment fm = (MapViewFragment) getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
-                */
-
                 // Get fragment's identification
                 fmt = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
 
@@ -371,63 +330,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
      * ---------------------
      */
 
-    /*
-    private void getCurrentUserId() {
-        uid = userManager.getCurrentUserId();
-    }
-
-    private void initializeListsInUtils() {
-        /** Initialize data objects in FirestoreUtils to make them available for fragments //
-        currentUser = FirestoreUtils.getCurrentUserFromDatabaseDocument();
-        restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
-        workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
-        likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
-    }
-
-    private void checkPermissions() {
-        // This is the result of the user answer to permissions request
-        ActivityResultContracts.RequestMultiplePermissions permissionsContract = new ActivityResultContracts.RequestMultiplePermissions();
-        requestPermissionsLauncher = registerForActivityResult(permissionsContract, result -> {
-            Boolean fineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
-            Boolean coarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION,false);
-            if (fineLocationGranted != null && fineLocationGranted) {
-                /** Fine location permission granted //
-                Log.w("ActivityResultLauncher", "Fine location permission was granted by user");
-                locationPermissionsGranted = true;
-                initializeListsInUtils();
-            } else if (coarseLocationGranted != null && coarseLocationGranted) {
-                /** Coarse location permission granted //
-                Log.w("ActivityResultLauncher", "Only coarse location permission was granted by user");
-                locationPermissionsGranted = true;
-                initializeListsInUtils();
-            } else {
-                /** No location permission granted //
-                Log.w("ActivityResultLauncher", "No location permission was granted by user");
-                locationPermissionsGranted = false;
-            }
-            /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment //
-            MapsApisUtils.setPermissions(locationPermissionsGranted);
-        });
-
-        // Check and request permissions
-        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            /** Permissions not granted
-             *  Request permissions to user.
-             *  The registered ActivityResultCallback gets the result of this(these) request(s). //
-            Log.w("checkPermissions", "Permissions not granted");
-            requestPermissionsLauncher.launch(PERMISSIONS);
-        } else {
-            /** Permissions granted //
-            Log.w("checkPermissions", "Permissions granted");
-            locationPermissionsGranted = true;
-            initializeListsInUtils();
-            /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment //
-            MapsApisUtils.setPermissions(locationPermissionsGranted);
-        }
-    }
-    */
-
     private void checkCurrentUserSelectionAndLaunchActivity() {
         // Get current user selected restaurant
         String selectionId = FirestoreUtils.getCurrentUser().getSelectionId();
@@ -470,31 +372,29 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         startActivity(intent);
     }
 
-    // Update user information
+    // Update user information (using User model and FirestoreUtils instead of FirebaseUser model and UserManager)
     private void updateUIWithUserData(){
-        if(userManager.isCurrentUserLogged()){
-            FirebaseUser user = userManager.getCurrentUser();
-            if(user.getPhotoUrl() != null){
-                setProfilePicture(user.getPhotoUrl());
+        if(FirestoreUtils.isCurrentUserLogged()){
+            User user = FirestoreUtils.getCurrentUser();
+            if(user.getUserUrlPicture() != null){
+                setProfilePicture(user.getUserUrlPicture());
             }
             setTextUserData(user);
         }
     }
-
     // Update user picture
-    private void setProfilePicture(Uri profilePictureUrl){
+    private void setProfilePicture(String profilePictureUrl){
         userPicture.setImageTintList(null);
         Glide.with(this)
                 .load(profilePictureUrl)
                 .apply(RequestOptions.circleCropTransform())
                 .into(userPicture);
     }
-
     // Update user name and email
-    private void setTextUserData(FirebaseUser user){
+    private void setTextUserData(User user){
         //Get email & username from User
-        String email = TextUtils.isEmpty(user.getEmail()) ? getString(R.string.info_no_email_found) : user.getEmail();
-        String username = TextUtils.isEmpty(user.getDisplayName()) ? getString(R.string.info_no_username_found) : user.getDisplayName();
+        String email = TextUtils.isEmpty(user.getUserEmail()) ? getString(R.string.info_no_email_found) : user.getUserEmail();
+        String username = TextUtils.isEmpty(user.getUsername()) ? getString(R.string.info_no_username_found) : user.getUsername();
         //Update views with data
         userName.setText(username);
         userEmail.setText(email);
@@ -559,132 +459,5 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void showSnackBar(String message) {
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-    // Declare main fragment
-    private MapViewFragment mMapViewFragment;
-    private ListViewFragment mListViewFragment;
-    private WorkmatesFragment mWorkmatesFragment;
-    */
-
-
-    /** To be commented if menu is handled in fragments */
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
-        // Inflate the menu and add it to the Toolbar
-        getMenuInflater().inflate(R.menu.activity_main_menu, menu);
-        return true;
-    }
-    */
-
-    /** To be commented if menu is handled in fragments */
-    /*
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle actions on menu items
-        switch (item.getItemId()) {
-            case R.id.menu_activity_main_search:
-                // toggleVisibility(autocompleteCardView);
-                // if (autocompleteCardView.getVisibility() == View.VISIBLE) MapsApisUtils.configureAutocompleteSupportFragment(autocompleteFragment, this);
-                toggleVisibility(searchView);
-
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-    */
-
-
-    /**
-     * ---------------------
-     * FRAGMENTS
-     * ---------------------
-     */
-
-    /*
-    private void configureAndShowMapViewFragment(){
-
-        // Get FragmentManager (Support) and Try to find existing instance of fragment in FrameLayout container
-        mMapViewFragment = (MapViewFragment) getSupportFragmentManager().findFragmentById(R.id.fm_lyt_map_view);
-
-        // We only add MapViewFragment if found fm_lyt_map_view (in Tablet mode)
-        if (mMapViewFragment == null && findViewById(R.id.fm_lyt_map_view) != null) {
-            // Create new main fragment
-            mMapViewFragment = new MapViewFragment();
-            // Add it to FrameLayout container
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fm_lyt_map_view, mMapViewFragment)
-                    .commit();
-        }
-    }
-
-    private void configureAndShowListViewFragment(){
-
-        // Get FragmentManager (Support) and Try to find existing instance of fragment in FrameLayout container
-        mListViewFragment = (ListViewFragment) getSupportFragmentManager().findFragmentById(R.id.fm_lyt_list_view);
-
-        // We only add ListViewFragment if found fm_lyt_list_view (in Tablet mode)
-        if (mListViewFragment == null && findViewById(R.id.fm_lyt_list_view) != null) {
-            // Create new main fragment
-            mListViewFragment = new ListViewFragment();
-            // Add it to FrameLayout container
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fm_lyt_list_view, mListViewFragment)
-                    .commit();
-        }
-    }
-
-    private void configureAndShowWorkmatesFragment(){
-
-        // Get FragmentManager (Support) and Try to find existing instance of fragment in FrameLayout container
-        mWorkmatesFragment = (WorkmatesFragment) getSupportFragmentManager().findFragmentById(R.id.fm_lyt_workmates);
-
-        // We only add WorkmatesFragment if found fm_lyt_workmates (in Tablet mode)
-        if (mWorkmatesFragment == null && findViewById(R.id.fm_lyt_workmates) != null) {
-            // Create new main fragment
-            mWorkmatesFragment = new WorkmatesFragment();
-            // Add it to FrameLayout container
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fm_lyt_workmates, mWorkmatesFragment)
-                    .commit();
-        }
-    }
-    */
-
-
-
-
-
 
 }

@@ -46,16 +46,13 @@ public class UserRepository {
         }
     }
 
+    // Get the Collection Reference
+    public static CollectionReference getUsersCollection(){
+        return FirebaseFirestore.getInstance().collection(COLLECTION_USERS);
+    }
+
     @Nullable public FirebaseUser getCurrentUser(){
         return FirebaseAuth.getInstance().getCurrentUser();
-    }
-
-    public Task<Void> signOut(Context context){
-        return AuthUI.getInstance().signOut(context);
-    }
-
-    public Task<Void> deleteFirebaseUser(Context context){
-        return AuthUI.getInstance().delete(context);
     }
 
     // Get current user ID
@@ -64,12 +61,7 @@ public class UserRepository {
         return (user != null)? user.getUid() : null;
     }
 
-    // Get the Collection Reference
-    public static CollectionReference getUsersCollection(){
-        return FirebaseFirestore.getInstance().collection(COLLECTION_USERS);
-    }
-
-    // Create user in Firestore
+    /* Create user in Firestore
     public void createUser() {
         FirebaseUser cUser = getCurrentUser();
         if(cUser != null){
@@ -107,6 +99,7 @@ public class UserRepository {
             });
         }
     }
+    */
 
     // Get restaurants list from Firestore
     public static void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
@@ -124,7 +117,7 @@ public class UserRepository {
         }
     }
 
-    // Get User Data from Firestore
+    /* Get User Data from Firestore
     public Task<DocumentSnapshot> getUserData(String uid){
         if(uid != null){
             // return this.getUsersCollection().document(uid).get();
@@ -133,6 +126,7 @@ public class UserRepository {
             return null;
         }
     }
+    */
 
     // Update selected restaurant
     public Task<Void> updateSelectionId(String selectionId) {
@@ -178,8 +172,16 @@ public class UserRepository {
         }
     }
 
+    public Task<Void> signOut(Context context){
+        return AuthUI.getInstance().signOut(context);
+    }
+
     public void deleteUser (String id) {
         getUsersCollection().document(id).delete();
+    }
+
+    public Task<Void> deleteFirebaseUser(Context context){
+        return AuthUI.getInstance().delete(context);
     }
 
 }

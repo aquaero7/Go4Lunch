@@ -39,20 +39,22 @@ public class LikedRestaurantManager {
         LikedRestaurantRepository.getLikedRestaurantsList(listener);
     }
 
-    // Get the liked restaurant data from Firestore and cast it to a LikedRestaurant model Object
+    /* Get the liked restaurant data from Firestore and cast it to a LikedRestaurant model Object
     public static Task<LikedRestaurant> getLikedRestaurantData(String id) {
         return LikedRestaurantRepository.getLikedRestaurantData(id)
                 .continueWith(task -> task.getResult().toObject(LikedRestaurant.class));
     }
+    */
 
     // Delete liked restaurant in Firestore
     public void deleteLikedRestaurant(String id) {
         likedRestaurantRepository.deleteLikedRestaurant(id);
     }
 
-    // Clear the liked restaurants collection
+    /* Clear the liked restaurants collection
     public static void clearLikedRestaurantsCollection() {
         LikedRestaurantRepository.clearLikedRestaurantsCollection();
     }
+    */
 
 }

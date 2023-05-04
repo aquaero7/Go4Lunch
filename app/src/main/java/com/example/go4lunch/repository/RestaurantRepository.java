@@ -52,7 +52,6 @@ public class RestaurantRepository {
 
     // Create restaurant in Firestore
 
-    // Constructor
     public void createRestaurant(String id, String name, List<Photo> photos, String address,
                                  double rating, OpeningHours openingHours, String phoneNumber,
                                  String website, Geometry geometry) {
@@ -77,7 +76,7 @@ public class RestaurantRepository {
         }
     }
 
-    // Clear the restaurants collection
+    /* Clear the restaurants collection
     public static void clearRestaurantsCollection() {
         getRestaurantsList(task -> {
             if (task.isSuccessful()) {
@@ -90,5 +89,6 @@ public class RestaurantRepository {
             }
         });
     }
+    */
 
 }

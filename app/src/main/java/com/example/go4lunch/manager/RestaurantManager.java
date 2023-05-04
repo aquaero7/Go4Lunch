@@ -35,7 +35,6 @@ public class RestaurantManager {
 
     // Create restaurant in Firestore
 
-    // Constructor
     public void createRestaurant(String id, String name, List<Photo> photos, String address,
                                  double rating, OpeningHours openingHours, String phoneNumber,
                                  String website, Geometry geometry) {
@@ -55,9 +54,10 @@ public class RestaurantManager {
                 .continueWith(task -> task.getResult().toObject(Restaurant.class));
     }
 
-    // Clear the restaurants collection
+    /* Clear the restaurants collection
     public static void clearRestaurantsCollection() {
         RestaurantRepository.clearRestaurantsCollection();
     }
+    */
 
 }

@@ -31,6 +31,10 @@ public class UserManager {
         }
     }
 
+    public static CollectionReference getUsersCollection() {
+        return UserRepository.getUsersCollection();
+    }
+
     public FirebaseUser getCurrentUser(){
         return userRepository.getCurrentUser();
     }
@@ -41,13 +45,11 @@ public class UserManager {
         return (this.getCurrentUser() != null);
     }
 
-    public static CollectionReference getUsersCollection() {
-        return UserRepository.getUsersCollection();
-    }
-
+    /*
     public void createUser(){
         userRepository.createUser();
     }
+    */
 
     // Get the users list from Firestore
     public static void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
@@ -59,10 +61,11 @@ public class UserManager {
         return userRepository.getCurrentUserData().continueWith(task -> task.getResult().toObject(User.class)) ;
     }
 
-    // Get the user from Firestore and cast it to a User model Object
+    /* Get the user from Firestore and cast it to a User model Object
     public Task<User> getUserData(String id) {
         return userRepository.getUserData(id).continueWith(task -> task.getResult().toObject(User.class)) ;
     }
+    */
 
     // Set ir update user selection restaurant id
     public Task<Void> updateSelectionId(String selectionId) {
