@@ -76,6 +76,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             case BTN_SAVE:
                 hideVirtualKeyboard(requireContext(), v);
                 searchRadiusPrefs = mRadiusEditText.getText().toString();
+                break;
             // case "SW_NOTIFICATION": // TODO : To be deleted
             case SW_NOTIFICATION:
                 notificationsPrefs = String.valueOf(mNotificationSwitch.isChecked());

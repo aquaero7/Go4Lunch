@@ -10,7 +10,7 @@ import com.example.go4lunch.R;
  * to manage clicks on buttons regardless of native or local language.
  * Buttons are identified by their ID and not by they TAG
  * in order to make these references dynamic according to the device language
- * and thus avoid constant value error with switch/case method
+ * and thus avoid 'Constant expression required' error with switch/case method.
  */
 
 public enum EventButtonClick {
