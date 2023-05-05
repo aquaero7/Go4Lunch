@@ -10,9 +10,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -46,7 +44,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, EventListener {
 
@@ -60,22 +57,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     // For ViewPager and Tabs
     private ViewPager2 pager;
     private TabLayout tabs;
-    private final String MAP_VIEW_TAB_TITLE = "Map View";
-    private final String LIST_VIEW_TAB_TITLE = "List View";
-    private final String WORKMATES_TAB_TITLE = "Workmates";
-
-    // Initialize title list
-    private final String [] tabTitles={
-            MAP_VIEW_TAB_TITLE,
-            LIST_VIEW_TAB_TITLE,
-            WORKMATES_TAB_TITLE};
-
-    // Initialize icon list
-    int[] tabIcons = {
-            R.drawable.ic_baseline_map_black_24,
-            R.drawable.ic_baseline_view_list_black_24,
-            R.drawable.ic_baseline_group_black_24
-    };
+    private String[] tabTitles;
 
     private ImageView userPicture;
     private TextView userName;
@@ -203,6 +185,19 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Get TabLayout from layout
         tabs = binding.activityMainTabs;
 
+        // Initialize tab titles list
+        final String MAP_VIEW_TAB_TITLE = getString(R.string.tab_map_view);
+        final String LIST_VIEW_TAB_TITLE = getString(R.string.tab_list_view);
+        final String WORKMATES_TAB_TITLE = getString(R.string.tab_workmates);
+        tabTitles= new String[]{MAP_VIEW_TAB_TITLE, LIST_VIEW_TAB_TITLE, WORKMATES_TAB_TITLE};
+
+        // Initialize tab icons list
+        final int[] tabIcons = {
+                R.drawable.ic_baseline_map_black_24,
+                R.drawable.ic_baseline_view_list_black_24,
+                R.drawable.ic_baseline_group_black_24
+        };
+
         // Glue TabLayout and ViewPager together
         new TabLayoutMediator(tabs, pager, (tab, position) -> {
             // Setup tab title
@@ -256,7 +251,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     // Configure progressBar
     private void configureProgressBar() {
-        ProgressBar progressBar = binding.progressBarMain.progressBar;
+        ProgressBar progressBar = binding.activityMainProgressBar.progressBar;
         progressBar.setVisibility(View.INVISIBLE);
     }
 
@@ -276,7 +271,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                         ((ListViewFragment)fmt).filterList(query);
                         break;
                     case "f2":
-                        showSnackBar(String.format(getString(R.string.search_error), tabTitles[pager.getCurrentItem()]));
+                        showSnackBar(String.format(getString(R.string.error_search), tabTitles[pager.getCurrentItem()]));
                         searchView.setQuery("", false);
                         break;
                 }
@@ -355,7 +350,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                     })
                     .addOnFailureListener(e -> Log.w("MainActivity", e.getMessage()));
         } else {
-            showSnackBar(getString(R.string.choice_error));
+            showSnackBar(getString(R.string.error_choice));
         }
     }
 
@@ -406,13 +401,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Create the builder with a specific theme setting (i.e. for all buttons text color)
         // builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
         // Add the buttons
-        builder .setPositiveButton(R.string.ok, (dialog, which) -> {
-                    message = getString(R.string.message_ok);
+        builder .setPositiveButton(R.string.dialog_button_ok, (dialog, which) -> {
+                    message = getString(R.string.dialog_info_ok);
                     showSnackBar(message);
                     deleteAccountAndLogout();
                 })
-                .setNegativeButton(R.string.cancel, (dialog, which) -> {
-                    message = getString(R.string.message_cancel);
+                .setNegativeButton(R.string.dialog_button_cancel, (dialog, which) -> {
+                    message = getString(R.string.dialog_info_cancel);
                     showSnackBar(message);
                 })
         // Chain together various setter methods to set the dialog characteristics
@@ -444,7 +439,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Delete current user from Firebase and logout
         userManager.deleteFirebaseUser(MainActivity.this)
                 .addOnSuccessListener(aVoid -> {
-                    message = getString(R.string.deletion_confirmation);
+                    message = getString(R.string.dialog_info_deletion_confirmation);
                     showSnackBar(message);
                     logout();
                 });

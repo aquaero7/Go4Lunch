@@ -1,8 +1,5 @@
 package com.example.go4lunch.fragment;
 
-import static android.content.Context.INPUT_METHOD_SERVICE;
-import static androidx.core.content.ContextCompat.getSystemService;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -20,6 +17,7 @@ import android.widget.EditText;
 import com.example.go4lunch.databinding.FragmentSettingsBinding;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
+import com.example.go4lunch.utils.EventButtonClick;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class SettingsFragment extends Fragment implements View.OnClickListener {
@@ -71,12 +69,15 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     /* Spread the click to the parent activity
     Binding added as an argument to make it available in the activity */
     public void onClick(View v) {
-        String tag = String.valueOf(v.getTag());
-        switch (tag) {
-            case "BTN_SAVE":
-                hideVirtualKeyboard(getContext(), v);
+        // String tag = String.valueOf(v.getTag()); // TODO : To be deleted
+        // switch (tag) {   // TODO : To be deleted
+        switch (EventButtonClick.from(v)) {
+            // case "BTN_SAVE": // TODO : To be deleted
+            case BTN_SAVE:
+                hideVirtualKeyboard(requireContext(), v);
                 searchRadiusPrefs = mRadiusEditText.getText().toString();
-            case "SW_NOTIFICATION":
+            // case "SW_NOTIFICATION": // TODO : To be deleted
+            case SW_NOTIFICATION:
                 notificationsPrefs = String.valueOf(mNotificationSwitch.isChecked());
                 // updatePreferencesInFirestoreUtils(tag);  // TODO: To be deleted cause done in SettingsActivity
                 break;

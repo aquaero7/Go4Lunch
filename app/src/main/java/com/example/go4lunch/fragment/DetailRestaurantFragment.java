@@ -22,23 +22,20 @@ import android.widget.TextView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
-import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
-import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
+import com.example.go4lunch.utils.EventButtonClick;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.DetailRestaurantWorkmateAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class DetailRestaurantFragment extends Fragment implements View.OnClickListener {
 
@@ -95,15 +92,15 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
         // Initialize View items
         mRecyclerView = binding.rvDetailRestaurant;
-        mImageView = binding.restaurantIv;
-        mTextView1 = binding.restaurantTv1;
-        mTextView2 = binding.restaurantTv2;
-        mRatingBar = binding.restaurantRatingBar;
-        mSelectionFab = binding.selectionFab;
-        mEmptyListMessage = binding.emptyListMessage;
-        mCallButton = binding.callButton;
-        mLikeButton = binding.likeButton;
-        mWebsiteButton = binding.websiteButton;
+        mImageView = binding.ivRestaurant;
+        mTextView1 = binding.tv1Restaurant;
+        mTextView2 = binding.tv2Restaurant;
+        mRatingBar = binding.ratingBarRestaurant;
+        mSelectionFab = binding.fabSelection;
+        mEmptyListMessage = binding.messageEmptyList;
+        mCallButton = binding.buttonCall;
+        mLikeButton = binding.buttonLike;
+        mWebsiteButton = binding.buttonWebsite;
 
         // Get restaurant from calling activity
         getIntentData();
@@ -129,16 +126,21 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     /* Spread the click to the parent activity
     Binding added as an argument to make it available in the activity */
     public void onClick(View v) {
-        String tag = String.valueOf(v.getTag());
-        switch (tag) {
-            case "BTN_CALL":
-            case "BTN_WEBSITE":
+        // String tag = String.valueOf(v.getTag());    // TODO : To be deleted
+        // switch (tag) {   // TODO : To be deleted
+        switch (EventButtonClick.from(v)) {
+            // case "BTN_CALL": // TODO : To be deleted
+            // case "BTN_WEBSITE":  // TODO : To be deleted
+            case BTN_CALL:
+            case BTN_WEBSITE:
                 break;
-            case "BTN_LIKE":
+            // case "BTN_LIKE": // TODO : To be deleted
+            case BTN_LIKE:
                 isLiked = !isLiked;
                 updateLikeButton();
                 break;
-            case "FAB":
+            // case "FAB_SELECT":  // TODO : To be deleted
+            case FAB_SELECT:
                 isSelected = !isSelected;
                 updateSelectionFab();
                 updateSelectionInFirestoreUtils();
@@ -184,7 +186,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         mEmptyListMessage.setVisibility(emptyListMessageVisibility);
         // Declare and create adapter
         DetailRestaurantWorkmateAdapter detailRestaurantWorkmateAdapter =
-                new DetailRestaurantWorkmateAdapter(selectorsList, getString(R.string.joining_text));
+                new DetailRestaurantWorkmateAdapter(selectorsList, getString(R.string.text_joining));
         // Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(detailRestaurantWorkmateAdapter);
         // Set layout manager to position the items

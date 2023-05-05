@@ -115,11 +115,11 @@ public class MapViewFragment extends Fragment implements
         setHasOptionsMenu(true);
 
         // Initialize CardView
-        autocompleteCardView = binding.includedAutocompleteCardView.autocompleteCardView;
+        autocompleteCardView = binding.includedCardViewAutocomplete.cardViewAutocomplete;
 
         // Initialize AutocompleteSupportFragment
-        // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.fragment_autocomplete);
+        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.fragment_autocomplete);
         MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
 
         // return rootView;
@@ -347,7 +347,7 @@ public class MapViewFragment extends Fragment implements
                         double longitude = location.getLongitude();
                         // ...and stop location updates as soon of current location is got
                         fusedLocationProviderClient.removeLocationUpdates(this);
-                        Snackbar.make(binding.getRoot(), getString(R.string.location_update), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(binding.getRoot(), getString(R.string.info_location_updated), Snackbar.LENGTH_LONG).show();
                         // Initialize home
                         home = new LatLng(latitude, longitude);
                         // Initialize home in MapsApisUtils to make it available for ListViewFragment

@@ -10,7 +10,7 @@
     android:orientation="vertical">
 
     <include
-        android:id="@+id/includedAutocompleteCardView"
+        android:id="@+id/included_cardView_autocomplete"
         layout="@layout/fragment_autocomplete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

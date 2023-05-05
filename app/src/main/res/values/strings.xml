@@ -1,6 +1,10 @@
+
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Go4Lunch</string>
     <string name="app_desc">Find a nice restaurant and invite your co-workers for lunch!</string>
+    <string name="tab_map_view">Map View</string>
+    <string name="tab_list_view">List View</string>
+    <string name="tab_workmates">Workmates</string>
     <string name="mapView_toolbar_title">I\'m Hungry!</string>
     <string name="listView_toolbar_title">I\'m Hungry!</string>
     <string name="workmates_toolbar_title">Available workmates</string>
@@ -11,28 +15,12 @@
     <string name="drawer_menu_settings">SETTINGS</string>
     <string name="drawer_menu_logout">LOGOUT</string>
     <string name="drawer_menu_delete_account">DELETE ACCOUNT</string>
-    <string name="call_button">CALL</string>
-    <string name="like_button">LIKE</string>
-    <string name="website_button">WEBSITE</string>
+    <string name="button_call">CALL</string>
+    <string name="button_like">LIKE</string>
+    <string name="button_website">WEBSITE</string>
 
-    <!-- ERROR MSG -->
-    <string name="unknown_error">An error has occurred.</string>
-    <string name="empty_list">No workmate currently interested in this restaurant.</string>
-    <string name="info_no_username_found">No user name found.</string>
-    <string name="info_no_email_found">No email found.</string>
-    <string name="info_no_permission">Features requiring permissions that you have denied are unavailable.</string>
-    <string name="info_no_current_location">Current location is null. Using defaults.</string>
-    <string name="choice_error">No restaurants selected.\nPlease choose one before!</string>
-    <string name="search_error">Search feature not implemented on %s.</string>
-    <string name="not_found_error">No restaurant found matching with query.</string>
-    <string name="no_selection_error">No restaurant selected by this workmate.</string>
-
-    <!-- LOCATION -->
-    <string name="location_provision">Location provided</string>
-    <string name="location_update">Location updated</string>
-
-    <!-- contentDescriptions -->
-    <string name="selection_fab">Selection FAB</string>
+    <!-- CONTENT DESCRIPTIONS -->
+    <string name="fab_selection">Selection FAB</string>
     <string name="im_detail_restaurant">Restaurant image</string>
     <string name="im_workmate_item">Workmate picture</string>
     <string name="im_restaurant_item">Restaurant picture</string>
@@ -41,49 +29,62 @@
     <string name="im_restaurant_auth">Restaurant picture</string>
     <string name="im_user_picture">User picture</string>
 
-    <!-- BUTTONS ACTIONS -->
-    <string name="fabChecked">Restaurant selected</string>
-    <string name="fabUnchecked">Restaurant unselected</string>
-    <string name="btnLikeChecked">Restaurant liked</string>
-    <string name="btnLikeUnchecked">Restaurant unliked</string>
-    <string name="searchRadiusPrefsSaved">Search radius preference saved</string>
-    <string name="searchRadiusPrefsDeleted">Search radius preference deleted.\nDefault applied</string>
-    <string name="switchChecked">Notifications enabled</string>
-    <string name="switchUnchecked">Notifications disabled</string>
-
     <!-- TAGS -->
-    <string name="fab">FAB</string>
+    <string name="fab">FAB_SELECT</string>
     <string name="call">BTN_CALL</string>
     <string name="like">BTN_LIKE</string>
     <string name="website">BTN_WEBSITE</string>
     <string name="save">BTN_SAVE</string>
     <string name="notification">SW_NOTIFICATION</string>
-    <string name="account">BTN_ACCOUNT</string>
+
+    <!-- ERROR AND INFO MSG -->
+    <string name="error">An error has occurred.</string>
+    <string name="info_empty_list">No workmate currently interested in this restaurant.</string>
+    <string name="info_no_username_found">No user name found.</string>
+    <string name="info_no_email_found">No email found.</string>
+    <string name="info_no_permission">Features requiring permissions that you have denied are unavailable.</string>
+    <string name="error_no_current_location">Current location is null. Using defaults.</string>
+    <string name="error_choice">No restaurants selected.\nPlease choose one before!</string>
+    <string name="error_search">Search feature not implemented on view %s.</string>
+    <string name="info_restaurant_not_found">No restaurant found matching with query.</string>
+    <string name="error_no_selection">No restaurant selected by this workmate.</string>
+    <string name="info_location_provided">Location provided</string>
+    <string name="info_location_updated">Location updated</string>
+
+    <!-- BUTTONS ACTIONS -->
+    <string name="fab_checked">Restaurant selected</string>
+    <string name="fab_unchecked">Restaurant unselected</string>
+    <string name="btn_like_checked">Restaurant liked</string>
+    <string name="btn_like_unchecked">Restaurant unliked</string>
+    <string name="search_radius_prefs_saved">Search radius preference saved</string>
+    <string name="search_radius_prefs_deleted">Search radius preference deleted.\nDefault applied</string>
+    <string name="switch_checked">Notifications enabled</string>
+    <string name="switch_unchecked">Notifications disabled</string>
 
     <!-- LOGIN -->
-    <string name="title_activity_login">LoginActivity</string>
+    <!--string name="title_activity_login">Login Activity</string-->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">Welcome!</string>
-    <string name="invalid_username">Not a valid username!</string>
-    <string name="invalid_password">Password must be >5 characters!</string>
-    <string name="login_failed">Login failed!</string>
+    <string name="error_invalid_username">Not a valid username!</string>
+    <string name="error_invalid_password">Password must contain at least 6 characters!</string>
+    <string name="error_login_failed">Login failed!</string>
 
     <!-- AUTH ACTIVITY -->
     <string name="error_not_connected">Please log in first!</string>
     <string name="error_authentication_canceled">Login aborted!</string>
     <string name="error_no_internet">Network unavailable!</string>
-    <string name="error_unknown_error">An unknown error occurred!</string>
-    <string name="connection_succeed">Login successful!</string>
-    <string name="disconnection_succeed">Logout successful!</string>
-    <string name="login_button">Log in</string>
-    <string name="start_button">Start the application</string>
-    <string name="sign_in_button_google">Sign in with Google</string>
-    <string name="sign_in_button_facebook">Sign in with Facebook</string>
-    <string name="sign_in_button_twitter">Sign in with Twitter</string>
-    <string name="sign_in_button_email">Sign in with eMail</string>
+    <string name="error_unknown">An unknown error occurred!</string>
+    <string name="info_connection_succeed">Login successful!</string>
+    <string name="info_disconnection_succeed">Logout successful!</string>
+    <string name="button_login">Log in</string>
+    <string name="button_start">Start the application</string>
+    <string name="button_sign_in_google">Sign in with Google</string>
+    <string name="button_sign_in_facebook">Sign in with Facebook</string>
+    <string name="button_sign_in_twitter">Sign in with Twitter</string>
+    <string name="button_sign_in_email">Sign in with eMail</string>
 
     <!-- RESTAURANT -->
     <string name="status_open">Open</string>
@@ -93,32 +94,32 @@
     <string name="status_open_until">Open until\ </string>
     <string name="status_open_at">Open at\ </string>
     <string name="status_unknown">Unknown opening hours</string>
-    <string name="choice_text">\ is eating at\ </string>
-    <string name="no_choice_text">\ is probably eating somewhere…</string>
-    <string name="joining_text">\ is joining!</string>
+    <string name="text_choice">\ is eating at\ </string>
+    <string name="text_no_choice">\ is probably eating somewhere…</string>
+    <string name="text_joining">\ is joining!</string>
 
     <!-- NOTIFICATION SERVICE -->
     <string name="notification_title">It\'s time to go for lunch!</string>
     <string name="notification_body_header">This restaurant is looking forward to welcoming you for lunch:</string>
-    <string name="none_joining_text">None of your workmates is joining.</string>
-    <string name="workmates_joining_text">The following workmates are joining:</string>
-    <string name="greeting">Enjoy your meal!</string>
+    <string name="text_none_joining">None of your workmates is joining.</string>
+    <string name="text_workmates_joining">The following workmates are joining:</string>
+    <string name="text_greeting">Enjoy your meal!</string>
 
     <!-- SETTINGS -->
     <string name="settings_title">SETTINGS</string>
     <string name="settings_radius">Search radius in km \n(for this device) :</string>
-    <string name="settings_button_save">SAVE</string>
+    <string name="settings_radius_hint">km</string>
+    <string name="settings_save">SAVE</string>
     <string name="settings_notification">Disable/Enable notifications\n(for current user) :</string>
-    <string name="settings_radius_edit_text_hint">km</string>
 
     <!-- DIALOG -->
-    <string name="dialog_title">Delete your account ?</string>
-    <string name="dialog_message">Your account will be deleted\nand you will be logged off!</string>
-    <string name="ok">DELETE</string>
-    <string name="cancel">DISMISS</string>
-    <string name="message_ok">Deleting account and logging out…</string>
-    <string name="message_cancel">Action canceled!</string>
-    <string name="deletion_confirmation">Account deleted!</string>
+    <string name="dialog_title">Delete your account?</string>
+    <string name="dialog_message">Your account will be deleted\nand you will be logged out!</string>
+    <string name="dialog_button_ok">DELETE</string>
+    <string name="dialog_button_cancel">DISMISS</string>
+    <string name="dialog_info_ok">Deleting account and logging out…</string>
+    <string name="dialog_info_cancel">Deletion canceled!</string>
+    <string name="dialog_info_deletion_confirmation">Account deleted!</string>
 
 
     <!--******************-->

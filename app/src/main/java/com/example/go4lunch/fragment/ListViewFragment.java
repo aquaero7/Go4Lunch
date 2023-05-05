@@ -29,8 +29,6 @@ import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.view.ListViewAdapter;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -185,7 +183,7 @@ public class ListViewFragment extends Fragment {
             }
             restaurantsListToDisplay.addAll(filteredRestaurantsListWithDistances);
             filterIsOn = true;
-            if (filteredRestaurantsListWithDistances.isEmpty()) showSnackBar(getString(R.string.not_found_error));
+            if (filteredRestaurantsListWithDistances.isEmpty()) showSnackBar(getString(R.string.info_restaurant_not_found));
         }
         // Update recyclerView
         listViewAdapter.notifyDataSetChanged();

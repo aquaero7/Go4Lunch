@@ -6,11 +6,10 @@
     android:id="@+id/fragment_detail_restaurant_rootview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.DetailRestaurantFragment"
-    >
+    tools:context=".fragment.DetailRestaurantFragment">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/selection_fab"
+        android:id="@+id/fab_selection"
         android:tag="@string/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -22,7 +21,7 @@
         android:foreground="@mipmap/im_check_green_white"
         android:backgroundTint="@color/white"
         android:visibility="visible"
-        android:contentDescription="@string/selection_fab"/>
+        android:contentDescription="@string/fab_selection"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,7 +30,7 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/restaurant_iv"
+            android:id="@+id/iv_restaurant"
             android:layout_width="match_parent"
             android:layout_height="256dp"
             android:src="@drawable/im_detail_restaurant"
@@ -45,7 +44,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/restaurant_tv1"
+                android:id="@+id/tv1_restaurant"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
@@ -53,11 +52,10 @@
                 android:gravity="center_vertical"
                 android:paddingTop="12dp"
                 android:paddingHorizontal="12dp"
-                android:text="Nom du Restaurant"
                 />
 
             <RatingBar
-                android:id="@+id/restaurant_rating_bar"
+                android:id="@+id/rating_bar_restaurant"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:paddingTop="16dp"
@@ -74,7 +72,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/restaurant_tv2"
+            android:id="@+id/tv2_restaurant"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
@@ -83,8 +81,7 @@
             android:gravity="center_vertical"
             android:paddingTop="4dp"
             android:paddingBottom="24dp"
-            android:paddingHorizontal="12dp"
-            android:text="Informations du restaurant"/>
+            android:paddingHorizontal="12dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -93,7 +90,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/callButton"
+                android:id="@+id/button_call"
                 android:tag="@string/call"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -102,11 +99,11 @@
                 android:background="@color/white"
                 android:drawableTop="@drawable/ic_baseline_call_24"
                 android:drawableTint="@color/app_background"
-                android:text="@string/call_button"
+                android:text="@string/button_call"
                 android:textColor="@color/app_background"/>
 
             <Button
-                android:id="@+id/likeButton"
+                android:id="@+id/button_like"
                 android:tag="@string/like"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -115,11 +112,11 @@
                 android:background="@color/white"
                 android:drawableTop="@drawable/ic_baseline_star_rate_24"
                 android:drawableTint="@color/app_background"
-                android:text="@string/like_button"
+                android:text="@string/button_like"
                 android:textColor="@color/app_background"/>
 
             <Button
-                android:id="@+id/websiteButton"
+                android:id="@+id/button_website"
                 android:tag="@string/website"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -128,7 +125,7 @@
                 android:background="@color/white"
                 android:drawableTop="@drawable/ic_baseline_public_24"
                 android:drawableTint="@color/app_background"
-                android:text="@string/website_button"
+                android:text="@string/button_website"
                 android:textColor="@color/app_background"/>
 
         </LinearLayout>
@@ -141,14 +138,14 @@
 
         <!-- TextView to display in case of empty list -->
         <TextView
-            android:id="@+id/emptyListMessage"
+            android:id="@+id/message_empty_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textSize="16sp"
             android:textStyle="bold"
             android:paddingTop="40dp"
             android:gravity="top|center_horizontal"
-            android:text="@string/empty_list"
+            android:text="@string/info_empty_list"
             android:visibility="gone"/>
 
     </LinearLayout>

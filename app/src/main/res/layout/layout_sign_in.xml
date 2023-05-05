@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".activity.AuthActivity"
     android:theme="@style/AuthTheme"
-    android:id="@+id/sign_in_layout">
+    android:id="@+id/layout_sign_in">
 
     <ImageView
         android:layout_width="match_parent"
@@ -37,7 +37,7 @@
         android:paddingHorizontal="20dp"
         android:gravity="center"
         android:textSize="16sp"
-        android:text="@string/sign_in_button_email"
+        android:text="@string/button_sign_in_email"
         android:id="@+id/button_email"/>
 
     <Button
@@ -51,7 +51,7 @@
         android:paddingHorizontal="20dp"
         android:gravity="center"
         android:textSize="16sp"
-        android:text="@string/sign_in_button_twitter"
+        android:text="@string/button_sign_in_twitter"
         android:id="@+id/button_twitter"/>
 
     <Button
@@ -65,7 +65,7 @@
         android:paddingHorizontal="20dp"
         android:gravity="center"
         android:textSize="16sp"
-        android:text="@string/sign_in_button_facebook"
+        android:text="@string/button_sign_in_facebook"
         android:id="@+id/button_facebook"/>
 
     <Button
@@ -79,7 +79,7 @@
         android:paddingHorizontal="20dp"
         android:gravity="center"
         android:textSize="16sp"
-        android:text="@string/sign_in_button_google"
+        android:text="@string/button_sign_in_google"
         android:id="@+id/button_google"/>
 
 

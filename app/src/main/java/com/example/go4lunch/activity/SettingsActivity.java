@@ -1,7 +1,6 @@
 package com.example.go4lunch.activity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import com.example.go4lunch.databinding.ActivitySettingsBinding;
@@ -11,6 +10,7 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
+import com.example.go4lunch.utils.EventButtonClick;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Objects;
@@ -39,12 +39,15 @@ public class SettingsActivity extends BaseActivity<ActivitySettingsBinding>
     public void onButtonClicked(View view, FragmentSettingsBinding fragmentBinding,
                                 String searchRadiusPrefs, String notificationsPrefs) {
         // Handle the button click event
-        String tag = String.valueOf(view.getTag());
-        switch (tag) {
-            case "BTN_SAVE":
+        // String tag = String.valueOf(view.getTag());  // TODO : To be deleted
+        // switch (tag) {   // TODO : To be deleted
+        switch (EventButtonClick.from(view)) {
+            // case "BTN_SAVE":    // TODO : To be deleted
+            case BTN_SAVE:
                 updateSearchRadiusPrefsInDatabase(searchRadiusPrefs);
                 break;
-            case "SW_NOTIFICATION":
+            // case "SW_NOTIFICATION": // TODO : To be deleted
+            case SW_NOTIFICATION:
                 updateNotificationsPrefsInDatabase(notificationsPrefs);
                 break;
         }
@@ -71,7 +74,7 @@ public class SettingsActivity extends BaseActivity<ActivitySettingsBinding>
             MapsApisUtils.setSearchRadius(searchRadiusPrefs);
             FirestoreUtils.updateCurrentUser("RAD", searchRadiusPrefs);
             FirestoreUtils.updateWorkmatesList("RAD", searchRadiusPrefs);
-            message = getString(R.string.searchRadiusPrefsSaved);
+            message = getString(R.string.search_radius_prefs_saved);
         } else {
             // Remove search radius preference from user document in database
             UserManager.getInstance().updateSearchRadiusPrefs(null);
@@ -79,28 +82,30 @@ public class SettingsActivity extends BaseActivity<ActivitySettingsBinding>
             MapsApisUtils.setSearchRadius(null);
             FirestoreUtils.updateCurrentUser("RAD", null);
             FirestoreUtils.updateWorkmatesList("RAD", null);
-            message = getString(R.string.searchRadiusPrefsDeleted);
+            message = getString(R.string.search_radius_prefs_deleted);
         }
         showSnackBar(message);
     }
 
     private void updateNotificationsPrefsInDatabase(String notificationsPrefs) {
         if (notificationsPrefs != null && ! notificationsPrefs.isEmpty()) {
-            // Add notifications preference to user document in database
-            UserManager.getInstance().updateNotificationsPrefs(notificationsPrefs);
-            /** Update object in FirestoreUtils to make it available for fragments */
-            FirestoreUtils.updateCurrentUser("NOT", notificationsPrefs);
-            FirestoreUtils.updateWorkmatesList("NOT", notificationsPrefs);
-            message = getString(R.string.switchChecked);
-        } else {
-            // Remove notifications preference from user document in database
-            UserManager.getInstance().updateNotificationsPrefs(null);
-            /** Update object in FirestoreUtils to make it available for fragments */
-            FirestoreUtils.updateCurrentUser("NOT", null);
-            FirestoreUtils.updateWorkmatesList("NOT", null);
-            message = getString(R.string.switchUnchecked);
-        }
+            if (Boolean.parseBoolean(notificationsPrefs)) {
+                // Add notifications preference to user document in database
+                UserManager.getInstance().updateNotificationsPrefs(notificationsPrefs);
+                /** Update object in FirestoreUtils to make it available for fragments */
+                FirestoreUtils.updateCurrentUser("NOT", notificationsPrefs);
+                FirestoreUtils.updateWorkmatesList("NOT", notificationsPrefs);
+                message = getString(R.string.switch_checked);
+            } else {
+                // Remove notifications preference from user document in database
+                UserManager.getInstance().updateNotificationsPrefs(null);
+                /** Update object in FirestoreUtils to make it available for fragments */
+                FirestoreUtils.updateCurrentUser("NOT", null);
+                FirestoreUtils.updateWorkmatesList("NOT", null);
+                message = getString(R.string.switch_unchecked);
+            }
         showSnackBar(message);
+        }
     }
 
     private void showSnackBar(String message) {

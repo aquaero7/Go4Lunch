@@ -16,13 +16,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
-import com.example.go4lunch.activity.MainActivity;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
-import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
@@ -35,11 +32,8 @@ import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.view.WorkmateAdapter;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class WorkmatesFragment extends Fragment {
 
@@ -123,7 +117,7 @@ public class WorkmatesFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
-        WorkmateAdapter workmateAdapter = new WorkmateAdapter(workmatesList, getString(R.string.choice_text), getString(R.string.no_choice_text));
+        WorkmateAdapter workmateAdapter = new WorkmateAdapter(workmatesList, getString(R.string.text_choice), getString(R.string.text_no_choice));
         // 3.3 - Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(workmateAdapter);
         // 3.4 - Set layout manager to position the items
@@ -147,7 +141,7 @@ public class WorkmatesFragment extends Fragment {
                             RestaurantWithDistance restaurantWithDistance = getSelectedRestaurant(rId);
                             launchDetailRestaurantActivity(restaurantWithDistance);
                         } else {
-                            Snackbar.make(binding.getRoot(), getString(R.string.no_selection_error), Snackbar.LENGTH_LONG).show();
+                            Snackbar.make(binding.getRoot(), getString(R.string.error_no_selection), Snackbar.LENGTH_LONG).show();
                         }
                     }
                 });

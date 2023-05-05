@@ -44,7 +44,7 @@
 
         <!-- If using a specific layout for the toolbar with tag 'include' -->
         <include
-            android:id="@+id/includedToolbar"
+            android:id="@+id/included_toolbar"
             layout="@layout/activity_main_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
@@ -66,9 +66,8 @@
         -->
 
         <include
-            android:id="@+id/progressBar_main"
-            layout="@layout/progressbar"
-            />
+            android:id="@+id/activity_main_progressBar"
+            layout="@layout/progressbar"/>
 
         <!-- FrameLayout for drawer fragments !!!! ACFM !!!-->
         <FrameLayout

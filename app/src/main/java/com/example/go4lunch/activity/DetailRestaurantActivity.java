@@ -14,6 +14,7 @@ import com.example.go4lunch.manager.LikedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
+import com.example.go4lunch.utils.EventButtonClick;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -49,18 +50,23 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
                                 String rWebsite, double rRating, List<Photo> rPhotos,
                                 boolean isSelected, boolean isLiked, String uId) {
         // Handle the button click event
-        String tag = String.valueOf(view.getTag());
-        switch (tag) {
-            case "BTN_CALL":
+        // String tag = String.valueOf(view.getTag());  // TODO : To be deleted
+        // switch (tag) {   // TODO : To be deleted
+        switch (EventButtonClick.from(view)) {
+            // case "BTN_CALL": // TODO : To be deleted
+            case BTN_CALL:
                 if (rPhoneNumber != null) callRestaurant(rPhoneNumber);
                 break;
-            case "BTN_LIKE":
+            // case "BTN_LIKE": // TODO : To be deleted
+            case BTN_LIKE:
                 updateLikeInDatabase(isLiked, rId, uId);
                 break;
-            case "BTN_WEBSITE":
+            // case "BTN_WEBSITE":  // TODO : To be deleted
+            case BTN_WEBSITE:
                 if (rWebsite != null) displayRestaurantWebsite(rWebsite);
                 break;
-            case "FAB":
+            // case "FAB_SELECT":  // TODO : To be deleted
+            case FAB_SELECT:
                 updateSelectionInDatabase(isSelected, rId);
                 break;
         }
@@ -89,7 +95,7 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
             /** Update objects in FirestoreUtils to make them available for notifications */    // TODO : To be deleted cause done in DetailRestaurantFragment
             // FirestoreUtils.updateCurrentUser(rId, currentDate);  // TODO : To be deleted cause done in DetailRestaurantFragment
             // FirestoreUtils.updateWorkmatesList(rId, currentDate);    // TODO : To be deleted cause done in DetailRestaurantFragment
-            message = getString(R.string.fabChecked);
+            message = getString(R.string.fab_checked);
         } else {
             // Remove selected restaurant ID from user document in database
             UserManager.getInstance().updateSelectionId(null);
@@ -97,7 +103,7 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
             /** Update objects in FirestoreUtils to make them available for notifications */    // TODO : To be deleted cause done in DetailRestaurantFragment
             // FirestoreUtils.updateCurrentUser(null, null);    // TODO : To be deleted cause done in DetailRestaurantFragment
             // FirestoreUtils.updateWorkmatesList(null, null);  // TODO : To be deleted cause done in DetailRestaurantFragment
-            message = getString(R.string.fabUnchecked);
+            message = getString(R.string.fab_unchecked);
         }
         showSnackBar(message);
 
@@ -120,10 +126,10 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
     private void updateLikeInDatabase(boolean isLiked, String rId, String uId){
         if (isLiked) {
             likedRestaurantManager.createLikedRestaurant(rId+uId, rId, uId);
-            message = getString(R.string.btnLikeChecked);
+            message = getString(R.string.btn_like_checked);
         } else {
             likedRestaurantManager.deleteLikedRestaurant(rId+uId);
-            message = getString(R.string.btnLikeUnchecked);
+            message = getString(R.string.btn_like_unchecked);
         }
         showSnackBar(message);
 

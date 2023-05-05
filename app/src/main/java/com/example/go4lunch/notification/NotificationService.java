@@ -13,12 +13,10 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.MainActivity;
-import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -103,14 +101,14 @@ public class NotificationService extends FirebaseMessagingService {
     private void createNotificationBodyText() {
         notificationBodyText = getString(R.string.notification_body_header) + "\n" + "\n" + rName + "\n" + rAddress;
         if (selectorsList.isEmpty()) {
-            notificationBodyText = notificationBodyText + "\n" + "\n" + getString(R.string.none_joining_text);
+            notificationBodyText = notificationBodyText + "\n" + "\n" + getString(R.string.text_none_joining);
         } else {
-            notificationBodyText = notificationBodyText + "\n" + "\n" + getString(R.string.workmates_joining_text);
+            notificationBodyText = notificationBodyText + "\n" + "\n" + getString(R.string.text_workmates_joining);
             for (User selector : selectorsList) {
                 notificationBodyText = notificationBodyText + "\n- " + selector.getUsername();
             }
         }
-        notificationBodyText = notificationBodyText + "\n" + "\n" + getString(R.string.greeting);
+        notificationBodyText = notificationBodyText + "\n" + "\n" + getString(R.string.text_greeting);
         Log.i("NotificationService", notificationBodyText);
     }
 

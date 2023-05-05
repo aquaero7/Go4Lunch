@@ -42,7 +42,7 @@
             android:textAllCaps="false"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:text="@string/login_button"
+            android:text="@string/button_login"
             style="@style/FirebaseUI.AuthMethodPicker.ButtonHolder"
             android:id="@+id/button_login"/>
 

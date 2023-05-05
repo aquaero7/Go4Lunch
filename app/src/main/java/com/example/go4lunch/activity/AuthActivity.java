@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -25,7 +24,6 @@ import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.repository.UserRepository;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
@@ -38,14 +36,10 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -103,7 +97,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                         // Get the current location...
                         double latitude = lastKnownLocation.getLatitude();
                         double longitude = lastKnownLocation.getLongitude();
-                        Snackbar.make(binding.getRoot(), getString(R.string.location_provision), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(binding.getRoot(), getString(R.string.info_location_provided), Snackbar.LENGTH_LONG).show();
                         // Initialize home
                         home = new LatLng(latitude, longitude);
                         /** Initialize home in MapsApisUtils to make it available for ListViewFragment */
@@ -142,7 +136,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                         double longitude = location.getLongitude();
                         // ...and stop location updates as soon of current location is got
                         fusedLocationProviderClient.removeLocationUpdates(this);
-                        Snackbar.make(binding.getRoot(), getString(R.string.location_update), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(binding.getRoot(), getString(R.string.info_location_updated), Snackbar.LENGTH_LONG).show();
                         // Initialize home
                         home = new LatLng(latitude, longitude);
                         /** Initialize home in MapsApisUtils to make it available for ListViewFragment */
@@ -269,7 +263,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         IdpResponse response = IdpResponse.fromResultIntent(result.getData());
         // SUCCESS
         if (result.getResultCode() == RESULT_OK) {
-            showSnackBar(getString(R.string.connection_succeed));
+            showSnackBar(getString(R.string.info_connection_succeed));
             // Create user in Firestore
             createUser();
         } else {
@@ -280,7 +274,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 if(response.getError().getErrorCode() == ErrorCodes.NO_NETWORK){
                     showSnackBar(getString(R.string.error_no_internet));
                 } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    showSnackBar(getString(R.string.error_unknown_error));
+                    showSnackBar(getString(R.string.error_unknown));
                 }
             }
 
@@ -292,7 +286,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     // Method that handles response after main activity close
     private void handleSnackBarAfterLogout(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK) {
-            showSnackBar(getString(R.string.disconnection_succeed));
+            showSnackBar(getString(R.string.info_disconnection_succeed));
         }
     }
 
@@ -315,7 +309,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
     // Update Login Button when activity is resuming
     private void updateLoginButton(){
-        binding.buttonLogin.setText(userManager.isCurrentUserLogged() ? getString(R.string.start_button) : getString(R.string.login_button));
+        binding.buttonLogin.setText(userManager.isCurrentUserLogged() ? getString(R.string.button_start) : getString(R.string.button_login));
     }
 
     private void createUser() {

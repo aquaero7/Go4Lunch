@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Go4Lunch</string>
+    <string name="app_desc">Trouvez un bon restaurant et invitez vos collègues à dejeuner !</string>
+    <string name="tab_map_view">Carte</string>
+    <string name="tab_list_view">Liste</string>
+    <string name="tab_workmates">Collègues</string>
+    <string name="mapView_toolbar_title">J\'ai Faim !</string>
+    <string name="listView_toolbar_title">J\'ai Faim !</string>
+    <string name="workmates_toolbar_title">Collègues disponibles</string>
+    <string name="search_menu">Recherche</string>
+    <string name="navigation_drawer_open">Ouvrir le tiroir de navigation</string>
+    <string name="navigation_drawer_close">Fermer le tiroir de navigation</string>
+    <string name="drawer_menu_lunch">VOTRE DEJEUNER</string>
+    <string name="drawer_menu_settings">REGLAGES</string>
+    <string name="drawer_menu_logout">DECONNEXION</string>
+    <string name="drawer_menu_delete_account">SUPPRIMER LE COMPTE</string>
+    <string name="button_call">APPELER</string>
+    <string name="button_like">J\'AIME</string>
+    <string name="button_website">SITE WEB</string>
+
+    <!-- CONTENT DESCRIPTIONS -->
+    <string name="fab_selection">FAB de sélection</string>
+    <string name="im_detail_restaurant">Photo du restaurant</string>
+    <string name="im_workmate_item">Photo du collègue</string>
+    <string name="im_restaurant_item">Image du restaurant</string>
+    <string name="ic_workmate_logo">Logo du collègue</string>
+    <string name="ic_app_logo">Logo de l\'application</string>
+    <string name="im_restaurant_auth">Image du restaurant</string>
+    <string name="im_user_picture">Photo de l\'utilisateur</string>
+
+    <!-- TAGS -->
+    <string name="fab">FAB_SELECT</string>
+    <string name="call">BTN_APPELER</string>
+    <string name="like">BTN_AIMER</string>
+    <string name="website">BTN_SITE_WEB</string>
+    <string name="save">BTN_SAUVEGARDER</string>
+    <string name="notification">SW_NOTIFICATION</string>
+
+    <!-- ERROR AND INFO MSG -->
+    <string name="error">Une erreur s\'est produite.</string>
+    <string name="info_empty_list">Aucun collègue n\'est actuellement intéressé par ce restaurant.</string>
+    <string name="info_no_username_found">Pas de nom trouvé.</string>
+    <string name="info_no_email_found">Pas d\'email trouvé.</string>
+    <string name="info_no_permission">Les fonctionnalités nécessitant des permissions que vous avez refusées sont indisponibles.</string>
+    <string name="error_no_current_location">La position actuelle n\'a pas été détectée. Utilisation de la position par défaut.</string>
+    <string name="error_choice">Aucun restaurant sélectionné.\nSélectionnez d\'abord un restaurant !</string>
+    <string name="error_search">Recherche non implémentée pour la vue %s.</string>
+    <string name="info_restaurant_not_found">Aucun restaurant correspondant à la recherche n\'a été trouvé.</string>
+    <string name="error_no_selection">Aucun restaurant n\'a été sélectionné par ce collègue.</string>
+    <string name="info_location_provided">Position détectée</string>
+    <string name="info_location_updated">Position mise à jour</string>
+
+    <!-- BUTTONS ACTIONS -->
+    <string name="fab_checked">Restaurant sélectionné</string>
+    <string name="fab_unchecked">Restaurant désélectionné</string>
+    <string name="btn_like_checked">Restaurant aimé</string>
+    <string name="btn_like_unchecked">Restaurant désaimé</string>
+    <string name="search_radius_prefs_saved">Préférence du rayon de recherche sauvegardée</string>
+    <string name="search_radius_prefs_deleted">Préférence du rayon de recherche supprimée.\nApplication de la valeur par défaut</string>
+    <string name="switch_checked">Notifications activées</string>
+    <string name="switch_unchecked">Notifications désactivées</string>
+
+    <!-- LOGIN -->
+    <!--string name="title_activity_login">Connexion</string-->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Mot de passe</string>
+    <string name="action_sign_in">Connectez-vous ou enregistrer-vous</string>
+    <string name="action_sign_in_short">Connectez-vous</string>
+    <string name="welcome">Bienvenue !</string>
+    <string name="error_invalid_username">Nom invalide !</string>
+    <string name="error_invalid_password">Le mot de passe doit contenir au moins 6 caractères !</string>
+    <string name="error_login_failed">Echec de connexion !</string>
+
+    <!-- AUTH ACTIVITY -->
+    <string name="error_not_connected">Vous devez d\'abord vous connecter !</string>
+    <string name="error_authentication_canceled">Connexion abandonnée !</string>
+    <string name="error_no_internet">Réseau indisponible !</string>
+    <string name="error_unknown">Une erreur inconnue s\'est produite !</string>
+    <string name="info_connection_succeed">Connexion réussie !</string>
+    <string name="info_disconnection_succeed">Déconnexion réussie !</string>
+    <string name="button_login">Connexion</string>
+    <string name="button_start">Démarrer l\'application</string>
+    <string name="button_sign_in_google">Se connecter avec Google</string>
+    <string name="button_sign_in_facebook">Se connecter avec Facebook</string>
+    <string name="button_sign_in_twitter">Se connecter avec Twitter</string>
+    <string name="button_sign_in_email">Se connecter avec eMail</string>
+
+    <!-- RESTAURANT -->
+    <string name="status_open">Ouvert</string>
+    <string name="status_closed">Fermé</string>
+    <string name="status_open247">Ouvert 24/7</string>
+    <string name="status_open24">Ouvert toute la journée</string>
+    <string name="status_open_until">Ouvert jusqu\'à\ </string>
+    <string name="status_open_at">Ouvre à\ </string>
+    <string name="status_unknown">Horaires d\'ouverture inconnus</string>
+    <string name="text_choice">\ mange à\ </string>
+    <string name="text_no_choice">\ mange probablement quelque part…</string>
+    <string name="text_joining">\ se joint au repas !</string>
+
+    <!-- NOTIFICATION SERVICE -->
+    <string name="notification_title">Il est temps d\'aller déjeuner !</string>
+    <string name="notification_body_header">Ce restaurant se réjouit de vous accueillir pour déjeuner :</string>
+    <string name="text_none_joining">Aucun de vos collègues ne se joint au repas.</string>
+    <string name="text_workmates_joining">Les collègues suivants se joignent au repas :</string>
+    <string name="text_greeting">Bon appétit !</string>
+
+    <!-- SETTINGS -->
+    <string name="settings_title">REGLAGES</string>
+    <string name="settings_radius">Rayon de recherche en km \n(pour cet appareil) :</string>
+    <string name="settings_radius_hint">km</string>
+    <string name="settings_save">SAUVEGARDER</string>
+    <string name="settings_notification">Désactiver/Activer les notifications\n(pour l\'utilisateur courant) :</string>
+
+    <!-- DIALOG -->
+    <string name="dialog_title">Supprimer votre compte ?</string>
+    <string name="dialog_message">Votre compte sera supprimé\net vous serez déconnecté !</string>
+    <string name="dialog_button_ok">SUPPRIMER</string>
+    <string name="dialog_button_cancel">ABANDONNER</string>
+    <string name="dialog_info_ok">Suppression du compte et déconnexion…</string>
+    <string name="dialog_info_cancel">Suppression abandonnée !</string>
+    <string name="dialog_info_deletion_confirmation">Compte supprimé !</string>
+
+
+    <!--******************-->
+    <!-- NOT TRANSLATABLE -->
+    <!--******************-->
+
+    <!-- SEPARATORS -->
+    <string name="hyphen">-</string>
+
+    <!-- FACEBOOK LOGIN -->
+    <string name="facebook_application_id" translatable="false">@string/fb_id</string>
+    <string name="facebook_client_token" translatable="false">@string/fb_token</string>
+
+    <!-- GOOGLE MAPS -->
+    <string name="MAPS_API_KEY" translatable="false">@string/maps_api_key</string>
+
+    <!-- NOTIFICATION SERVICE -->
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+
+</resources>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/autocomplete_cardView"
+    android:id="@+id/cardView_autocomplete"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:visibility="gone">
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/autocomplete_fragment"
+        android:id="@+id/fragment_autocomplete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"/>

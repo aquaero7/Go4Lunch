@@ -97,7 +97,7 @@ public class MapsApisUtils extends FragmentActivity {
 
             @Override
             public void onFailure(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Throwable t) {
-                Toast.makeText(context, R.string.unknown_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.error, Toast.LENGTH_SHORT).show();
                 Log.w("MapsApisUtils", t.getMessage(), t);
             }
         });
@@ -141,7 +141,7 @@ public class MapsApisUtils extends FragmentActivity {
 
             @Override
             public void onFailure(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Throwable t) {
-                Toast.makeText(context, R.string.unknown_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.error, Toast.LENGTH_SHORT).show();
                 Log.w("MapsApisUtils", t.getMessage(), t);
             }
         });
