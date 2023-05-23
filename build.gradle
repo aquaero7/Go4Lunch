@@ -4,7 +4,7 @@ buildscript {
     repositories {
         // FIREBASE
         google()    // Google's Maven repository
-        mavenCentral()  // Maven Central repository for Facebook Login
+        mavenCentral()  // Maven Central repository (for Facebook Login, Mockito, ...)
     }
 
     dependencies {
