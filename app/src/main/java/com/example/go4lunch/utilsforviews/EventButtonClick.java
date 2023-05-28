@@ -1,4 +1,4 @@
-package com.example.go4lunch.utils;
+package com.example.go4lunch.utilsforviews;
 
 import android.util.SparseArray;
 import android.view.View;

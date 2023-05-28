@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 
-import org.checkerframework.checker.units.qual.C;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,7 @@ import java.util.Locale;
 /**
  * Example local Mockito unit test, which will execute on the development machine (host).
  */
-public class ExampleMockitoTest {
+public class _ExampleMockitoTest {
 
     MockitoSession mockito;
 

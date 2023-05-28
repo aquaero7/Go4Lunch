@@ -14,7 +14,7 @@ import com.example.go4lunch.manager.LikedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
-import com.example.go4lunch.utils.EventButtonClick;
+import com.example.go4lunch.utilsforviews.EventButtonClick;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.google.android.material.snackbar.Snackbar;
 

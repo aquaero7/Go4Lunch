@@ -17,7 +17,7 @@ import android.widget.EditText;
 import com.example.go4lunch.databinding.FragmentSettingsBinding;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
-import com.example.go4lunch.utils.EventButtonClick;
+import com.example.go4lunch.utilsforviews.EventButtonClick;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class SettingsFragment extends Fragment implements View.OnClickListener {

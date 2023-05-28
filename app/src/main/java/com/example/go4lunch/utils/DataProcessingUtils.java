@@ -152,7 +152,6 @@ public class DataProcessingUtils {
         return openingInformation;
     }
 
-
     public static List<RestaurantWithDistance> updateRestaurantsListWithDistances(List<Restaurant> restaurantsList, LatLng home) {
         List<RestaurantWithDistance> restaurants = new ArrayList();
         for (Restaurant restaurant : restaurantsList) {
@@ -169,13 +168,14 @@ public class DataProcessingUtils {
         return restaurants;
     }
 
-    public static LatLngBounds calculateBounds(LatLng home, int radius) {
-        /** Distances in meters / Angles in radians */
+    /*  // TODO : To be deleted
+    public static LatLngBounds calculateBoundsOld(LatLng home, int radius) {
+        //** Distances in meters / Angles in radians //
         double earthRadius = 6371e3;
         double earthCircle = 2 * Math.PI * earthRadius;
         double latHome = home.latitude;
         double lngHome = home.longitude;
-        double latDegreeInMeters = 2 * Math.PI * earthRadius / 180;
+        double latDegreeInMeters = 1 * Math.PI * earthRadius / 180;
         double lngDegreeInMeters = 2 * Math.PI * earthRadius / 360;
         double angle = Math.PI / 4;
         double curveCoef = (earthCircle / 2 * angle) / (2 * earthRadius * Math.sin(angle / 2)) / Math.PI;
@@ -191,18 +191,25 @@ public class DataProcessingUtils {
 
         return new LatLngBounds(sw, ne);
     }
+    */
 
+    public static LatLngBounds calculateBounds(LatLng home, int radius) {
+        /** Distances in meters / Headings in degrees */
+        double distanceToCorner = radius * Math.sqrt(2);
+        LatLng sw = SphericalUtil.computeOffset(home, distanceToCorner, 225);   // 5*PI/4
+        LatLng ne = SphericalUtil.computeOffset(home, distanceToCorner, 45);    // PI/4
+
+        return new LatLngBounds(sw, ne);
+    }
 
     public static void sortByDistanceAndName (List<RestaurantWithDistance> restaurantsWithDistance) {
         Collections.sort(restaurantsWithDistance, RestaurantWithDistance.comparatorName);
         Collections.sort(restaurantsWithDistance, RestaurantWithDistance.comparatorDistance);
     }
 
-
     public static void sortByName(List<User> workmatesList) {
         Collections.sort(workmatesList, User.comparatorName);
     }
-
 
     public static void sortByAscendingOpeningTime(List<Period> periods) {
         // Using Comparator
@@ -212,7 +219,6 @@ public class DataProcessingUtils {
         // Or without using Comparator
         // periods.sort((o1, o2) -> o1.getOpen().getTime().compareTo(o2.getOpen().getTime()));
     }
-
 
     public static void sortByDescendingOpeningTime(List<Period> periods) {
         // Using Comparator

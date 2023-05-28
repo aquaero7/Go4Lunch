@@ -26,7 +26,7 @@ import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
-import com.example.go4lunch.utils.EventListener;
+import com.example.go4lunch.utilsforviews.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.google.android.gms.common.api.Status;

@@ -10,7 +10,7 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
-import com.example.go4lunch.utils.EventButtonClick;
+import com.example.go4lunch.utilsforviews.EventButtonClick;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Objects;
