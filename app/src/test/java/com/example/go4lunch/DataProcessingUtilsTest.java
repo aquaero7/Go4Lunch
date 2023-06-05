@@ -256,7 +256,6 @@ public class DataProcessingUtilsTest {
 
 
         /** Test opening information (openingInformation object is null) */
-        // TODO for line 149 covering
         String openingInformationOpHoNull = DataProcessingUtils.getOpeningInformation(testRestaurantsWithDistanceOpHoNull.get(0));
         // Test verification
         assertEquals("Wrong information 000", UNK, openingInformationOpHoNull);

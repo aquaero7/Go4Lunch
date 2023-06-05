@@ -2,8 +2,13 @@ package com.example.go4lunch;
 
 import static org.junit.Assert.assertEquals;
 
+import com.example.go4lunch.activity.MainActivity;
+import com.example.go4lunch.fragment.SettingsFragment;
+import com.example.go4lunch.fragment.WorkmatesFragment;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
+import com.example.go4lunch.utilsforviews.EventButtonClick;
+import com.example.go4lunch.utilsforviews.EventListener;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,6 +22,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
+
+import android.view.View;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -233,9 +240,6 @@ public class _ExampleMockitoTest {
         }
         //
     }
-
-
-
 
 
 }
