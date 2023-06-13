@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.app.Activity;
@@ -39,6 +40,10 @@ import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utilsforviews.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
+import com.example.go4lunch.viewmodel.LocationViewModel;
+import com.example.go4lunch.viewmodel.RestaurantViewModel;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -74,6 +79,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     private final UserManager userManager = UserManager.getInstance();
     private final LikedRestaurantManager likedRestaurantManager = LikedRestaurantManager.getInstance();
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private LocationViewModel locationViewModel;
+    private RestaurantViewModel restaurantViewModel;
 
 
     @Override
@@ -102,6 +110,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         searchView = binding.includedToolbar.searchView;
         this.configureSearchViewListener(searchView);
 
+        // Init data
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        this.initLocationViewModel();
+        this.initRestaurantViewModel();
+
     }
 
     @Override
@@ -117,6 +130,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         } else {
             view.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void initLocationViewModel() {
+        locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
+        locationViewModel.fetchLocation(this);
+    }
+    //
+
+    private void initRestaurantViewModel() {
+        restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
+        restaurantViewModel.fetchRestaurants(this, getString(R.string.MAPS_API_KEY));
     }
 
 

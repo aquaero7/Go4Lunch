@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,10 +26,10 @@ import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utilsforviews.EventListener;
-import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utilsforviews.ItemClickSupport;
-import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.view.ListViewAdapter;
+import com.example.go4lunch.viewmodel.LocationViewModel;
+import com.example.go4lunch.viewmodel.RestaurantViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -45,11 +46,13 @@ public class ListViewFragment extends Fragment {
 
     // private FusedLocationProviderClient fusedLocationProviderClient;
     private LatLng home;
-    private List<Restaurant> restaurantsList;
-    private List<RestaurantWithDistance> restaurantsListWithDistances;
+    private List<Restaurant> restaurantsList = new ArrayList<>();
+    private List<RestaurantWithDistance> restaurantsListWithDistances = new ArrayList<>();
     private List<RestaurantWithDistance> filteredRestaurantsListWithDistances = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsListToDisplay = new ArrayList<>();
     private boolean filterIsOn = false;
+    private LocationViewModel locationViewModel;
+    private RestaurantViewModel restaurantViewModel;
 
     private EventListener eventListener;
 
@@ -79,6 +82,14 @@ public class ListViewFragment extends Fragment {
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
+        // Initialize ViewModels
+        locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
+        restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+
+        // Initialize RecyclerView
+        configureRecyclerView();
+        configureOnClickRecyclerView();
+
         return binding.getRoot();
     }
 
@@ -99,7 +110,9 @@ public class ListViewFragment extends Fragment {
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.listView_toolbar_title);
         // Getting restaurants list from Firestore and configure RecyclerView
-        getRestaurantsListAndConfigureRecyclerView();
+        // getRestaurantsListAndConfigureRecyclerView();    // TODO : Test MVVM
+        // Update data
+        updateData();   // TODO : Test MVVM
     }
 
     /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
@@ -146,6 +159,7 @@ public class ListViewFragment extends Fragment {
                 });
     }
 
+    /*  // TODO : Test MVVM
     private void getRestaurantsListAndConfigureRecyclerView() {
         home = MapsApisUtils.getHome();
         restaurantsList = FirestoreUtils.getRestaurantsList();
@@ -155,6 +169,27 @@ public class ListViewFragment extends Fragment {
         if (!filterIsOn) restaurantsListToDisplay.addAll(restaurantsListWithDistances);
         configureRecyclerView();
         configureOnClickRecyclerView();
+    }
+    */
+    // TODO : Test MVVM
+    private void updateData() {
+        // Initialize location data
+        locationViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), latLng -> {
+            home = latLng;
+        });
+        // Initialize restaurants data
+        restaurantViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), restaurants -> {
+            restaurantsList.clear();
+            restaurantsList.addAll(restaurants);
+            restaurantsListWithDistances.clear();
+            restaurantsListWithDistances = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
+            DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistances);
+            if (!filterIsOn) {
+                restaurantsListToDisplay.clear();
+                restaurantsListToDisplay.addAll(restaurantsListWithDistances);
+                mRecyclerView.getAdapter().notifyDataSetChanged();
+            }
+        });
     }
 
     private void launchDetailRestaurantActivity(RestaurantWithDistance restaurantWithDistance) {

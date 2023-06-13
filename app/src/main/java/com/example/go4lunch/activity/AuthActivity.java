@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.app.Activity;
@@ -26,6 +27,7 @@ import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
+import com.example.go4lunch.viewmodel.RestaurantViewModel;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -54,10 +56,9 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     private ProgressBar progressBar;
     private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private ActivityResultLauncher<String[]> requestPermissionsLauncher;
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    // private FusedLocationProviderClient fusedLocationProviderClient; // TODO : Test MVVM
     boolean locationPermissionsGranted;
-    private LatLng home;
-    boolean taskCompleted;
+    // private LatLng home; // TODO : Test MVVM
 
     @Override
     ActivityAuthBinding getViewBinding() {
@@ -73,7 +74,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         setupListeners();
 
         // Create a new FusedLocationProviderClient.
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        // fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this); // TODO : Test MVVM
+
         // Check permissions and get device location
         checkPermissions();
     }
@@ -84,8 +86,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         updateLoginButton();
     }
 
-
-    @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
+    /*  // TODO : Test MVVM
+    @SuppressWarnings("MissingPermission")  // Permissions already checked in the onCreate method
     public void getDataFromApi() {
         try {
             Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
@@ -100,9 +102,9 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                         Snackbar.make(binding.getRoot(), getString(R.string.info_location_provided), Snackbar.LENGTH_LONG).show();
                         // Initialize home
                         home = new LatLng(latitude, longitude);
-                        /** Initialize home in MapsApisUtils to make it available for ListViewFragment */
+                        // Initialize home in MapsApisUtils to make it available for ListViewFragment //
                         MapsApisUtils.setHome(home);
-                        /** Get nearby restaurants list from API to initialize database */
+                        // Get nearby restaurants list from API to initialize database //
                         List<Restaurant> nearbyRestaurantsList = MapsApisUtils
                                 .getRestaurantsFromApi(this, home, getString(R.string.MAPS_API_KEY));
                     } else {
@@ -119,7 +121,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         }
     }
 
-    @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
+    @SuppressWarnings("MissingPermission")  // Permissions already checked in the onCreate method
     private void getUpdatedDataFromApi() {
         // Setup parameters of location request
         LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500).build();
@@ -139,9 +141,9 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                         Snackbar.make(binding.getRoot(), getString(R.string.info_location_updated), Snackbar.LENGTH_LONG).show();
                         // Initialize home
                         home = new LatLng(latitude, longitude);
-                        /** Initialize home in MapsApisUtils to make it available for ListViewFragment */
+                        // Initialize home in MapsApisUtils to make it available for ListViewFragment //
                         MapsApisUtils.setHome(home);
-                        /** Get nearby restaurants list from API to initialize database */
+                        // Get nearby restaurants list from API to initialize database //
                         List<Restaurant> nearbyRestaurantsList = MapsApisUtils
                                 .getRestaurantsFromApi(getApplicationContext(), home, getString(R.string.MAPS_API_KEY));
                     }
@@ -151,6 +153,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
     }
+    */
 
     private void checkPermissions() {
         // This is the result of the user answer to permissions request
@@ -162,12 +165,12 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 /** Fine location permission granted */
                 Log.w("ActivityResultLauncher", "Fine location permission was granted by user");
                 locationPermissionsGranted = true;
-                getDataFromApi();
+                // getDataFromApi();    // TODO : Test MVVM
             } else if (coarseLocationGranted != null && coarseLocationGranted) {
                 /** Coarse location permission granted */
                 Log.w("ActivityResultLauncher", "Only coarse location permission was granted by user");
                 locationPermissionsGranted = true;
-                getDataFromApi();
+                // getDataFromApi();    // TODO : Test MVVM
             } else {
                 /** No location permission granted */
                 Log.w("ActivityResultLauncher", "No location permission was granted by user");
@@ -189,7 +192,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
             /** Permissions granted */
             Log.w("checkPermissions", "Permissions granted");
             locationPermissionsGranted = true;
-            getDataFromApi();
+            // getDataFromApi();    // TODO : Test MVVM
             /** Initialize permissions in Utils to make them available for fragments */
             MapsApisUtils.setPermissions(locationPermissionsGranted);
         }
@@ -379,7 +382,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                     String notificationsPrefs = user.getNotificationsPrefs();
 
                     // Update currentUser in FirestoreUtils
-                    FirestoreUtils.setCurrentUser(new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate, searchRadiusPrefs, notificationsPrefs));
+                    FirestoreUtils.setCurrentUser(new User(uId, uName, uEmail, uUrlPicture, selectionId,
+                            selectionDate, searchRadiusPrefs, notificationsPrefs));
                     // Call step 2/4: Update current user in FirestoreUtils
                     updateRestaurantsListInFirestoreUtils();
                 })
@@ -403,7 +407,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
                     // Update restaurantsList in FirestoreUtils
                     FirestoreUtils.setRestaurantsList(restaurantsList);
-                    // Call step 3/4: Update restaurants list in FirestoreUtils
+                    // Call step 3/4: Update workmates list in FirestoreUtils
                     updateWorkmatesListInFirestoreUtils();
                 }
             } else {

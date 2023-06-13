@@ -59,18 +59,13 @@ public class MapsApisUtils extends FragmentActivity {
         locationPermissionsGranted = granted;
     }
 
+    /*  // TODO : Test MVVM
     public static void setHome(LatLng latLng) {
         home = latLng;
     }
-
-    /* // TODO : To be deleted
-    public static void setRestaurantsList(List<Restaurant> restaurants) {
-        restaurantsList = restaurants;
-    }
     */
 
-
-    // Get restaurants list from API
+    /* Get restaurants list from API    // TODO : Test MVVM
     public static List<Restaurant> getRestaurantsFromApi(Context context, LatLng latLng, String apiKey) {
         home = latLng;
         // Call Place Nearby Search API
@@ -103,8 +98,9 @@ public class MapsApisUtils extends FragmentActivity {
         });
         return restaurantsList;
     }
+    */
 
-
+    /*  // TODO : Test MVVM
     private static void getRestaurantDetailsFromApi(Restaurant nearbyRestaurant, LatLng latLng, String apiKey, Context context) {
 
         String rId = nearbyRestaurant.getRid();
@@ -130,11 +126,11 @@ public class MapsApisUtils extends FragmentActivity {
                 String website = restaurantDetails.getWebsite();
                 OpeningHours openingHours = restaurantDetails.getOpeningHours();    // Can be commented to make openingHours come from nearby api
 
-                /** Add restaurant to current restaurants list */
+                // Add restaurant to current restaurants list //
                 restaurantsList.add(new Restaurant(rId, name, photos, address, rating, openingHours,
                         phoneNumber, website, geometry));
 
-                /** Create or update restaurant in Firebase */
+                // Create or update restaurant in Firebase //
                 RestaurantManager.getInstance().createRestaurant(rId, name, photos, address, rating,
                         openingHours, phoneNumber, website, geometry);
             }
@@ -146,6 +142,7 @@ public class MapsApisUtils extends FragmentActivity {
             }
         });
     }
+    */
 
 
     public static void initializeAutocompleteSupportFragment(AutocompleteSupportFragment autocompleteFragment) {
