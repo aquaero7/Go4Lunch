@@ -46,7 +46,7 @@ public class RestaurantRepository {
     }
 
     // Get the Collection Reference
-    private static CollectionReference getRestaurantsCollection() {
+    private CollectionReference getRestaurantsCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_RESTAURANTS);
     }
 
@@ -63,12 +63,12 @@ public class RestaurantRepository {
     }
 
     // Get restaurants list from Firestore
-    public static void getRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
+    public void getRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
         getRestaurantsCollection().get().addOnCompleteListener(listener);
     }
 
     // Get restaurant data from Firestore
-    public static Task<DocumentSnapshot> getRestaurantData(String id) {
+    public Task<DocumentSnapshot> getRestaurantData(String id) {
         if(id != null){
             return getRestaurantsCollection().document(id).get();
         } else {
@@ -77,7 +77,7 @@ public class RestaurantRepository {
     }
 
     /* Clear the restaurants collection
-    public static void clearRestaurantsCollection() {
+    public void clearRestaurantsCollection() {
         getRestaurantsList(task -> {
             if (task.isSuccessful()) {
                 // Get and delete each document in restaurants collection

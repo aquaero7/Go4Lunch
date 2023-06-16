@@ -35,14 +35,13 @@ import retrofit2.Response;
 
 public class RestaurantViewModel extends ViewModel {
 
-    private RestaurantRepository mRestaurantRepository;
     private MutableLiveData<List<Restaurant>> mMutableLiveData;
     private LatLng home;
     private List<Restaurant> restaurantsList = new ArrayList<>();
     private List<Restaurant> nearbyRestaurantsList = new ArrayList<>();
 
     public RestaurantViewModel() {
-        mRestaurantRepository = new RestaurantRepository();
+        // mRestaurantRepository = new RestaurantRepository();
         mMutableLiveData = new MutableLiveData<>();
     }
 
@@ -92,7 +91,7 @@ public class RestaurantViewModel extends ViewModel {
         });
     }
 
-    public List<Restaurant> getRestaurantsFromApi(Context context, LatLng home, String apiKey) {
+    private List<Restaurant> getRestaurantsFromApi(Context context, LatLng home, String apiKey) {
         // Call Place Nearby Search API
         Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient()
                 .getPlaces("restaurant", home.latitude + "," + home.longitude, Integer.parseInt(MapsApisUtils.getSearchRadius())*1000, apiKey);

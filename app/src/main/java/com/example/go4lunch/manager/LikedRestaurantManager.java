@@ -35,13 +35,13 @@ public class LikedRestaurantManager {
     }
 
     // Get the liked restaurants list from Firestore
-    public static void getLikedRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
-        LikedRestaurantRepository.getLikedRestaurantsList(listener);
+    public void getLikedRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
+        likedRestaurantRepository.getLikedRestaurantsList(listener);
     }
 
     /* Get the liked restaurant data from Firestore and cast it to a LikedRestaurant model Object
-    public static Task<LikedRestaurant> getLikedRestaurantData(String id) {
-        return LikedRestaurantRepository.getLikedRestaurantData(id)
+    public Task<LikedRestaurant> getLikedRestaurantData(String id) {
+        return likedRestaurantRepository.getLikedRestaurantData(id)
                 .continueWith(task -> task.getResult().toObject(LikedRestaurant.class));
     }
     */
@@ -52,8 +52,8 @@ public class LikedRestaurantManager {
     }
 
     /* Clear the liked restaurants collection
-    public static void clearLikedRestaurantsCollection() {
-        LikedRestaurantRepository.clearLikedRestaurantsCollection();
+    public void clearLikedRestaurantsCollection() {
+        likedRestaurantRepository.clearLikedRestaurantsCollection();
     }
     */
 

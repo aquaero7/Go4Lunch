@@ -31,7 +31,7 @@ public class UserRepository {
     private static final String SEARCH_RADIUS_PREFS = "searchRadiusPrefs";
     private static final String NOTIFICATIONS_PREFS = "notificationsPrefs";
 
-    private UserRepository() { }
+    public UserRepository() { }
 
     public static UserRepository getInstance() {
         UserRepository result = instance;
@@ -47,7 +47,7 @@ public class UserRepository {
     }
 
     // Get the Collection Reference
-    public static CollectionReference getUsersCollection(){
+    public CollectionReference getUsersCollection(){
         return FirebaseFirestore.getInstance().collection(COLLECTION_USERS);
     }
 
@@ -102,7 +102,7 @@ public class UserRepository {
     */
 
     // Get restaurants list from Firestore
-    public static void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
+    public void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
         getUsersCollection().get().addOnCompleteListener(listener);
     }
 

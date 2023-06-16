@@ -35,7 +35,7 @@ public class LikedRestaurantRepository {
     }
 
     // Get the Collection Reference
-    private static CollectionReference getLikedRestaurantsCollection() {
+    private CollectionReference getLikedRestaurantsCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_LIKED_RESTAURANTS);
     }
 
@@ -46,12 +46,12 @@ public class LikedRestaurantRepository {
     }
 
     // Get liked restaurants list from Firestore
-    public static void getLikedRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
+    public void getLikedRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
         getLikedRestaurantsCollection().get().addOnCompleteListener(listener);
     }
 
     /* Get liked restaurant data from Firestore
-    public static Task<DocumentSnapshot> getLikedRestaurantData(String id) {
+    public Task<DocumentSnapshot> getLikedRestaurantData(String id) {
         if(id != null) {
             return getLikedRestaurantsCollection().document(id).get();
         } else {
@@ -66,7 +66,7 @@ public class LikedRestaurantRepository {
     }
 
     /* Clear the liked restaurants collection
-    public static void clearLikedRestaurantsCollection() {
+    public void clearLikedRestaurantsCollection() {
         getLikedRestaurantsList(task -> {
             if (task.isSuccessful()) {
                 // Get and delete each document in liked restaurants collection

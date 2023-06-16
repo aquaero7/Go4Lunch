@@ -333,7 +333,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 if (user != null) {
                     // If the current user already exist in Firestore, we update his data
                     Log.w("AuthActivity", "User already exists and will be updated");
-                    UserManager.getUsersCollection().document(uid)
+                    userManager.getUsersCollection().document(uid)
                             .update(USER_ID, uid, USER_NAME, username, USER_EMAIL, userEmail,
                                     USER_URL_PICTURE, userUrlPicture)
                             .addOnSuccessListener(command -> {
@@ -347,7 +347,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                     // If the current user doesn't exist in Firestore, we create this user
                     Log.w("AuthActivity", "User doesn't exist and will be created");
                     User userToCreate = new User(uid, username, userEmail, userUrlPicture);
-                    UserManager.getUsersCollection().document(uid)
+                    userManager.getUsersCollection().document(uid)
                             .set(userToCreate)
                             .addOnSuccessListener(command -> {
                                 Log.w("AuthActivity","Creation successful");
@@ -394,7 +394,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
     private void updateRestaurantsListInFirestoreUtils() {
         // Get restaurants list from database document
-        RestaurantManager.getRestaurantsList(task -> {
+        RestaurantManager.getInstance().getRestaurantsList(task -> {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
                     // Get restaurants list
@@ -418,7 +418,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
     private void updateWorkmatesListInFirestoreUtils() {
         // Get workmates list from database document
-        UserManager.getUsersList(task -> {
+        UserManager.getInstance().getUsersList(task -> {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
                     // Get users list
@@ -442,7 +442,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
     private void updateLikedRestaurantsListInFirestoreUtils() {
         // Get liked restaurants list from database document
-        LikedRestaurantManager.getLikedRestaurantsList(task -> {
+        LikedRestaurantManager.getInstance().getLikedRestaurantsList(task -> {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
                     // Get liked restaurants list

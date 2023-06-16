@@ -31,8 +31,8 @@ public class UserManager {
         }
     }
 
-    public static CollectionReference getUsersCollection() {
-        return UserRepository.getUsersCollection();
+    public CollectionReference getUsersCollection() {
+        return userRepository.getUsersCollection();
     }
 
     public FirebaseUser getCurrentUser(){
@@ -52,8 +52,8 @@ public class UserManager {
     */
 
     // Get the users list from Firestore
-    public static void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
-        UserRepository.getUsersList(listener);
+    public void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
+        userRepository.getUsersList(listener);
     }
 
     // Get the current user from Firestore and cast it to a User model Object

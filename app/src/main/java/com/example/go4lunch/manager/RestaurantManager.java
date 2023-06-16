@@ -44,19 +44,19 @@ public class RestaurantManager {
     }
 
     // Get the restaurants list from Firestore
-    public static void getRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
-        RestaurantRepository.getRestaurantsList(listener);
+    public void getRestaurantsList(OnCompleteListener<QuerySnapshot> listener) {
+        restaurantRepository.getRestaurantsList(listener);
     }
 
     // Get the restaurant data from Firestore and cast it to a Restaurant model Object
-    public static Task<Restaurant> getRestaurantData(String id){
-        return RestaurantRepository.getRestaurantData(id)
+    public Task<Restaurant> getRestaurantData(String id){
+        return restaurantRepository.getRestaurantData(id)
                 .continueWith(task -> task.getResult().toObject(Restaurant.class));
     }
 
     /* Clear the restaurants collection
-    public static void clearRestaurantsCollection() {
-        RestaurantRepository.clearRestaurantsCollection();
+    public void clearRestaurantsCollection() {
+        restaurantRepository.clearRestaurantsCollection();
     }
     */
 

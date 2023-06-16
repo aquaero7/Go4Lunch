@@ -43,7 +43,7 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
         boolean isSelected = workmate.getSelectionId() != null && currentDate.equals(workmate.getSelectionDate());
         if (isSelected) {
             // Get selected restaurant name from database
-            RestaurantManager.getRestaurantData(workmate.getSelectionId())
+            RestaurantManager.getInstance().getRestaurantData(workmate.getSelectionId())
                     .addOnSuccessListener(restaurant -> {
                         mText = workmate.getUsername() + CHOICE_TEXT + "\"" + restaurant.getName() + "\"";
                         textView.setText(mText);

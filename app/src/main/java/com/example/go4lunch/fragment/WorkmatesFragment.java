@@ -6,6 +6,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,9 +32,13 @@ import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utilsforviews.ItemClickSupport;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.view.WorkmateAdapter;
+import com.example.go4lunch.viewmodel.LocationViewModel;
+import com.example.go4lunch.viewmodel.RestaurantViewModel;
+import com.example.go4lunch.viewmodel.UserViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WorkmatesFragment extends Fragment {
@@ -42,8 +48,13 @@ public class WorkmatesFragment extends Fragment {
     // Declare RecyclerView
     private RecyclerView mRecyclerView;
 
-    private List<User> workmatesList;
-    // private User workmateToAdd; // TODO : To be deleted
+    private List<User> workmatesList = new ArrayList<>();
+    private List<Restaurant> restaurantsList = new ArrayList<>();
+
+    private UserViewModel userViewModel;
+    private LocationViewModel locationViewModel;
+    private RestaurantViewModel restaurantViewModel;
+    private LatLng home;
 
     private EventListener eventListener;
 
@@ -70,6 +81,18 @@ public class WorkmatesFragment extends Fragment {
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
+        // Initialize ViewModels    // TODO : Test MVVM
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        // userViewModel.fetchWorkmates();  // TODO : To be deleted
+        locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
+        // locationViewModel.fetchLocation(requireActivity());  // TODO : To be deleted
+        restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+        // restaurantViewModel.fetchRestaurants(requireActivity(), getString(R.string.MAPS_API_KEY));   // TODO : To be deleted
+
+        // Initialize RecyclerView  // TODO : Test MVVM
+        configureRecyclerView();
+        configureOnClickRecyclerView();
+
         return binding.getRoot();
     }
 
@@ -89,8 +112,10 @@ public class WorkmatesFragment extends Fragment {
         super.onResume();
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.workmates_toolbar_title);
-
-        getWorkmatesListAndConfigureRecyclerView();
+        // Getting workmates list from Firestore and configure RecyclerView
+        // getWorkmatesListAndConfigureRecyclerView(); // TODO : Test MVVM
+        // Update data
+        updateData();   // TODO : Test MVVM
     }
 
     /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
@@ -139,7 +164,11 @@ public class WorkmatesFragment extends Fragment {
                         // If a restaurant is selected, get it from restaurants list and launch detail activity
                         if (rId != null && currentDate.equals(selectionDate)) {
                             RestaurantWithDistance restaurantWithDistance = getSelectedRestaurant(rId);
-                            launchDetailRestaurantActivity(restaurantWithDistance);
+                            if (restaurantWithDistance != null) {
+                                launchDetailRestaurantActivity(restaurantWithDistance);
+                            } else {
+                                Snackbar.make(binding.getRoot(), getString(R.string.error_no_selection), Snackbar.LENGTH_LONG).show();
+                            }
                         } else {
                             Snackbar.make(binding.getRoot(), getString(R.string.error_no_selection), Snackbar.LENGTH_LONG).show();
                         }
@@ -147,6 +176,7 @@ public class WorkmatesFragment extends Fragment {
                 });
     }
 
+    /*  // TODO : Test MVVM
     private void getWorkmatesListAndConfigureRecyclerView() {
         workmatesList = FirestoreUtils.getWorkmatesList();
         // workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();   // TODO : May not keep coherence between fragments
@@ -154,13 +184,31 @@ public class WorkmatesFragment extends Fragment {
         configureRecyclerView();
         configureOnClickRecyclerView();
     }
+    */
+    // TODO : Test MVVM
+    private void updateData() {
+        // Initialize location data
+        locationViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), latLng -> {
+            home = latLng;
+        });
+        // Initialize restaurants data
+        restaurantViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), restaurants -> {
+            restaurantsList.clear();
+            restaurantsList.addAll(restaurants);
+        });
+        // Initialize workmates data
+        userViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), workmates -> {
+            workmatesList.clear();
+            workmatesList.addAll(workmates);
+            DataProcessingUtils.sortByName(workmatesList);
+            mRecyclerView.getAdapter().notifyDataSetChanged();
+        });
+    }
 
     private RestaurantWithDistance getSelectedRestaurant(String rId) {
-        List<Restaurant> restaurants = FirestoreUtils.getRestaurantsList();
         RestaurantWithDistance selectedRestaurant = null;
-        for (Restaurant restaurant : restaurants) {
+        for (Restaurant restaurant : restaurantsList) {
             if (rId.equals(restaurant.getRid())) {
-                LatLng home = MapsApisUtils.getHome();
                 int distance = (home != null) ?
                         DataProcessingUtils.calculateRestaurantDistance(restaurant, home) : 0;
 

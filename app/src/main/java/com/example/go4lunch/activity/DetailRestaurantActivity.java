@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.go4lunch.databinding.ActivityDetailRestaurantBinding;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.example.go4lunch.fragment.DetailRestaurantFragment;
@@ -16,6 +18,7 @@ import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utilsforviews.EventButtonClick;
 import com.example.go4lunch.utils.FirestoreUtils;
+import com.example.go4lunch.viewmodel.UserViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -28,6 +31,8 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
 
     LikedRestaurantManager likedRestaurantManager = LikedRestaurantManager.getInstance();
 
+    UserViewModel userViewModel;
+
 
     @Override
     ActivityDetailRestaurantBinding getViewBinding() {
@@ -38,6 +43,8 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         configureAndShowDetailRestaurantFragment();
+        initViewmodels();
+
     }
 
     // --------------
@@ -84,6 +91,10 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
                     .add(R.id.frameLayoutDetailRestaurant, detailRestaurantFragment)
                     .commit();
         }
+    }
+
+    private void initViewmodels() {
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
     }
 
     private void updateSelectionInDatabase(boolean isSelected, String rId) {

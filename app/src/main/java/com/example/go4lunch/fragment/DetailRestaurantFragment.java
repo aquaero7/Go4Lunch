@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,6 +33,7 @@ import com.example.go4lunch.utilsforviews.EventButtonClick;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utilsforviews.ItemClickSupport;
 import com.example.go4lunch.view.DetailRestaurantWorkmateAdapter;
+import com.example.go4lunch.viewmodel.UserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
@@ -69,8 +71,6 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private boolean isLiked;
     // Declare Workmates-Selectors list
     private List<User> selectorsList;
-    // Declare Workmate-Selector to add to create Workmates-Selectors list
-    // private User selectorToAdd; // TODO : To be deleted
     // Declare liked restaurants list
     private List<LikedRestaurant> likedRestaurantsList;
     // Initialize Google Maps API key
@@ -205,31 +205,6 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                 });
     }
 
-    /*  // Replaced with access from FirestoreUtils
-    private void getSelectorsListAndConfigureRecyclerView() {
-        String restaurantId = restaurant.getRid();
-        selectorsList = new ArrayList<>();
-        UserManager.getUsersList(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult() != null) {
-                    // Check selected restaurant id and date and get users list
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> userData = document.getData(); // Map data for debug.
-                        selectorToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
-                        boolean isSelector = (restaurantId.equals(selectorToAdd.getSelectionId())
-                                        && currentDate.equals(selectorToAdd.getSelectionDate()));
-                        if (isSelector) selectorsList.add(selectorToAdd);
-                    }
-                }
-            } else {
-                Log.w("DetailRestaurantFragment", "Error getting documents: ", task.getException());
-            }
-            configureRecyclerView();
-            configureOnClickRecyclerView();
-        });
-    }
-    */
-
     //
     private void getSelectorsListAndConfigureRecyclerView() {
         String restaurantId = restaurant.getRid();
@@ -271,24 +246,6 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         setupSelectionFab();
         setupLikeButton();
     }
-
-    // TODO : To be deleted
-    /*
-    private void OLD_setupSelectionFab() {
-        // Get current user selected restaurant id from database
-        UserManager.getInstance().getCurrentUserData().addOnSuccessListener(user -> {
-            // Get current user selected restaurant id from database
-            selectionId = user.getSelectionId();
-            selectionDate = user.getSelectionDate();
-            // Get the id of this restaurant
-            String restaurantId = restaurant.getRid();
-            // Update selection status
-            isSelected = (restaurantId.equals(selectionId)) && (currentDate.equals(selectionDate));
-
-            updateSelectionFab();
-        });
-    }
-    */
 
     private void setupSelectionFab() {
         // Get current user selected restaurant id

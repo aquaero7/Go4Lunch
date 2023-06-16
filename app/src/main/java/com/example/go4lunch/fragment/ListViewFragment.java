@@ -44,7 +44,6 @@ public class ListViewFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private ListViewAdapter listViewAdapter;
 
-    // private FusedLocationProviderClient fusedLocationProviderClient;
     private LatLng home;
     private List<Restaurant> restaurantsList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsListWithDistances = new ArrayList<>();
@@ -75,18 +74,17 @@ public class ListViewFragment extends Fragment {
         binding = FragmentListViewBinding.inflate(inflater, container, false);
         mRecyclerView = binding.rvListView;
 
-        // Create a new FusedLocationProviderClient.
-        // fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-
         /** To use if menu is handled in fragment
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
-        // Initialize ViewModels
+        // Initialize ViewModels    // TODO : Test MVVM
         locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
+        // locationViewModel.fetchLocation(requireActivity());  // TODO : To be deleted
         restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+        // restaurantViewModel.fetchRestaurants(requireActivity(), getString(R.string.MAPS_API_KEY));   // TODO : To be deleted
 
-        // Initialize RecyclerView
+        // Initialize RecyclerView  // TODO : Test MVVM
         configureRecyclerView();
         configureOnClickRecyclerView();
 

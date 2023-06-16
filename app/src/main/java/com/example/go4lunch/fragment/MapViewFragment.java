@@ -5,12 +5,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.activity.AuthActivity;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
 import com.example.go4lunch.model.Restaurant;
@@ -36,6 +32,7 @@ import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.viewmodel.LocationViewModel;
 import com.example.go4lunch.viewmodel.RestaurantViewModel;
+import com.example.go4lunch.viewmodel.UserViewModel;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -57,16 +54,16 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
-public class MapViewFragment extends Fragment implements
-        OnMapReadyCallback,
+public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMarkerClickListener,
         OnMapsSdkInitializedCallback {
-
 
     private FragmentMapViewBinding binding;
     private SupportMapFragment mapFragment;
@@ -74,18 +71,17 @@ public class MapViewFragment extends Fragment implements
     private AutocompleteSupportFragment autocompleteFragment;
     private LocationViewModel locationViewModel;
     private RestaurantViewModel restaurantViewModel;
+    private UserViewModel userViewModel;
     private EventListener eventListener;
-
     private boolean locationPermissionsGranted;
     private boolean focusHome;
     private GoogleMap mGoogleMap;
-    private LatLng home;
+    private LatLng home = MapsApisUtils.getDefaultLatLng();
     private PlacesClient placesClient;
-
     private static final int DEFAULT_ZOOM = 17;
     private static final int RESTAURANT_ZOOM = 19;
     private List<Restaurant> restaurantsList = new ArrayList<>();
-    private List<User> workmatesList;
+    private List<User> workmatesList = new ArrayList<>();
     private int selectionsCount;
     private final String currentDate = CalendarUtils.getCurrentDate();
 
@@ -109,10 +105,8 @@ public class MapViewFragment extends Fragment implements
                              @Nullable Bundle savedInstanceState) {
         // Set the layout file as the content view.
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
-
         // Require latest version of map renderer   // Not working : Legacy version is used anyway !
         MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this);
-
         // Initialize SDK Places for Autocomplete API
         Places.initialize(requireContext(), getString(R.string.MAPS_API_KEY));
         // Create a new PlacesClient instance or Autocomplete API
@@ -124,15 +118,12 @@ public class MapViewFragment extends Fragment implements
 
         // Initialize CardView
         autocompleteCardView = binding.includedCardViewAutocomplete.cardViewAutocomplete;
-
         // Initialize AutocompleteSupportFragment
         // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.fragment_autocomplete);
         autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.fragment_autocomplete);
         MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
-
         // Initialize ViewModels
-        locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
-        restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+        initViewModels();
 
         // return rootView;
         return binding.getRoot();
@@ -146,13 +137,11 @@ public class MapViewFragment extends Fragment implements
         // Acquiring the map
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
-
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
         if (context instanceof EventListener) {
             eventListener = (EventListener) context;
         } else {
@@ -166,19 +155,9 @@ public class MapViewFragment extends Fragment implements
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.mapView_toolbar_title);
         // Initialize data
-        initializeData();
+        initData();
         // Display map with or without home focus
         displayMap();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        // Disconnect listener from system updates
-        /** USED WITH SOLUTION 2 */ // if (fusedLocationProviderClient != null && locationCallback != null)
-                                        // fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        /** USED WITH SOLUTION 4 */ // if (mLocationManager != null) mLocationManager.removeUpdates(locationListener);
     }
 
     /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
@@ -220,9 +199,9 @@ public class MapViewFragment extends Fragment implements
          This is where we can add markers or lines, add listeners or move the camera. */
         mGoogleMap = googleMap;
         // Initialize the map
-        initializeMap();
+        initMap();
         // Initialize data
-        initializeData();
+        initData();
         // Display map with or without home focus
         displayMap();
     }
@@ -233,8 +212,7 @@ public class MapViewFragment extends Fragment implements
         focusHome = true;
         mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
         // Refresh and display restaurant list
-        // restaurantsList = FirestoreUtils.getRestaurantsList();   // TODO : Test MVVM
-        initializeData();
+        initData();
         displayRestaurantsOnMap(restaurantsList);
         return false;
     }
@@ -258,7 +236,7 @@ public class MapViewFragment extends Fragment implements
     }
 
     @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
-    private void initializeMap() {
+    private void initMap() {
         // Check permissions
         locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
         if (mGoogleMap != null) {
@@ -276,30 +254,40 @@ public class MapViewFragment extends Fragment implements
         focusHome = true;
     }
 
-    private void initializeData() {
-        // Initialize location data
+    private void initViewModels() {
+        // Initialize location ViewModel
+        locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
+        // Initialize restaurant ViewModel
+        restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+        // Initialize user ViewModel
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+    }
+
+    private void initData() {
+        // Initialize or update location data
         locationViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), latLng -> {
             home = latLng;
         });
-        // Initialize restaurants data
+        // Initialize or update restaurants data
         restaurantViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), restaurants -> {
             restaurantsList.clear();
             restaurantsList.addAll(restaurants);
-            // mRecyclerView.getAdapter().notifyDataSetChanged();
+        });
+        // Initialize or update restaurants data
+        userViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), workmates -> {
+            workmatesList.clear();
+            workmatesList.addAll(workmates);
         });
     }
 
     @SuppressLint("MissingPermission")  // Permissions already checked in AuthActivity
     private void displayMap() {
         if (mGoogleMap != null) {
-            /* If necessary, display again MyLocation button if permissions are granted
-               (sometimes it is and I don't know why) */
+            /* If necessary, displays again MyLocation button if permissions are granted
+               (sometimes it is... and I don't know why) */
             locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
             mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
-            // Get data from API and display map with or without home focus
-            //getDataFromApiAndFocusHome(); // TODO : To be deleted
             // Display restaurants
-            // restaurantsList = FirestoreUtils.getRestaurantsList();   // TODO : Test MVVM
             displayRestaurantsOnMap(restaurantsList);
             // Set Focus to home
             setFocusToHome();
@@ -307,9 +295,6 @@ public class MapViewFragment extends Fragment implements
     }
 
     private void setFocusToHome() {
-        // home = MapsApisUtils.getHome();  // TODO : Test MVVM
-        // home = restaurantViewModel.getHome();
-
         // Set camera position to home if requested
         if (focusHome) {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
@@ -317,93 +302,6 @@ public class MapViewFragment extends Fragment implements
             focusHome = false;
         }
     }
-
-    /*  // TODO : To be deleted
-    @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
-    public void getDataFromApiAndFocusHome() {
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        try {
-            Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-            // Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);
-            locationResult.addOnCompleteListener(requireActivity(), task -> {
-                if (task.isSuccessful()) {
-                    Location lastKnownLocation = task.getResult();
-                    if (lastKnownLocation != null) {
-                        // Get the current location...
-                        double latitude = lastKnownLocation.getLatitude();
-                        double longitude = lastKnownLocation.getLongitude();
-                        // Initialize home
-                        home = new LatLng(latitude, longitude);
-                        // Initialize home in MapsApisUtils to make it available for ListViewFragment
-                        MapsApisUtils.setHome(home);
-                        // Set camera position to home if requested
-                        if (focusHome) {
-                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
-                            // No more home focus after first display (except if MyLocationButton is triggered)
-                            focusHome = false;
-                        }
-                        // Get nearby restaurants list from API
-                        restaurantsList = MapsApisUtils.getRestaurantsFromApi(requireActivity(), home, getString(R.string.MAPS_API_KEY));
-                        // Reinitialize restaurantList in FirestoreUtils to make it available for ListViewFragment
-                        restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
-                        // Display restaurants on map
-                        displayRestaurantsOnMap(restaurantsList);
-                    } else {
-                        getUpdatedDataFromApiAndFocusHome();
-                    }
-                }
-                else {
-                    Log.w("getDeviceLocation", "Exception: %s", task.getException());
-                }
-            });
-
-        } catch (SecurityException e) {
-            Log.w("Exception: %s", e.getMessage(), e);
-        }
-    }
-
-    @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
-    private void getUpdatedDataFromApiAndFocusHome() {
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        // Setup parameters of location request
-        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500).build();
-        // Create callback to handle location result
-        LocationCallback locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                for (Location location : locationResult.getLocations()) {
-                    if (location != null) {
-                        // Get the current location...
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        // ...and stop location updates as soon of current location is got
-                        fusedLocationProviderClient.removeLocationUpdates(this);
-                        Snackbar.make(binding.getRoot(), getString(R.string.info_location_updated), Snackbar.LENGTH_LONG).show();
-                        // Initialize home
-                        home = new LatLng(latitude, longitude);
-                        // Initialize home in MapsApisUtils to make it available for ListViewFragment
-                        MapsApisUtils.setHome(home);
-                        // Set camera position to home if requested
-                        if (focusHome) {
-                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
-                            // No more home focus after first display (except if MyLocationButton is triggered)
-                            focusHome = false;
-                        }
-                        // Get nearby restaurants list from API
-                        restaurantsList = MapsApisUtils.getRestaurantsFromApi(requireActivity(), home, getString(R.string.MAPS_API_KEY));
-                        // Reinitialize restaurantList in FirestoreUtils to make it available for ListViewFragment
-                        restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
-                        // Display restaurants on map
-                        displayRestaurantsOnMap(restaurantsList);
-                    }
-                }
-            }
-        };
-
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-    }
-    */
 
     @SuppressLint("PotentialBehaviorOverride")  // This remark concerns OnMarkerClickListener below
     private void displayRestaurantsOnMap(List<Restaurant> restaurants) {
@@ -432,8 +330,7 @@ public class MapViewFragment extends Fragment implements
     }
 
     private void getSelectionsCountAndUpdateMarkerIcon(String rId, Marker marker) {
-        workmatesList = FirestoreUtils.getWorkmatesList();
-        // workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();   // TODO : May not keep coherence between fragments
+        // workmatesList = FirestoreUtils.getWorkmatesList();   // TODO : Test MVVM
         selectionsCount = 0;
         for (User workmate : workmatesList) {
             // For each workmate, check selected restaurant and increase selections count if matches with restaurant id
@@ -445,7 +342,7 @@ public class MapViewFragment extends Fragment implements
         marker.setIcon(BitmapDescriptorFactory.defaultMarker(markerColor));
     }
 
-    // Autocomplete launched from activity
+    // Autocomplete is launched from activity
     public void launchAutocomplete(String text) {
         autocompleteCardView.setVisibility(View.VISIBLE);
         configureAutocompleteSupportFragment(text);
@@ -480,7 +377,7 @@ public class MapViewFragment extends Fragment implements
             @Override
             public void onError(@NonNull Status status) {
                 // TODO: Handle the error.
-                Log.i("MainActivity", "An error occurred: " + status);
+                Log.i("MapViewFragment", "An error occurred: " + status);
                 autocompleteFragment.setText("");
                 autocompleteCardView.setVisibility(View.GONE);
             }

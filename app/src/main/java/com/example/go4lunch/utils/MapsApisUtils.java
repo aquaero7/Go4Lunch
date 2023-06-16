@@ -47,6 +47,10 @@ public class MapsApisUtils extends FragmentActivity {
         return locationPermissionsGranted;
     }
 
+    public static LatLng getDefaultLatLng() {
+        return new LatLng(DEF_LATITUDE, DEF_LONGITUDE);
+    }
+
     public static LatLng getHome() {
         return home;
     }
