@@ -120,7 +120,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     protected void onResume() {
         super.onResume();
         // Update data
-        updateData();
+        this.updateData();
     }
 
     @Override

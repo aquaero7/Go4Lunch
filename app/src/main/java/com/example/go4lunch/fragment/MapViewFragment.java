@@ -124,7 +124,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
         // Initialize ViewModels
         initViewModels();
-
         // return rootView;
         return binding.getRoot();
     }
@@ -154,8 +153,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         super.onResume();
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.mapView_toolbar_title);
-        // Initialize data
-        initData();
         // Display map with or without home focus
         displayMap();
     }
@@ -200,8 +197,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         mGoogleMap = googleMap;
         // Initialize the map
         initMap();
-        // Initialize data
-        initData();
         // Display map with or without home focus
         displayMap();
     }
@@ -211,9 +206,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         // Request for home focus and default zoom
         focusHome = true;
         mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
-        // Refresh and display restaurant list
-        initData();
-        displayRestaurantsOnMap(restaurantsList);
+        // Display restaurant list
+        displayRestaurantsOnMap();
         return false;
     }
 
@@ -263,6 +257,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
     }
 
+    /*  TODO : To be deleted
     private void initData() {
         // Initialize or update location data
         locationViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), latLng -> {
@@ -279,6 +274,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
             workmatesList.addAll(workmates);
         });
     }
+    */
 
     @SuppressLint("MissingPermission")  // Permissions already checked in AuthActivity
     private void displayMap() {
@@ -288,13 +284,17 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
             locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
             mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
             // Display restaurants
-            displayRestaurantsOnMap(restaurantsList);
+            displayRestaurantsOnMap();
             // Set Focus to home
             setFocusToHome();
         }
     }
 
     private void setFocusToHome() {
+        // Initialize or update location data
+        locationViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), latLng -> {
+            home = latLng;
+        });
         // Set camera position to home if requested
         if (focusHome) {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
@@ -304,21 +304,28 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @SuppressLint("PotentialBehaviorOverride")  // This remark concerns OnMarkerClickListener below
-    private void displayRestaurantsOnMap(List<Restaurant> restaurants) {
-        if (restaurants != null) {
-            for (Restaurant restaurant : restaurants) {
-                double rLat = restaurant.getGeometry().getLocation().getLat();
-                double rLng = restaurant.getGeometry().getLocation().getLng();
-                String rId = restaurant.getRid();
+    private void displayRestaurantsOnMap() {
+        // Initialize or update restaurants data
+        restaurantViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), restaurants -> {
+            restaurantsList.clear();
+            restaurantsList.addAll(restaurants);
+            // Display restaurants on map
+            if (restaurants != null) {
+                for (Restaurant restaurant : restaurants) {
+                    double rLat = restaurant.getGeometry().getLocation().getLat();
+                    double rLng = restaurant.getGeometry().getLocation().getLng();
+                    String rId = restaurant.getRid();
 
-                Marker marker = mGoogleMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(rLat, rLng))
-                        .title(restaurant.getName()));
-                marker.setTag(rId);
-                getSelectionsCountAndUpdateMarkerIcon(rId, marker);
+                    Marker marker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(rLat, rLng))
+                            .title(restaurant.getName()));
+                    marker.setTag(rId);
+                    getSelectionsCountAndUpdateMarkerIcon(rId, marker);
+                }
+                // Add listener on restaurants markers
+                mGoogleMap.setOnMarkerClickListener(this);
             }
-            mGoogleMap.setOnMarkerClickListener(this);
-        }
+        });
     }
 
     private void launchDetailRestaurantActivity(RestaurantWithDistance restaurant) {
@@ -330,16 +337,21 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void getSelectionsCountAndUpdateMarkerIcon(String rId, Marker marker) {
-        // workmatesList = FirestoreUtils.getWorkmatesList();   // TODO : Test MVVM
-        selectionsCount = 0;
-        for (User workmate : workmatesList) {
-            // For each workmate, check selected restaurant and increase selections count if matches with restaurant id
-            boolean isSelected = rId.equals(workmate.getSelectionId()) && currentDate.equals(workmate.getSelectionDate());
-            if (isSelected) selectionsCount += 1;
-        }
-        // Update marker color
-        float markerColor = (selectionsCount > 0) ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_RED;
-        marker.setIcon(BitmapDescriptorFactory.defaultMarker(markerColor));
+        // Initialize or update restaurants data
+        userViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), workmates -> {
+            workmatesList.clear();
+            workmatesList.addAll(workmates);
+            // Count selections
+            selectionsCount = 0;
+            for (User workmate : workmatesList) {
+                // For each workmate, check selected restaurant and increase selections count if matches with restaurant id
+                boolean isSelected = rId.equals(workmate.getSelectionId()) && currentDate.equals(workmate.getSelectionDate());
+                if (isSelected) selectionsCount += 1;
+            }
+            // Update marker color
+            float markerColor = (selectionsCount > 0) ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_RED;
+            marker.setIcon(BitmapDescriptorFactory.defaultMarker(markerColor));
+        });
     }
 
     // Autocomplete is launched from activity

@@ -138,4 +138,13 @@ public class RestaurantViewModel extends ViewModel {
         });
     }
 
+    public void fetchRestaurants(Activity activity, LatLng home, String apiKey) {
+        if (home != null) {
+            // Get nearby restaurants list from API
+            nearbyRestaurantsList = getRestaurantsFromApi(activity, home, apiKey);
+            // Populate the LiveData
+            mMutableLiveData.setValue(nearbyRestaurantsList);
+        }
+    }
+
 }
