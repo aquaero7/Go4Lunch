@@ -59,8 +59,6 @@ public class LikedRestaurantViewModel extends ViewModel {
                 Log.d("LikedRestaurantViewModel", "Error getting documents: ", task.getException());
             }
         });
-
-
-
     }
+
 }

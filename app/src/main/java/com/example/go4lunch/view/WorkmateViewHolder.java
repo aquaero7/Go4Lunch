@@ -31,15 +31,22 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void updateWithWorkmate(User workmate, String CHOICE_TEXT, String NO_CHOICE_TEXT) {
-
         // Display workmate picture
+        displayWorkmatePicture(workmate);
+        // Display workmate name
+        displayWorkmateName(workmate, CHOICE_TEXT, NO_CHOICE_TEXT);
+    }
+
+
+    private void displayWorkmatePicture(User workmate) {
         String pictureUrl = workmate.getUserUrlPicture();
         if (pictureUrl != null && !pictureUrl.equals("")) {
             Picasso.get().load(pictureUrl).into(imageView);
             imageView.setColorFilter(Color.argb(0, 0, 0, 0));
         }
+    }
 
-        // Display workmate name
+    private void displayWorkmateName(User workmate, String CHOICE_TEXT, String NO_CHOICE_TEXT) {
         boolean isSelected = workmate.getSelectionId() != null && currentDate.equals(workmate.getSelectionDate());
         if (isSelected) {
             // Get selected restaurant name from database
@@ -54,7 +61,6 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
             mText = workmate.getUsername();
             textView.setText(mText);
         }
-
     }
 
 }

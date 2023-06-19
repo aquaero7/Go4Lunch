@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
+import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
@@ -30,6 +32,7 @@ import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utilsforviews.EventListener;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
+import com.example.go4lunch.viewmodel.LikedRestaurantViewModel;
 import com.example.go4lunch.viewmodel.LocationViewModel;
 import com.example.go4lunch.viewmodel.RestaurantViewModel;
 import com.example.go4lunch.viewmodel.UserViewModel;
@@ -53,6 +56,7 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -71,9 +75,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     private AutocompleteSupportFragment autocompleteFragment;
     private LocationViewModel locationViewModel;
     private RestaurantViewModel restaurantViewModel;
+    private LikedRestaurantViewModel likedRestaurantViewModel;
     private UserViewModel userViewModel;
     private EventListener eventListener;
-    private boolean locationPermissionsGranted;
     private boolean focusHome;
     private GoogleMap mGoogleMap;
     private LatLng home = MapsApisUtils.getDefaultLatLng();
@@ -81,6 +85,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     private static final int DEFAULT_ZOOM = 17;
     private static final int RESTAURANT_ZOOM = 19;
     private List<Restaurant> restaurantsList = new ArrayList<>();
+    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private List<User> workmatesList = new ArrayList<>();
     private int selectionsCount;
     private final String currentDate = CalendarUtils.getCurrentDate();
@@ -153,6 +158,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         super.onResume();
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.mapView_toolbar_title);
+        initData();
         // Display map with or without home focus
         displayMap();
     }
@@ -232,10 +238,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
     private void initMap() {
         // Check permissions
-        locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
         if (mGoogleMap != null) {
             // Display MyLocation button if permissions are granted
-            mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
+            mGoogleMap.setMyLocationEnabled(MapsApisUtils.arePermissionsGranted());
             // Set camera default zoom
             mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
             // Other settings
@@ -249,40 +254,26 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void initViewModels() {
-        // Initialize location ViewModel
         locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
-        // Initialize restaurant ViewModel
         restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
-        // Initialize user ViewModel
+        likedRestaurantViewModel = new ViewModelProvider(requireActivity()).get(LikedRestaurantViewModel.class);
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
     }
 
-    /*  TODO : To be deleted
     private void initData() {
-        // Initialize or update location data
-        locationViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), latLng -> {
-            home = latLng;
-        });
-        // Initialize or update restaurants data
-        restaurantViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), restaurants -> {
-            restaurantsList.clear();
-            restaurantsList.addAll(restaurants);
-        });
-        // Initialize or update restaurants data
-        userViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), workmates -> {
-            workmatesList.clear();
-            workmatesList.addAll(workmates);
+        // Initialize liked restaurants data
+        likedRestaurantViewModel.getMutableLiveData().observe(requireActivity(), likedRestaurants -> {
+            likedRestaurantsList.clear();
+            likedRestaurantsList.addAll(likedRestaurants);
         });
     }
-    */
 
     @SuppressLint("MissingPermission")  // Permissions already checked in AuthActivity
     private void displayMap() {
         if (mGoogleMap != null) {
             /* If necessary, displays again MyLocation button if permissions are granted
                (sometimes it is... and I don't know why) */
-            locationPermissionsGranted = MapsApisUtils.arePermissionsGranted();
-            mGoogleMap.setMyLocationEnabled(locationPermissionsGranted);
+            mGoogleMap.setMyLocationEnabled(MapsApisUtils.arePermissionsGranted());
             // Display restaurants
             displayRestaurantsOnMap();
             // Set Focus to home
@@ -332,6 +323,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurant);
+        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
+        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
         intent.putExtras(bundle);
         startActivity(intent);
     }

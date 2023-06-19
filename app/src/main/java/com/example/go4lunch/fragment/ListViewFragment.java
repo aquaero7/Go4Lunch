@@ -22,17 +22,23 @@ import android.view.ViewGroup;
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentListViewBinding;
+import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
+import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utilsforviews.EventListener;
 import com.example.go4lunch.utilsforviews.ItemClickSupport;
 import com.example.go4lunch.view.ListViewAdapter;
+import com.example.go4lunch.viewmodel.LikedRestaurantViewModel;
 import com.example.go4lunch.viewmodel.LocationViewModel;
 import com.example.go4lunch.viewmodel.RestaurantViewModel;
+import com.example.go4lunch.viewmodel.UserViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -40,19 +46,20 @@ import java.util.Locale;
 public class ListViewFragment extends Fragment {
 
     private FragmentListViewBinding binding;
-
     private RecyclerView mRecyclerView;
     private ListViewAdapter listViewAdapter;
-
     private LatLng home;
     private List<Restaurant> restaurantsList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsListWithDistances = new ArrayList<>();
     private List<RestaurantWithDistance> filteredRestaurantsListWithDistances = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsListToDisplay = new ArrayList<>();
+    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
+    private List<User> workmatesList = new ArrayList<>();
     private boolean filterIsOn = false;
     private LocationViewModel locationViewModel;
     private RestaurantViewModel restaurantViewModel;
-
+    private LikedRestaurantViewModel likedRestaurantViewModel;
+    private UserViewModel userViewModel;
     private EventListener eventListener;
 
     // Constructor
@@ -78,13 +85,10 @@ public class ListViewFragment extends Fragment {
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
-        // Initialize ViewModels    // TODO : Test MVVM
-        locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
-        // locationViewModel.fetchLocation(requireActivity());  // TODO : To be deleted
-        restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
-        // restaurantViewModel.fetchRestaurants(requireActivity(), getString(R.string.MAPS_API_KEY));   // TODO : To be deleted
+        // Initialize ViewModels
+        initViewModels();
 
-        // Initialize RecyclerView  // TODO : Test MVVM
+        // Initialize RecyclerView
         configureRecyclerView();
         configureOnClickRecyclerView();
 
@@ -107,10 +111,8 @@ public class ListViewFragment extends Fragment {
         super.onResume();
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.listView_toolbar_title);
-        // Getting restaurants list from Firestore and configure RecyclerView
-        // getRestaurantsListAndConfigureRecyclerView();    // TODO : Test MVVM
-        // Update data
-        updateData();   // TODO : Test MVVM
+        // Initialize data
+        initData();
     }
 
     /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
@@ -136,7 +138,7 @@ public class ListViewFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
-        listViewAdapter = new ListViewAdapter(restaurantsListToDisplay, getString(R.string.MAPS_API_KEY),
+        listViewAdapter = new ListViewAdapter(restaurantsListToDisplay, workmatesList, getString(R.string.MAPS_API_KEY),
                 getString(R.string.status_open), getString(R.string.status_closed), getString(R.string.status_open247),
                 getString(R.string.status_open24), getString(R.string.status_open_until),
                 getString(R.string.status_open_at), getString(R.string.status_unknown));
@@ -157,36 +159,42 @@ public class ListViewFragment extends Fragment {
                 });
     }
 
-    /*  // TODO : Test MVVM
-    private void getRestaurantsListAndConfigureRecyclerView() {
-        home = MapsApisUtils.getHome();
-        restaurantsList = FirestoreUtils.getRestaurantsList();
-        // restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();   // TODO : May not keep coherence between fragments
-        restaurantsListWithDistances = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
-        DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistances);
-        if (!filterIsOn) restaurantsListToDisplay.addAll(restaurantsListWithDistances);
-        configureRecyclerView();
-        configureOnClickRecyclerView();
+    private void initViewModels() {
+        locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
+        restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+        likedRestaurantViewModel = new ViewModelProvider(requireActivity()).get(LikedRestaurantViewModel.class);
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
     }
-    */
-    // TODO : Test MVVM
-    private void updateData() {
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void initData() {
         // Initialize location data
         locationViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), latLng -> {
             home = latLng;
+            // Initialize restaurants data
+            restaurantViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), restaurants -> {
+                restaurantsList.clear();
+                restaurantsList.addAll(restaurants);
+                restaurantsListWithDistances.clear();
+                restaurantsListWithDistances = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
+                DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistances);
+                if (!filterIsOn) {
+                    restaurantsListToDisplay.clear();
+                    restaurantsListToDisplay.addAll(restaurantsListWithDistances);
+                    listViewAdapter.notifyDataSetChanged();
+                }
+            });
         });
-        // Initialize restaurants data
-        restaurantViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), restaurants -> {
-            restaurantsList.clear();
-            restaurantsList.addAll(restaurants);
-            restaurantsListWithDistances.clear();
-            restaurantsListWithDistances = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
-            DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistances);
-            if (!filterIsOn) {
-                restaurantsListToDisplay.clear();
-                restaurantsListToDisplay.addAll(restaurantsListWithDistances);
-                mRecyclerView.getAdapter().notifyDataSetChanged();
-            }
+        // Initialize workmates data
+        userViewModel.getMutableLiveData().observe(requireActivity(), workmates -> {
+            workmatesList.clear();
+            workmatesList.addAll(workmates);
+            listViewAdapter.notifyDataSetChanged();
+        });
+        // Initialize liked restaurants data
+        likedRestaurantViewModel.getMutableLiveData().observe(requireActivity(), likedRestaurants -> {
+            likedRestaurantsList.clear();
+            likedRestaurantsList.addAll(likedRestaurants);
         });
     }
 
@@ -194,6 +202,8 @@ public class ListViewFragment extends Fragment {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurantWithDistance);
+        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
+        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
         intent.putExtras(bundle);
         startActivity(intent);
     }

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.RestaurantWithDistance;
+import com.example.go4lunch.model.User;
 
 import java.util.List;
 
@@ -25,13 +26,15 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     private final String STATUS_UNKNOWN;
 
     private List<RestaurantWithDistance> restaurantsList;
+    private List<User> workmatesList;
 
 
     // Constructor
-    public ListViewAdapter(List<RestaurantWithDistance> restaurantsList, String KEY, String STATUS_OPEN,
+    public ListViewAdapter(List<RestaurantWithDistance> restaurantsList, List<User> workmatesList, String KEY, String STATUS_OPEN,
                            String STATUS_CLOSED, String STATUS_OPEN247, String STATUS_OPEN24,
                            String STATUS_OPEN_UNTIL, String STATUS_OPEN_AT, String STATUS_UNKNOWN) {
         this.restaurantsList = restaurantsList;
+        this.workmatesList = workmatesList;
         this.KEY = KEY;
         this.STATUS_OPEN = STATUS_OPEN;
         this.STATUS_CLOSED = STATUS_CLOSED;
@@ -58,7 +61,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     // Update view holder with restaurants
     @Override
     public void onBindViewHolder(@NonNull ListViewViewHolder viewHolder, int position) {
-        viewHolder.updateWithRestaurants(this.restaurantsList.get(position), this.KEY,
+        viewHolder.updateWithRestaurants(this.restaurantsList.get(position), this.workmatesList, this.KEY,
                 this.STATUS_OPEN, this.STATUS_CLOSED, this.STATUS_OPEN247, this.STATUS_OPEN24,
                 this.STATUS_OPEN_UNTIL, this.STATUS_OPEN_AT, this.STATUS_UNKNOWN);
     }

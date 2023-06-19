@@ -26,18 +26,24 @@ public class DetailRestaurantWorkmateViewHolder extends RecyclerView.ViewHolder 
     }
 
     public void updateWithSelector(User selector, String JOINING_TEXT) {
-
         // Display selector picture
+        displaySelectorPicture(selector);
+        // Display workmate name
+        displayWorkmateName(selector, JOINING_TEXT);
+    }
+
+
+    private void displaySelectorPicture(User selector) {
         String pictureUrl = selector.getUserUrlPicture();
         if (pictureUrl != null && pictureUrl != "") {
             Picasso.get().load(pictureUrl).into(imageView);
             imageView.setColorFilter(Color.argb(0, 0, 0, 0));
         }
+    }
 
-        // Display workmate name
+    private void displayWorkmateName(User selector, String JOINING_TEXT) {
         String mText = selector.getUsername() + JOINING_TEXT;
         textView.setText(mText);
-
     }
 
 }

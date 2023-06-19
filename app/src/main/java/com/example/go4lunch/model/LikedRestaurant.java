@@ -1,6 +1,8 @@
 package com.example.go4lunch.model;
 
-public class LikedRestaurant {
+import java.io.Serializable;
+
+public class LikedRestaurant implements Serializable {
 
     private String id;
     private String rid;

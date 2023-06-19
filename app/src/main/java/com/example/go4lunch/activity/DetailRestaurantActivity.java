@@ -28,11 +28,7 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         implements DetailRestaurantFragment.OnButtonClickedListener {
 
     private String message;
-
     LikedRestaurantManager likedRestaurantManager = LikedRestaurantManager.getInstance();
-
-    UserViewModel userViewModel;
-
 
     @Override
     ActivityDetailRestaurantBinding getViewBinding() {
@@ -43,7 +39,6 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         configureAndShowDetailRestaurantFragment();
-        initViewmodels();
 
     }
 
@@ -57,22 +52,16 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
                                 String rWebsite, double rRating, List<Photo> rPhotos,
                                 boolean isSelected, boolean isLiked, String uId) {
         // Handle the button click event
-        // String tag = String.valueOf(view.getTag());  // TODO : To be deleted
-        // switch (tag) {   // TODO : To be deleted
         switch (EventButtonClick.from(view)) {
-            // case "BTN_CALL": // TODO : To be deleted
             case BTN_CALL:
                 if (rPhoneNumber != null) callRestaurant(rPhoneNumber);
                 break;
-            // case "BTN_LIKE": // TODO : To be deleted
             case BTN_LIKE:
                 updateLikeInDatabase(isLiked, rId, uId);
                 break;
-            // case "BTN_WEBSITE":  // TODO : To be deleted
             case BTN_WEBSITE:
                 if (rWebsite != null) displayRestaurantWebsite(rWebsite);
                 break;
-            // case "FAB_SELECT":  // TODO : To be deleted
             case FAB_SELECT:
                 updateSelectionInDatabase(isSelected, rId);
                 break;
@@ -84,17 +73,13 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         DetailRestaurantFragment detailRestaurantFragment =
                 (DetailRestaurantFragment) getSupportFragmentManager().findFragmentById(R.id.frameLayoutDetailRestaurant);
         if (detailRestaurantFragment == null) {
-            // Create new detail restaurant fragment
-            detailRestaurantFragment = new DetailRestaurantFragment();
+            // Create instance of detail restaurant fragment (instead of new detail restaurant fragment) TODO : To be confirmed
+            detailRestaurantFragment = DetailRestaurantFragment.newInstance();  // instead of : new DetailRestaurantFragment();
             // Add it to FrameLayout container
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.frameLayoutDetailRestaurant, detailRestaurantFragment)
                     .commit();
         }
-    }
-
-    private void initViewmodels() {
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
     }
 
     private void updateSelectionInDatabase(boolean isSelected, String rId) {
@@ -103,34 +88,17 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
             String currentDate = CalendarUtils.getCurrentDate();
             UserManager.getInstance().updateSelectionId(rId);
             UserManager.getInstance().updateSelectionDate(currentDate);
-            /** Update objects in FirestoreUtils to make them available for notifications */    // TODO : To be deleted cause done in DetailRestaurantFragment
-            // FirestoreUtils.updateCurrentUser(rId, currentDate);  // TODO : To be deleted cause done in DetailRestaurantFragment
-            // FirestoreUtils.updateWorkmatesList(rId, currentDate);    // TODO : To be deleted cause done in DetailRestaurantFragment
             message = getString(R.string.fab_checked);
         } else {
             // Remove selected restaurant ID from user document in database
             UserManager.getInstance().updateSelectionId(null);
             UserManager.getInstance().updateSelectionDate(null);
-            /** Update objects in FirestoreUtils to make them available for notifications */    // TODO : To be deleted cause done in DetailRestaurantFragment
-            // FirestoreUtils.updateCurrentUser(null, null);    // TODO : To be deleted cause done in DetailRestaurantFragment
-            // FirestoreUtils.updateWorkmatesList(null, null);  // TODO : To be deleted cause done in DetailRestaurantFragment
             message = getString(R.string.fab_unchecked);
         }
         showSnackBar(message);
-
-        /*  // TODO : To be deleted
-        /** Update object workmatesList in FirestoreUtils
-         only to make selection changes available for fragments //
-        List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
-        */
     }
 
     private void callRestaurant(String rPhoneNumber){
-        /*
-        Intent dialIntent = new Intent(Intent.ACTION_DIAL);
-        dialIntent.setData(Uri.parse("tel:" + rPhoneNumber));
-        startActivity(dialIntent);
-        */
         startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + rPhoneNumber)));
     }
 
@@ -143,23 +111,9 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
             message = getString(R.string.btn_like_unchecked);
         }
         showSnackBar(message);
-
-        /*  // TODO : To be deleted
-        /** Update objects likedRestaurantsList and workmatesLists in FirestoreUtils
-         only to make likes changes available for fragments //
-        List<LikedRestaurant> likedRestaurantsList = FirestoreUtils.getLikedRestaurantsListFromDatabaseDocument();
-        // List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
-        */
-        /** Update object likedRestaurantsList in FirestoreUtils to make it available for fragments */
-        FirestoreUtils.updateLikedRestaurantsList(isLiked,rId, uId);
     }
 
     private void displayRestaurantWebsite(String rWebsite){
-        /*
-        Intent webViewIntent = new Intent(Intent.ACTION_VIEW);
-        webViewIntent.setData(Uri.parse(rWebsite));
-        startActivity(webViewIntent);
-        */
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(rWebsite)));
     }
 

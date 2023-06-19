@@ -10,13 +10,17 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.MainActivity;
+import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
+import com.example.go4lunch.viewmodel.RestaurantViewModel;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -29,14 +33,13 @@ public class NotificationService extends FirebaseMessagingService {
     private final String NOTIFICATION_TAG = "GO4LUNCH";
 
     String currentDate = CalendarUtils.getCurrentDate();
-    User currentUser = FirestoreUtils.getCurrentUser();
-    String currentUserId = currentUser.getUid();
-    String selectionId = currentUser.getSelectionId();
-    String selectionDate = currentUser.getSelectionDate();
-    String rName;
-    String rAddress;
-    List<User> selectorsList;
+    User currentUser;
+    String currentUserId;
+    String selectionId;
+    String selectionDate;
+    String notificationPrefs;
     String notificationBodyText;
+    UserManager userManager = UserManager.getInstance();
 
 
     @Override
@@ -48,20 +51,40 @@ public class NotificationService extends FirebaseMessagingService {
             RemoteMessage.Notification notification = remoteMessage.getNotification();
             Log.i("NotificationService", notification.getTitle() + "\n" + notification.getBody());
 
-            // Check if current user has selected a restaurant
-            boolean aRestaurantIsSelected = selectionId != null && currentDate.equals(selectionDate);
+            userManager.getCurrentUserData()
+                    .addOnSuccessListener(user -> {
+                        currentUser = user;
+                        currentUserId = user.getUid();
+                        selectionId = user.getSelectionId();
+                        selectionDate = user.getSelectionDate();
+                        notificationPrefs = user.getNotificationsPrefs();
 
-            // Send notification with message only if current user has selected a restaurant
-            if (aRestaurantIsSelected) {
-                // Get selected restaurant data from restaurants collection in database
-                getSelectedRestaurantData();
-                // Get the list of workmates with the same selection (other than current user)
-                getSelectorsList();
-                // Create notification body text
-                createNotificationBodyText();
-                // Send notification with message if preferences parameter is set true
-                if (Boolean.parseBoolean(FirestoreUtils.getCurrentUser().getNotificationsPrefs())) sendLunchNotification();
-            }
+                        // Check if current user has selected a restaurant
+                        boolean aRestaurantIsSelected = selectionId != null && currentDate.equals(selectionDate);
+
+                        // Send notification with message only if current user has selected a restaurant
+                        if (aRestaurantIsSelected) {
+                            // Send notification with message if preferences parameter is set true
+                            if (Boolean.parseBoolean(notificationPrefs)) {
+                                // Get selected restaurant data from restaurants collection in database
+                                getSelectedRestaurantData();    // TODO
+
+
+
+                                    // Get the list of workmates with the same selection (other than current user)
+                                    getSelectorsList();             // TODO
+
+
+                                        // Create notification body text
+                                        createNotificationBodyText(rName, rAddress, selectorsNameList);
+                                        // Send notification
+                                        sendLunchNotification();
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w("NotificationService", e.getMessage());
+                    });
         }
     }
 
@@ -98,23 +121,23 @@ public class NotificationService extends FirebaseMessagingService {
     }
 
 
-    private void createNotificationBodyText() {
+    private void createNotificationBodyText(String rName, String rAddress, List<String> selectorsNameList) {
         notificationBodyText = getString(R.string.notification_body_header) + "\n" + "\n" + rName + "\n" + rAddress;
-        if (selectorsList.isEmpty()) {
+        if (selectorsNameList.isEmpty()) {
             notificationBodyText = notificationBodyText + "\n" + "\n" + getString(R.string.text_none_joining);
         } else {
             notificationBodyText = notificationBodyText + "\n" + "\n" + getString(R.string.text_workmates_joining);
-            for (User selector : selectorsList) {
-                notificationBodyText = notificationBodyText + "\n- " + selector.getUsername();
+            for (String selectorName : selectorsNameList) {
+                notificationBodyText = notificationBodyText + "\n- " + selectorName;
             }
         }
         notificationBodyText = notificationBodyText + "\n" + "\n" + getString(R.string.text_greeting);
         Log.i("NotificationService", notificationBodyText);
     }
 
+    /*
     private void getSelectorsList() {
         selectorsList = new ArrayList<>();
-        // List<User> workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();
         List<User> workmatesList = FirestoreUtils.getWorkmatesList();
         for (User workmate : workmatesList) {
             // Check selected restaurant id and date and get users list
@@ -126,7 +149,6 @@ public class NotificationService extends FirebaseMessagingService {
     }
 
     private void getSelectedRestaurantData() {
-        // List<Restaurant> restaurantsList = FirestoreUtils.getRestaurantsListFromDatabaseDocument();
         List<Restaurant> restaurantsList = FirestoreUtils.getRestaurantsList();
         for (Restaurant restaurant : restaurantsList) {
             if (selectionId.equals(restaurant.getRid())) {
@@ -135,5 +157,6 @@ public class NotificationService extends FirebaseMessagingService {
             }
         }
     }
+    */
 
 }

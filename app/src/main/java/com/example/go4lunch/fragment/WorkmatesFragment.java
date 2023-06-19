@@ -1,12 +1,12 @@
 package com.example.go4lunch.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,40 +22,40 @@ import android.view.ViewGroup;
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
+import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utilsforviews.EventListener;
-import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utilsforviews.ItemClickSupport;
-import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.view.WorkmateAdapter;
+import com.example.go4lunch.viewmodel.LikedRestaurantViewModel;
 import com.example.go4lunch.viewmodel.LocationViewModel;
 import com.example.go4lunch.viewmodel.RestaurantViewModel;
 import com.example.go4lunch.viewmodel.UserViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WorkmatesFragment extends Fragment {
 
     private FragmentWorkmatesBinding binding;
-
-    // Declare RecyclerView
     private RecyclerView mRecyclerView;
-
+    private WorkmateAdapter workmateAdapter;
     private List<User> workmatesList = new ArrayList<>();
     private List<Restaurant> restaurantsList = new ArrayList<>();
-
+    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private UserViewModel userViewModel;
     private LocationViewModel locationViewModel;
     private RestaurantViewModel restaurantViewModel;
+    private LikedRestaurantViewModel likedRestaurantViewModel;
     private LatLng home;
-
     private EventListener eventListener;
 
 
@@ -81,15 +81,10 @@ public class WorkmatesFragment extends Fragment {
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
-        // Initialize ViewModels    // TODO : Test MVVM
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-        // userViewModel.fetchWorkmates();  // TODO : To be deleted
-        locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
-        // locationViewModel.fetchLocation(requireActivity());  // TODO : To be deleted
-        restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
-        // restaurantViewModel.fetchRestaurants(requireActivity(), getString(R.string.MAPS_API_KEY));   // TODO : To be deleted
+        // Initialize ViewModels
+        initViewModels();
 
-        // Initialize RecyclerView  // TODO : Test MVVM
+        // Initialize RecyclerView
         configureRecyclerView();
         configureOnClickRecyclerView();
 
@@ -112,10 +107,8 @@ public class WorkmatesFragment extends Fragment {
         super.onResume();
         // Setup toolbar title (Activity title)
         requireActivity().setTitle(R.string.workmates_toolbar_title);
-        // Getting workmates list from Firestore and configure RecyclerView
-        // getWorkmatesListAndConfigureRecyclerView(); // TODO : Test MVVM
-        // Update data
-        updateData();   // TODO : Test MVVM
+        // Initialize data
+        initData();
     }
 
     /** To use with setHasOptionsMenu(true), if menu is handled in fragment */
@@ -131,7 +124,6 @@ public class WorkmatesFragment extends Fragment {
         // Handle actions on menu items
         switch (item.getItemId()) {
             case R.id.menu_activity_main_search:
-                // Toast.makeText(requireContext(), "Click on search button in Workmates", Toast.LENGTH_SHORT).show();   // TODO : To be deleted
                 eventListener.toggleSearchViewVisibility();
                 return true;
             default:
@@ -142,7 +134,7 @@ public class WorkmatesFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
-        WorkmateAdapter workmateAdapter = new WorkmateAdapter(workmatesList, getString(R.string.text_choice), getString(R.string.text_no_choice));
+        workmateAdapter = new WorkmateAdapter(workmatesList, getString(R.string.text_choice), getString(R.string.text_no_choice));
         // 3.3 - Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(workmateAdapter);
         // 3.4 - Set layout manager to position the items
@@ -153,7 +145,6 @@ public class WorkmatesFragment extends Fragment {
     private void configureOnClickRecyclerView(){
         ItemClickSupport.addTo(mRecyclerView, R.layout.workmate_list_item)
                 .setOnItemClickListener((recyclerView, position, v) -> {
-                    Log.w("TAG", "Position : "+position);   // TODO : To be deleted
                     if (workmatesList.size() != 0) {
                         // Get workmate
                         User workmate = workmatesList.get(position);
@@ -176,17 +167,15 @@ public class WorkmatesFragment extends Fragment {
                 });
     }
 
-    /*  // TODO : Test MVVM
-    private void getWorkmatesListAndConfigureRecyclerView() {
-        workmatesList = FirestoreUtils.getWorkmatesList();
-        // workmatesList = FirestoreUtils.getWorkmatesListFromDatabaseDocument();   // TODO : May not keep coherence between fragments
-        DataProcessingUtils.sortByName(workmatesList);
-        configureRecyclerView();
-        configureOnClickRecyclerView();
+    private void initViewModels() {
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
+        restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+        likedRestaurantViewModel = new ViewModelProvider(requireActivity()).get(LikedRestaurantViewModel.class);
     }
-    */
-    // TODO : Test MVVM
-    private void updateData() {
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void initData() {
         // Initialize location data
         locationViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), latLng -> {
             home = latLng;
@@ -201,7 +190,12 @@ public class WorkmatesFragment extends Fragment {
             workmatesList.clear();
             workmatesList.addAll(workmates);
             DataProcessingUtils.sortByName(workmatesList);
-            mRecyclerView.getAdapter().notifyDataSetChanged();
+            workmateAdapter.notifyDataSetChanged();
+        });
+        // Initialize liked restaurants data
+        likedRestaurantViewModel.getMutableLiveData().observe(requireActivity(), likedRestaurants -> {
+            likedRestaurantsList.clear();
+            likedRestaurantsList.addAll(likedRestaurants);
         });
     }
 
@@ -228,6 +222,8 @@ public class WorkmatesFragment extends Fragment {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurantWithDistance);
+        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
+        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
         intent.putExtras(bundle);
         startActivity(intent);
     }

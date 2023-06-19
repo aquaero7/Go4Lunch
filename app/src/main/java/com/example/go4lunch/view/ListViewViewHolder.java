@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.RestaurantListItemBinding;
 import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
@@ -53,15 +54,34 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
     }
 
 
-    public void updateWithRestaurants(RestaurantWithDistance restaurant, String KEY, String STATUS_OPEN,
+    public void updateWithRestaurants(RestaurantWithDistance restaurant, List<User> workmatesList, String KEY, String STATUS_OPEN,
                                       String STATUS_CLOSED, String STATUS_OPEN247,
                                       String STATUS_OPEN24, String STATUS_OPEN_UNTIL,
                                       String STATUS_OPEN_AT, String STATUS_UNKNOWN) {
 
         // Display restaurant name
         tvTitle.setText(restaurant.getName());
-
         // Display restaurant distance
+        displayRestaurantDistance(restaurant);
+        // Display restaurant address
+        tvAddress.setText(restaurant.getAddress());
+        // Display workmate logo
+        ivWorkmateLogo.setImageResource(R.drawable.ic_outline_person_black_24);
+        // Display selections count
+        displaySelectionsCount(restaurant.getRid(), workmatesList);
+        // Display restaurant opening info
+        displayRestaurantOpeningInfo(restaurant, KEY, STATUS_OPEN, STATUS_CLOSED, STATUS_OPEN247,
+                STATUS_OPEN24, STATUS_OPEN_UNTIL, STATUS_OPEN_AT, STATUS_UNKNOWN);
+        // Display restaurant rating
+        mRatingBar.setRating((float) (restaurant.getRating() * 3/5));
+        // Display restaurant picture
+        if (restaurant.getPhotos() != null) Picasso.get().load(restaurant.getPhotos().get(0).getPhotoUrl(KEY)).into(ivPicture);
+        // Setup text scrolling
+        setupTextScrolling();
+    }
+
+
+    private void displayRestaurantDistance(RestaurantWithDistance restaurant) {
         String distance;
         int dist = (int) restaurant.getDistance();
         if (dist < 10000) {
@@ -70,17 +90,32 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
             distance = dist / 1000 + "km";
         }
         tvDistance.setText(distance);
+    }
 
-        // Display restaurant address
-        tvAddress.setText(restaurant.getAddress());
-
-        // Display workmate logo
-        ivWorkmateLogo.setImageResource(R.drawable.ic_outline_person_black_24);
-
+    private void displaySelectionsCount(String rId, List<User> workmates) {
+        int selectionsCount = 0;
+        for (User workmate : workmates) {
+            // Check selected restaurant id and date and increase selections count if matches with restaurant id
+            boolean isSelected = rId.equals(workmate.getSelectionId())
+                    && currentDate.equals(workmate.getSelectionDate());
+            if (isSelected) selectionsCount += 1;
+        }
         // Display selections count
-        displaySelectionsCount(restaurant.getRid());
+        if (selectionsCount > 0) {
+            ivWorkmateLogo.setVisibility(View.VISIBLE);
+            tvSelectionsCount.setVisibility(View.VISIBLE);
+        } else {
+            ivWorkmateLogo.setVisibility(View.INVISIBLE);
+            tvSelectionsCount.setVisibility(View.INVISIBLE);
+        }
+        String workmatesCount = "(" + selectionsCount + ")";
+        tvSelectionsCount.setText(workmatesCount);
+    }
 
-        // Display restaurant opening info
+    private void displayRestaurantOpeningInfo(RestaurantWithDistance restaurant, String KEY, String STATUS_OPEN,
+                                              String STATUS_CLOSED, String STATUS_OPEN247,
+                                              String STATUS_OPEN24, String STATUS_OPEN_UNTIL,
+                                              String STATUS_OPEN_AT, String STATUS_UNKNOWN) {
         String information = DataProcessingUtils.getOpeningInformation(restaurant);
         if (!information.isEmpty()) {
             int lim = 7;    // Information must be 7 char length max
@@ -118,76 +153,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         } else {
             tvOpenTime.setText(STATUS_UNKNOWN);
         }
-
-        // Display restaurant rating
-        mRatingBar.setRating((float) (restaurant.getRating() * 3/5));
-
-        // Display restaurant picture
-        if (restaurant.getPhotos() != null) Picasso.get().load(restaurant.getPhotos().get(0).getPhotoUrl(KEY)).into(ivPicture);
-
-        // Setup text scrolling
-        setupTextScrolling();
-
     }
-
-    /*  // Replaced with access from FirestoreUtils
-    private void displaySelectionsCount(String rId) {
-        // Get workmates list
-        UserManager.getUsersList(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult() != null) {
-                    int selectionsCount = 0;
-                    // Get users list
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> userData = document.getData(); // Map data for debug.
-                        // Get workmate in workmates list
-                        User workmate = FirestoreUtils.getUserFromDatabaseDocument(document);
-                        // Check selected restaurant id and date and increase selections count if matches with restaurant id
-                        boolean isSelected = rId.equals(workmate.getSelectionId())
-                                        && currentDate.equals(workmate.getSelectionDate());
-                        if (isSelected) selectionsCount += 1;
-                    }
-                    // Display selections count
-                    if (selectionsCount > 0) {
-                        ivWorkmateLogo.setVisibility(View.VISIBLE);
-                        tvSelectionsCount.setVisibility(View.VISIBLE);
-                    } else {
-                        ivWorkmateLogo.setVisibility(View.INVISIBLE);
-                        tvSelectionsCount.setVisibility(View.INVISIBLE);
-                    }
-                    String workmatesCount = "(" + selectionsCount + ")";
-                    tvSelectionsCount.setText(workmatesCount);
-                }
-            } else {
-                Log.w("ListViewViewHolder", "Error getting documents: ", task.getException());
-            }
-        });
-
-    }
-    */
-
-    private void displaySelectionsCount(String rId) {
-        int selectionsCount = 0;
-        // Get workmates list
-        List<User> workmates = FirestoreUtils.getWorkmatesList();
-        for (User workmate : workmates) {
-            // Check selected restaurant id and date and increase selections count if matches with restaurant id
-            boolean isSelected = rId.equals(workmate.getSelectionId())
-                    && currentDate.equals(workmate.getSelectionDate());
-            if (isSelected) selectionsCount += 1;
-        }
-        // Display selections count
-        if (selectionsCount > 0) {
-            ivWorkmateLogo.setVisibility(View.VISIBLE);
-            tvSelectionsCount.setVisibility(View.VISIBLE);
-        } else {
-            ivWorkmateLogo.setVisibility(View.INVISIBLE);
-            tvSelectionsCount.setVisibility(View.INVISIBLE);
-        }
-        String workmatesCount = "(" + selectionsCount + ")";
-        tvSelectionsCount.setText(workmatesCount);
-    }
-
 
     private void setupTextScrolling() {
         // Set TextView selected for text scrolling

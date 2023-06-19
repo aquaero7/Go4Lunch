@@ -56,6 +56,8 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -88,6 +90,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private RestaurantViewModel restaurantViewModel;
     private UserViewModel userViewModel;
     private LikedRestaurantViewModel likedRestaurantViewModel;
+    private List<User> workmatesList = new ArrayList<>();
+    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private User currentUser;
     private boolean selectionIsNearBy;
 
@@ -157,6 +161,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         userViewModel.fetchWorkmates();
         // Update liked restaurants list
         likedRestaurantViewModel.fetchLikedRestaurants();
+
+        // Initialize workmates data
+        userViewModel.getMutableLiveData().observe(this, workmates -> {
+            workmatesList.clear();
+            workmatesList.addAll(workmates);
+        });
+        // Initialize liked restaurants data
+        likedRestaurantViewModel.getMutableLiveData().observe(this, likedRestaurants -> {
+            likedRestaurantsList.clear();
+            likedRestaurantsList.addAll(likedRestaurants);
+        });
     }
 
     /**
@@ -410,6 +425,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurant);
+        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
+        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
         intent.putExtras(bundle);
         startActivity(intent);
     }
