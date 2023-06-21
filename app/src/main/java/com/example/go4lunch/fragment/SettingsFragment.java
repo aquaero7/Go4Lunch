@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.go4lunch.databinding.FragmentSettingsBinding;
+import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.utilsforviews.EventButtonClick;
@@ -32,6 +35,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     private SwitchMaterial mNotificationSwitch;
     private String searchRadiusPrefs;
     private String notificationsPrefs;
+    private UserManager userManager = UserManager.getInstance();
 
 
     // Constructor
@@ -55,8 +59,16 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         mNotificationSwitch = binding.switchNotification;
 
         // Initialize preferences
+        // Search Radius prefs
         mRadiusEditText.setText(MapsApisUtils.getSearchRadius());
-        mNotificationSwitch.setChecked(Boolean.parseBoolean(FirestoreUtils.getCurrentUser().getNotificationsPrefs()));
+        // Notifications prefs
+        userManager.getCurrentUserData()
+                .addOnSuccessListener(user -> {
+                    mNotificationSwitch.setChecked(Boolean.parseBoolean(user.getNotificationsPrefs()));
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("DetailRestaurantFragment", e.getMessage());
+                });
 
         //Set listeners on buttons and switch
         mSaveButton.setOnClickListener(this);
@@ -69,18 +81,13 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     /* Spread the click to the parent activity
     Binding added as an argument to make it available in the activity */
     public void onClick(View v) {
-        // String tag = String.valueOf(v.getTag()); // TODO : To be deleted
-        // switch (tag) {   // TODO : To be deleted
         switch (EventButtonClick.from(v)) {
-            // case "BTN_SAVE": // TODO : To be deleted
             case BTN_SAVE:
                 hideVirtualKeyboard(requireContext(), v);
                 searchRadiusPrefs = mRadiusEditText.getText().toString();
                 break;
-            // case "SW_NOTIFICATION": // TODO : To be deleted
             case SW_NOTIFICATION:
                 notificationsPrefs = String.valueOf(mNotificationSwitch.isChecked());
-                // updatePreferencesInFirestoreUtils(tag);  // TODO: To be deleted cause done in SettingsActivity
                 break;
         }
         mCallback.onButtonClicked(v, binding, searchRadiusPrefs, notificationsPrefs);

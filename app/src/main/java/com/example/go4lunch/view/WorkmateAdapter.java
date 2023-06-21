@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateViewHolder> {

@@ -65,7 +65,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private String uid;
     // Declare restaurant
     private RestaurantWithDistance restaurant;
-    private String rid;
+    private String rid, rName, rAddress;
     // Declare current date
     private final String currentDate = CalendarUtils.getCurrentDate();
 
@@ -232,6 +232,8 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                 workmatesList = (List<User>) bundle.getSerializable("WORKMATES");
                 restaurant = (RestaurantWithDistance) bundle.getSerializable("RESTAURANT");
                 rid = restaurant.getRid();
+                rName = restaurant.getName();
+                rAddress = restaurant.getAddress();
                 Log.w("DetailRestaurantFragment", "Name of this restaurant : " + restaurant.getName());
             }
         }
@@ -271,24 +273,32 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     }
 
     private void updateLocalObjectsWithSelection() {
-        String selIdUpdate, selDateUpdate;
+        String selIdUpdate, selDateUpdate, selNameUpdate, selAddressUpdate;
         if (isSelected) {
             selIdUpdate = rid;
             selDateUpdate = currentDate;
+            selNameUpdate = rName;
+            selAddressUpdate = rAddress;
         } else {
             selIdUpdate = null;
             selDateUpdate = null;
+            selNameUpdate = null;
+            selAddressUpdate = null;
         }
         userManager.getCurrentUserData()
                 .addOnSuccessListener(currentUser -> {
                     // Update current user
                     currentUser.setSelectionId(selIdUpdate);
                     currentUser.setSelectionDate(selDateUpdate);
+                    currentUser.setSelectionName(selNameUpdate);
+                    currentUser.setSelectionAddress(selAddressUpdate);
                     // Update workmates list
                     for (User workmate : workmatesList) {
                         if (currentUser.getUid().equals(workmate.getUid())) {
                             workmate.setSelectionId(selIdUpdate);
                             workmate.setSelectionDate(selDateUpdate);
+                            workmate.setSelectionName(selNameUpdate);
+                            workmate.setSelectionAddress(selAddressUpdate);
                             break;
                         }
                     }

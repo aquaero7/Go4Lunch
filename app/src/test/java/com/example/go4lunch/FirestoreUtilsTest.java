@@ -19,7 +19,7 @@ import org.mockito.quality.Strictness;
 public class FirestoreUtilsTest {
 
     User currentUser, testCurrentUser, testUser1, testUser2;
-    String uId, uName, uEmail, uUrlPicture, uSelId, uSelDate, uRadPrefs, uNotPrefs;
+    String uId, uName, uEmail, uUrlPicture, uSelId, uSelDate, uSelName, uSelAddress, uRadPrefs, uNotPrefs;
 
 
     @Before
@@ -49,6 +49,8 @@ public class FirestoreUtilsTest {
         assertEquals("Wrong current user url picture", uUrlPicture, testCurrentUser.getUserUrlPicture());
         assertNull("Wrong current user selection id", testCurrentUser.getSelectionId());
         assertNull("Wrong current user selection date", testCurrentUser.getSelectionDate());
+        assertNull("Wrong current user selection name", testCurrentUser.getSelectionName());
+        assertNull("Wrong current user selection address", testCurrentUser.getSelectionAddress());
         assertNull("Wrong current user search radius prefs", testCurrentUser.getSearchRadiusPrefs());
         assertNull("Wrong current user notifications prefs", testCurrentUser.getNotificationsPrefs());
 
@@ -59,10 +61,12 @@ public class FirestoreUtilsTest {
         uUrlPicture = "uUrlPicture2";
         uSelId = "uSelId2";
         uSelDate = "uSelDate2";
+        uSelName = "uSelName2";
+        uSelAddress = "uSelAddress2";
         uRadPrefs = "uRadPrefs2";
         uNotPrefs = "uNotPrefs2";
         // Create test current user (full constructor)
-        testUser2 = new User(uId, uName, uEmail, uUrlPicture, uSelId, uSelDate, uRadPrefs, uNotPrefs);
+        testUser2 = new User(uId, uName, uEmail, uUrlPicture, uSelId, uSelDate, uSelName, uSelAddress, uRadPrefs, uNotPrefs);
         // Test current user setting to FirestoreUtils
         FirestoreUtils.setCurrentUser(testUser2);
         // Test current user getting from FirestoreUtils
@@ -74,13 +78,15 @@ public class FirestoreUtilsTest {
         assertEquals("Wrong current user url picture", uUrlPicture, testCurrentUser.getUserUrlPicture());
         assertEquals("Wrong current user selection id", uSelId, testCurrentUser.getSelectionId());
         assertEquals("Wrong current user selection date", uSelDate, testCurrentUser.getSelectionDate());
+        assertEquals("Wrong current user selection name", uSelName, testCurrentUser.getSelectionName());
+        assertEquals("Wrong current user selection address", uSelAddress, testCurrentUser.getSelectionAddress());
         assertEquals("Wrong current user search radius prefs", uRadPrefs, testCurrentUser.getSearchRadiusPrefs());
         assertEquals("Wrong current user notifications prefs", uNotPrefs, testCurrentUser.getNotificationsPrefs());
     }
 
     @Test
     public void updateCurrentUserWirthSuccess() {
-        String tag, uSelId, uSelDate, uRadPrefs, uNotPrefs;
+        String tag, uSelId, uSelDate, uSelName, uSelAddress, uRadPrefs, uNotPrefs;
 
         // Mocking Log class is necessary to run this test /////////////////////////////////////////
         // Set and start Mockito strictness                                                       //
@@ -91,39 +97,47 @@ public class FirestoreUtilsTest {
         try (MockedStatic<Log> mockedLog = mockStatic(Log.class)) {                               //
             mockedLog.when(() -> Log.e(anyString(), anyString())).thenReturn(-1);   //////////
 
-            // Method with 2 or 3 args and wrong tag, so nothing should be updated
+            // Method with 2 or 5 args and wrong tag, so nothing should be updated
             // Reference data
             tag = "XXX";
             // Test update with 2 args
-            FirestoreUtils.updateCurrentUser(tag, tag, tag);
-            // Test verifications
-            testCurrentUser = FirestoreUtils.getCurrentUser();
-            assertNull("Wrong current user selection id", testCurrentUser.getSelectionId());
-            assertNull("Wrong current user selection date", testCurrentUser.getSelectionDate());
-            assertNull("Wrong current user search radius prefs", testCurrentUser.getSearchRadiusPrefs());
-            assertNull("Wrong current user notifications prefs", testCurrentUser.getNotificationsPrefs());
-            // Test update with 3 args
             FirestoreUtils.updateCurrentUser(tag, tag);
             // Test verifications
             testCurrentUser = FirestoreUtils.getCurrentUser();
             assertNull("Wrong current user selection id", testCurrentUser.getSelectionId());
             assertNull("Wrong current user selection date", testCurrentUser.getSelectionDate());
+            assertNull("Wrong current user selection name", testCurrentUser.getSelectionName());
+            assertNull("Wrong current user selection address", testCurrentUser.getSelectionAddress());
+            assertNull("Wrong current user search radius prefs", testCurrentUser.getSearchRadiusPrefs());
+            assertNull("Wrong current user notifications prefs", testCurrentUser.getNotificationsPrefs());
+            // Test update with 5 args
+            FirestoreUtils.updateCurrentUser(tag, tag, tag, tag, tag);
+            // Test verifications
+            testCurrentUser = FirestoreUtils.getCurrentUser();
+            assertNull("Wrong current user selection id", testCurrentUser.getSelectionId());
+            assertNull("Wrong current user selection date", testCurrentUser.getSelectionDate());
+            assertNull("Wrong current user selection name", testCurrentUser.getSelectionName());
+            assertNull("Wrong current user selection address", testCurrentUser.getSelectionAddress());
             assertNull("Wrong current user search radius prefs", testCurrentUser.getSearchRadiusPrefs());
             assertNull("Wrong current user notifications prefs", testCurrentUser.getNotificationsPrefs());
         }
         mockito.finishMocking();    // Stop mocking Log class //////////////////////////////////////
 
-        // Method with 3 args
+        // Method with 5 args
         // Reference data
         tag = "SEL";
         uSelId = "uSelId0";
         uSelDate = "uSelDate0";
+        uSelName = "uSelName0";
+        uSelAddress = "uSelAddress0";
         // Test update
-        FirestoreUtils.updateCurrentUser(tag, uSelId, uSelDate);
+        FirestoreUtils.updateCurrentUser(tag, uSelId, uSelDate, uSelName, uSelAddress);
         // Test verifications
         testCurrentUser = FirestoreUtils.getCurrentUser();
         assertEquals("Wrong current user selection id", uSelId, testCurrentUser.getSelectionId());
         assertEquals("Wrong current user selection date", uSelDate, testCurrentUser.getSelectionDate());
+        assertEquals("Wrong current user selection name", uSelName, testCurrentUser.getSelectionName());
+        assertEquals("Wrong current user selection address", uSelAddress, testCurrentUser.getSelectionAddress());
 
         // Method with 2 args : Tag "RAD"
         // Reference data

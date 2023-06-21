@@ -56,9 +56,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     private ProgressBar progressBar;
     private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private ActivityResultLauncher<String[]> requestPermissionsLauncher;
-    // private FusedLocationProviderClient fusedLocationProviderClient; // TODO : Test MVVM
     boolean locationPermissionsGranted;
-    // private LatLng home; // TODO : Test MVVM
 
     @Override
     ActivityAuthBinding getViewBinding() {
@@ -72,10 +70,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         progressBar = binding.progressBarAuth.progressBar;
         // Listen to the clicks on button(s)
         setupListeners();
-
-        // Create a new FusedLocationProviderClient.
-        // fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this); // TODO : Test MVVM
-
         // Check permissions and get device location
         checkPermissions();
     }
@@ -85,75 +79,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         super.onResume();
         updateLoginButton();
     }
-
-    /*  // TODO : Test MVVM
-    @SuppressWarnings("MissingPermission")  // Permissions already checked in the onCreate method
-    public void getDataFromApi() {
-        try {
-            Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-            // Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);
-            locationResult.addOnCompleteListener(this, task -> {
-                if (task.isSuccessful()) {
-                    Location lastKnownLocation = task.getResult();
-                    if (lastKnownLocation != null) {
-                        // Get the current location...
-                        double latitude = lastKnownLocation.getLatitude();
-                        double longitude = lastKnownLocation.getLongitude();
-                        Snackbar.make(binding.getRoot(), getString(R.string.info_location_provided), Snackbar.LENGTH_LONG).show();
-                        // Initialize home
-                        home = new LatLng(latitude, longitude);
-                        // Initialize home in MapsApisUtils to make it available for ListViewFragment //
-                        MapsApisUtils.setHome(home);
-                        // Get nearby restaurants list from API to initialize database //
-                        List<Restaurant> nearbyRestaurantsList = MapsApisUtils
-                                .getRestaurantsFromApi(this, home, getString(R.string.MAPS_API_KEY));
-                    } else {
-                        getUpdatedDataFromApi();
-                    }
-                }
-                else {
-                    Log.w("getDeviceLocation", "Exception: %s", task.getException());
-                }
-            });
-
-        } catch (SecurityException e) {
-            Log.w("Exception: %s", e.getMessage(), e);
-        }
-    }
-
-    @SuppressWarnings("MissingPermission")  // Permissions already checked in the onCreate method
-    private void getUpdatedDataFromApi() {
-        // Setup parameters of location request
-        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500).build();
-        // Create callback to handle location result
-        Activity activity = this;
-        LocationCallback locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                for (Location location : locationResult.getLocations()) {
-                    if (location != null) {
-                        // Get the current location...
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        // ...and stop location updates as soon of current location is got
-                        fusedLocationProviderClient.removeLocationUpdates(this);
-                        Snackbar.make(binding.getRoot(), getString(R.string.info_location_updated), Snackbar.LENGTH_LONG).show();
-                        // Initialize home
-                        home = new LatLng(latitude, longitude);
-                        // Initialize home in MapsApisUtils to make it available for ListViewFragment //
-                        MapsApisUtils.setHome(home);
-                        // Get nearby restaurants list from API to initialize database //
-                        List<Restaurant> nearbyRestaurantsList = MapsApisUtils
-                                .getRestaurantsFromApi(getApplicationContext(), home, getString(R.string.MAPS_API_KEY));
-                    }
-                }
-            }
-        };
-
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-    }
-    */
 
     private void checkPermissions() {
         // This is the result of the user answer to permissions request
@@ -165,12 +90,10 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 /** Fine location permission granted */
                 Log.w("ActivityResultLauncher", "Fine location permission was granted by user");
                 locationPermissionsGranted = true;
-                // getDataFromApi();    // TODO : Test MVVM
             } else if (coarseLocationGranted != null && coarseLocationGranted) {
                 /** Coarse location permission granted */
                 Log.w("ActivityResultLauncher", "Only coarse location permission was granted by user");
                 locationPermissionsGranted = true;
-                // getDataFromApi();    // TODO : Test MVVM
             } else {
                 /** No location permission granted */
                 Log.w("ActivityResultLauncher", "No location permission was granted by user");
@@ -204,7 +127,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         binding.buttonLogin.setOnClickListener(view -> {
             if(userManager.isCurrentUserLogged()){
                 // Update Firestore utils then launch application
-                updateUtilsAndStartApp();
+                // updateUtilsAndStartApp();   // TODO : To be deleted if MVVM
+                startApp();
             }else{
                 startSignInActivity();
             }
@@ -280,7 +204,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                     showSnackBar(getString(R.string.error_unknown));
                 }
             }
-
             // Hide progressBar
             progressBar.setVisibility(View.INVISIBLE);
         }
@@ -301,11 +224,9 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     private void startApp(){
         // Show progressBar
         progressBar.setVisibility(View.VISIBLE);
-
+        // Launch main activity
         Intent intent = new Intent(this,MainActivity.class);
-        // startActivity(intent);
         mainActivityResultLauncher.launch(intent);
-
         // Hide progressBar
         progressBar.setVisibility(View.INVISIBLE);
     }
@@ -339,7 +260,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                             .addOnSuccessListener(command -> {
                                 Log.w("AuthActivity","Update successful");
                                 // Update Firestore utils then launch application
-                                updateUtilsAndStartApp();
+                                // updateUtilsAndStartApp();   // TODO : To be deleted if MVVM
+                                startApp();
                             })
                             .addOnFailureListener(e -> Log.w("AuthActivity",
                                     "Update failed. Message : " + e.getMessage()));
@@ -352,7 +274,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                             .addOnSuccessListener(command -> {
                                 Log.w("AuthActivity","Creation successful");
                                 // Update Firestore utils then launch application
-                                updateUtilsAndStartApp();
+                                // updateUtilsAndStartApp();   // TODO : To be deleted if MVVM
+                                startApp();
                             })
                             .addOnFailureListener(e -> Log.w("AuthActivity",
                                     "Creation failed. Message : " + e.getMessage()));
@@ -361,6 +284,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         }
     }
 
+    /*
     private void updateUtilsAndStartApp() {
         // Call step 1/4: Update current user in FirestoreUtils
         updateCurrentUserInFirestoreUtils();
@@ -378,12 +302,14 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                     String uUrlPicture = user.getUserUrlPicture();
                     String selectionId = user.getSelectionId();
                     String selectionDate = user.getSelectionDate();
+                    String selectionName = user.getSelectionName();
+                    String selectionAddress = user.getSelectionAddress();
                     String searchRadiusPrefs = user.getSearchRadiusPrefs();
                     String notificationsPrefs = user.getNotificationsPrefs();
 
                     // Update currentUser in FirestoreUtils
                     FirestoreUtils.setCurrentUser(new User(uId, uName, uEmail, uUrlPicture, selectionId,
-                            selectionDate, searchRadiusPrefs, notificationsPrefs));
+                            selectionDate, selectionName, selectionAddress, searchRadiusPrefs, notificationsPrefs));
                     // Call step 2/4: Update current user in FirestoreUtils
                     updateRestaurantsListInFirestoreUtils();
                 })
@@ -463,5 +389,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
             }
         });
     }
+    */
 
 }

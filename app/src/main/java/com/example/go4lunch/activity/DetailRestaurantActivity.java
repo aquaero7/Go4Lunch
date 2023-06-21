@@ -28,7 +28,8 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         implements DetailRestaurantFragment.OnButtonClickedListener {
 
     private String message;
-    LikedRestaurantManager likedRestaurantManager = LikedRestaurantManager.getInstance();
+    private LikedRestaurantManager likedRestaurantManager = LikedRestaurantManager.getInstance();
+    private UserManager userManager = UserManager.getInstance();
 
     @Override
     ActivityDetailRestaurantBinding getViewBinding() {
@@ -63,7 +64,7 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
                 if (rWebsite != null) displayRestaurantWebsite(rWebsite);
                 break;
             case FAB_SELECT:
-                updateSelectionInDatabase(isSelected, rId);
+                updateSelectionInDatabase(isSelected, rId, rName, rAddress);
                 break;
         }
     }
@@ -82,17 +83,21 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         }
     }
 
-    private void updateSelectionInDatabase(boolean isSelected, String rId) {
+    private void updateSelectionInDatabase(boolean isSelected, String rId, String rName, String rAddress) {
         if (isSelected) {
             // Add selected restaurant ID to user document in database
             String currentDate = CalendarUtils.getCurrentDate();
-            UserManager.getInstance().updateSelectionId(rId);
-            UserManager.getInstance().updateSelectionDate(currentDate);
+            userManager.updateSelectionId(rId);
+            userManager.updateSelectionDate(currentDate);
+            userManager.updateSelectionName(rName);
+            userManager.updateSelectionAddress(rAddress);
             message = getString(R.string.fab_checked);
         } else {
             // Remove selected restaurant ID from user document in database
-            UserManager.getInstance().updateSelectionId(null);
-            UserManager.getInstance().updateSelectionDate(null);
+            userManager.updateSelectionId(null);
+            userManager.updateSelectionDate(null);
+            userManager.updateSelectionName(null);
+            userManager.updateSelectionAddress(null);
             message = getString(R.string.fab_unchecked);
         }
         showSnackBar(message);

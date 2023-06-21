@@ -176,17 +176,18 @@ public class WorkmatesFragment extends Fragment {
 
     @SuppressLint("NotifyDataSetChanged")
     private void initData() {
+        // TODO : owner =  getViewLifecycleOwner() or requireActivity()
         // Initialize location data
-        locationViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), latLng -> {
+        locationViewModel.getMutableLiveData().observe(requireActivity(), latLng -> {
             home = latLng;
         });
         // Initialize restaurants data
-        restaurantViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), restaurants -> {
+        restaurantViewModel.getMutableLiveData().observe(requireActivity(), restaurants -> {
             restaurantsList.clear();
             restaurantsList.addAll(restaurants);
         });
         // Initialize workmates data
-        userViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), workmates -> {
+        userViewModel.getMutableLiveData().observe(requireActivity(), workmates -> {
             workmatesList.clear();
             workmatesList.addAll(workmates);
             DataProcessingUtils.sortByName(workmatesList);

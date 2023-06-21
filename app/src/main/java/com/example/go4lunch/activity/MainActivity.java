@@ -93,6 +93,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private List<User> workmatesList = new ArrayList<>();
     private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private User currentUser;
+    private LatLng home;
     private boolean selectionIsNearBy;
 
 
@@ -162,6 +163,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Update liked restaurants list
         likedRestaurantViewModel.fetchLikedRestaurants();
 
+        // Initialize current location
+        locationViewModel.getMutableLiveData().observe(this, latLng -> {
+            home = latLng;
+        });
         // Initialize workmates data
         userViewModel.getMutableLiveData().observe(this, workmates -> {
             workmatesList.clear();
@@ -398,10 +403,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                         restaurantManager.getRestaurantData(selectionId)
                                 .addOnSuccessListener(restaurant -> {
                                     Log.w("MainActivity", "success task getRestaurantData");
-                                    LatLng home = MapsApisUtils.getHome();
                                     int distance = (home != null) ?
                                             DataProcessingUtils.calculateRestaurantDistance(restaurant, home) : 0;
-
                                     RestaurantWithDistance restaurantWithDistance =
                                             new RestaurantWithDistance(restaurant.getRid(), restaurant.getName(),
                                                     restaurant.getPhotos(), restaurant.getAddress(),

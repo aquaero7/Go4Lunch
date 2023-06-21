@@ -35,9 +35,13 @@ public class MapsApisUtils extends FragmentActivity {
     private static final String DEFAULT_RADIUS = "1"; /** Distance in km */
     private static String searchRadius; /** Distance in km */
     private static boolean locationPermissionsGranted;
-    private static List<Restaurant> restaurantsList = new ArrayList<>();
-    private static LatLng home;
+    // private static List<Restaurant> restaurantsList = new ArrayList<>(); // TODO : Test MVVM
+    // private static LatLng home;  // TODO : Test MVVM
 
+
+    public static LatLng getDefaultLatLng() {
+        return new LatLng(DEF_LATITUDE, DEF_LONGITUDE);
+    }
 
     public static String getSearchRadius() {
         return (searchRadius != null) ? searchRadius : DEFAULT_RADIUS;
@@ -47,13 +51,13 @@ public class MapsApisUtils extends FragmentActivity {
         return locationPermissionsGranted;
     }
 
-    public static LatLng getDefaultLatLng() {
-        return new LatLng(DEF_LATITUDE, DEF_LONGITUDE);
-    }
 
+
+    /*  // TODO : Test MVVM
     public static LatLng getHome() {
         return home;
     }
+    */
 
     public static void setSearchRadius(String radius) {
         searchRadius = radius;

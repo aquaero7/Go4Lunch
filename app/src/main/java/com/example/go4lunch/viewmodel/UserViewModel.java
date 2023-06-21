@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.repository.UserRepository;
+import com.example.go4lunch.utils.DataProcessingUtils;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -39,10 +40,13 @@ public class UserViewModel extends ViewModel {
         String uUrlPicture = ((document.getData().get("userUrlPicture")) != null) ? document.getData().get("userUrlPicture").toString() : null;
         String selectionId = ((document.getData().get("selectionId")) != null) ? document.getData().get("selectionId").toString() : null;
         String selectionDate = ((document.getData().get("selectionDate")) != null) ? document.getData().get("selectionDate").toString() : null;
+        String selectionName = ((document.getData().get("selectionName")) != null) ? document.getData().get("selectionName").toString() : null;
+        String selectionAddress = ((document.getData().get("selectionAddress")) != null) ? document.getData().get("selectionAddress").toString() : null;
         String searchRadiusPrefs = ((document.getData().get("searchRadiusPrefs")) != null) ? document.getData().get("searchRadiusPrefs").toString() : null;
         String notificationsPrefs = ((document.getData().get("notificationsPrefs")) != null) ? document.getData().get("notificationsPrefs").toString() : null;
 
-        User userFromData = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate, searchRadiusPrefs, notificationsPrefs);
+        User userFromData = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate,
+                selectionName, selectionAddress, searchRadiusPrefs, notificationsPrefs);
 
         return userFromData;
     }
@@ -66,8 +70,5 @@ public class UserViewModel extends ViewModel {
             }
         });
     }
-
-
-
 
 }

@@ -262,6 +262,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
 
     private void initData() {
         // Initialize liked restaurants data
+        // TODO : owner =  getViewLifecycleOwner() or requireActivity()
         likedRestaurantViewModel.getMutableLiveData().observe(requireActivity(), likedRestaurants -> {
             likedRestaurantsList.clear();
             likedRestaurantsList.addAll(likedRestaurants);
@@ -283,7 +284,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
 
     private void setFocusToHome() {
         // Initialize or update location data
-        locationViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), latLng -> {
+        // TODO : owner =  getViewLifecycleOwner() or requireActivity()
+        locationViewModel.getMutableLiveData().observe(requireActivity(), latLng -> {
             home = latLng;
         });
         // Set camera position to home if requested
@@ -297,7 +299,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     @SuppressLint("PotentialBehaviorOverride")  // This remark concerns OnMarkerClickListener below
     private void displayRestaurantsOnMap() {
         // Initialize or update restaurants data
-        restaurantViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), restaurants -> {
+        // TODO : owner =  getViewLifecycleOwner() or requireActivity()
+        restaurantViewModel.getMutableLiveData().observe(requireActivity(), restaurants -> {
             restaurantsList.clear();
             restaurantsList.addAll(restaurants);
             // Display restaurants on map
@@ -331,7 +334,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
 
     private void getSelectionsCountAndUpdateMarkerIcon(String rId, Marker marker) {
         // Initialize or update restaurants data
-        userViewModel.getMutableLiveData().observe(getViewLifecycleOwner(), workmates -> {
+        // TODO : owner =  getViewLifecycleOwner() or requireActivity()
+        userViewModel.getMutableLiveData().observe(requireActivity(), workmates -> {
             workmatesList.clear();
             workmatesList.addAll(workmates);
             // Count selections

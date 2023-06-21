@@ -28,6 +28,8 @@ public class UserRepository {
     private static final String USER_URL_PICTURE = "userUrlPicture";
     private static final String SELECTION_ID_FIELD = "selectionId";
     private static final String SELECTION_DATE_FIELD = "selectionDate";
+    private static final String SELECTION_NAME_FIELD = "selectionName";
+    private static final String SELECTION_ADDRESS_FIELD = "selectionAddress";
     private static final String SEARCH_RADIUS_PREFS = "searchRadiusPrefs";
     private static final String NOTIFICATIONS_PREFS = "notificationsPrefs";
 
@@ -61,46 +63,6 @@ public class UserRepository {
         return (user != null)? user.getUid() : null;
     }
 
-    /* Create user in Firestore
-    public void createUser() {
-        FirebaseUser cUser = getCurrentUser();
-        if(cUser != null){
-            // Data from FirebaseAuth
-            String userUrlPicture = (cUser.getPhotoUrl() != null) ? cUser.getPhotoUrl().toString() : null;
-            String username = cUser.getDisplayName();
-            String userEmail = cUser.getEmail();
-            String uid = cUser.getUid();
-
-            // If the current user already exist in Firestore, we get his data from Firestore
-            Task<DocumentSnapshot> userData = getCurrentUserData();
-            userData.continueWith(task -> task.getResult().toObject(User.class))
-                    .addOnSuccessListener(user -> {
-                if (user != null) {
-                    // If the current user already exist in Firestore, we update his data
-                    Log.w("UserRepository", "User already exists and will be updated");
-                    getUsersCollection().document(uid)
-                            .update(USER_ID, uid, USER_NAME, username, USER_EMAIL, userEmail,
-                                    USER_URL_PICTURE, userUrlPicture)
-                            .addOnSuccessListener(command -> Log.w("UserRepository",
-                                    "Update successful"))
-                            .addOnFailureListener(e -> Log.w("UserRepository",
-                                    "Update failed. Message : " + e.getMessage()));
-                } else {
-                    // If the current user doesn't exist in Firestore, we create this user
-                    Log.w("UserRepository", "User doesn't exist and will be created");
-                    User userToCreate = new User(uid, username, userEmail, userUrlPicture);
-                    getUsersCollection().document(uid)
-                            .set(userToCreate)
-                            .addOnSuccessListener(command -> Log.w("UserRepository",
-                                    "Creation successful"))
-                            .addOnFailureListener(e -> Log.w("UserRepository",
-                                    "Creation failed. Message : " + e.getMessage()));
-                }
-            });
-        }
-    }
-    */
-
     // Get restaurants list from Firestore
     public void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
         getUsersCollection().get().addOnCompleteListener(listener);
@@ -110,29 +72,16 @@ public class UserRepository {
     public Task<DocumentSnapshot> getCurrentUserData(){
         String uid = this.getCurrentUserUID();
         if(uid != null){
-            // return this.getUsersCollection().document(uid).get();
             return getUsersCollection().document(uid).get();
         }else{
             return null;
         }
     }
-
-    /* Get User Data from Firestore
-    public Task<DocumentSnapshot> getUserData(String uid){
-        if(uid != null){
-            // return this.getUsersCollection().document(uid).get();
-            return getUsersCollection().document(uid).get();
-        }else{
-            return null;
-        }
-    }
-    */
 
     // Update selected restaurant
     public Task<Void> updateSelectionId(String selectionId) {
         String uid = this.getCurrentUserUID();
         if(uid != null){
-            // return this.getUsersCollection().document(uid).update(SELECTION_ID_FIELD, selectionId);
             return getUsersCollection().document(uid).update(SELECTION_ID_FIELD, selectionId);
         }else{
             return null;
@@ -143,8 +92,26 @@ public class UserRepository {
     public Task<Void> updateSelectionDate(String selectionDate) {
         String uid = this.getCurrentUserUID();
         if(uid != null){
-            // return this.getUsersCollection().document(uid).update(SELECTION_DATE_FIELD, selectionDate);
             return getUsersCollection().document(uid).update(SELECTION_DATE_FIELD, selectionDate);
+        }else{
+            return null;
+        }
+    }
+
+    // Update selection name
+    public Task<Void> updateSelectionName(String selectionName) {
+        String uid = this.getCurrentUserUID();
+        if(uid != null){
+            return getUsersCollection().document(uid).update(SELECTION_NAME_FIELD, selectionName);
+        }else{
+            return null;
+        }
+    }
+
+    public Task<Void> updateSelectionAddress(String selectionAddress) {
+        String uid = this.getCurrentUserUID();
+        if(uid != null){
+            return getUsersCollection().document(uid).update(SELECTION_ADDRESS_FIELD, selectionAddress);
         }else{
             return null;
         }
@@ -154,7 +121,6 @@ public class UserRepository {
     public Task<Void> updateSearchRadiusPrefs(String searchRadiusPrefs) {
         String uid = this.getCurrentUserUID();
         if(uid != null){
-            // return this.getUsersCollection().document(uid).update(SEARCH_RADIUS_PREFS, searchRadiusPrefs);
             return getUsersCollection().document(uid).update(SEARCH_RADIUS_PREFS, searchRadiusPrefs);
         }else{
             return null;
@@ -165,7 +131,6 @@ public class UserRepository {
     public Task<Void> updateNotificationsPrefs(String notificationsPrefs) {
         String uid = this.getCurrentUserUID();
         if(uid != null){
-            // return this.getUsersCollection().document(uid).update(NOTIFICATIONS_PREFS, notificationsPrefs);
             return getUsersCollection().document(uid).update(NOTIFICATIONS_PREFS, notificationsPrefs);
         }else{
             return null;

@@ -13,6 +13,8 @@ public class User implements Serializable {
     @Nullable private String userUrlPicture;
     @Nullable private String selectionId;
     @Nullable private String selectionDate;
+    @Nullable private String selectionName;
+    @Nullable private String selectionAddress;
     @Nullable private String searchRadiusPrefs;
     @Nullable private String notificationsPrefs;
 
@@ -28,20 +30,24 @@ public class User implements Serializable {
         this.userUrlPicture = userUrlPicture;
         this.selectionId = null;
         this.selectionDate = null;
+        this.selectionName = null;
+        this.selectionAddress = null;
         this.searchRadiusPrefs = null;
         this.notificationsPrefs = null;
     }
 
     // Full constructor
     public User(String uid, String username, @Nullable String userEmail, @Nullable String userUrlPicture,
-                @Nullable String selectionId, @Nullable String selectionDate,
-                @Nullable String searchRadiusPrefs, @Nullable String notificationsPrefs) {
+                @Nullable String selectionId, @Nullable String selectionDate, @Nullable String selectionName,
+                @Nullable String selectionAddress, @Nullable String searchRadiusPrefs, @Nullable String notificationsPrefs) {
         this.uid = uid;
         this.username = username;
         this.userEmail = userEmail;
         this.userUrlPicture = userUrlPicture;
         this.selectionId = selectionId;
         this.selectionDate = selectionDate;
+        this.selectionName = selectionName;
+        this.selectionAddress = selectionAddress;
         this.searchRadiusPrefs = searchRadiusPrefs;
         this.notificationsPrefs = notificationsPrefs;
     }
@@ -65,6 +71,12 @@ public class User implements Serializable {
     }
     @Nullable public String getSelectionDate() {
         return selectionDate;
+    }
+    @Nullable public String getSelectionName() {
+        return selectionName;
+    }
+    @Nullable public String getSelectionAddress() {
+        return selectionAddress;
     }
     @Nullable public String getSearchRadiusPrefs() {
         return searchRadiusPrefs;
@@ -92,6 +104,12 @@ public class User implements Serializable {
     }
     public void setSelectionDate(@Nullable String selectionDate) {
         this.selectionDate = selectionDate;
+    }
+    public void setSelectionName(@Nullable String selectionName) {
+        this.selectionName = selectionName;
+    }
+    public void setSelectionAddress(@Nullable String selectionAddress) {
+        this.selectionAddress = selectionAddress;
     }
     public void setSearchRadiusPrefs(@Nullable String searchRadiusPrefs) {
         this.searchRadiusPrefs = searchRadiusPrefs;

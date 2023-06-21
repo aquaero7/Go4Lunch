@@ -45,12 +45,6 @@ public class UserManager {
         return (this.getCurrentUser() != null);
     }
 
-    /*
-    public void createUser(){
-        userRepository.createUser();
-    }
-    */
-
     // Get the users list from Firestore
     public void getUsersList(OnCompleteListener<QuerySnapshot> listener) {
         userRepository.getUsersList(listener);
@@ -61,12 +55,6 @@ public class UserManager {
         return userRepository.getCurrentUserData().continueWith(task -> task.getResult().toObject(User.class)) ;
     }
 
-    /* Get the user from Firestore and cast it to a User model Object
-    public Task<User> getUserData(String id) {
-        return userRepository.getUserData(id).continueWith(task -> task.getResult().toObject(User.class)) ;
-    }
-    */
-
     // Set ir update user selection restaurant id
     public Task<Void> updateSelectionId(String selectionId) {
         return userRepository.updateSelectionId(selectionId);
@@ -75,6 +63,16 @@ public class UserManager {
     // Set or update user selection date
     public Task<Void> updateSelectionDate(String selectionDate) {
         return userRepository.updateSelectionDate(selectionDate);
+    }
+
+    // Set or update user selection name
+    public Task<Void> updateSelectionName(String selectionName) {
+        return userRepository.updateSelectionName(selectionName);
+    }
+
+    // Set or update user selection address
+    public Task<Void> updateSelectionAddress(String selectionAddress) {
+        return userRepository.updateSelectionAddress(selectionAddress);
     }
 
     // Set or update user search radius preferences
@@ -98,5 +96,6 @@ public class UserManager {
     public Task<Void> deleteFirebaseUser(Context context){
         return userRepository.deleteFirebaseUser(context);
     }
+
 
 }

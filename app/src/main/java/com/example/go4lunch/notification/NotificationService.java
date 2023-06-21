@@ -21,25 +21,30 @@ import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.viewmodel.RestaurantViewModel;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationService extends FirebaseMessagingService {
 
     private final int NOTIFICATION_ID = 4;
     private final String NOTIFICATION_TAG = "GO4LUNCH";
 
-    String currentDate = CalendarUtils.getCurrentDate();
-    User currentUser;
-    String currentUserId;
-    String selectionId;
-    String selectionDate;
-    String notificationPrefs;
-    String notificationBodyText;
-    UserManager userManager = UserManager.getInstance();
+    private String currentDate = CalendarUtils.getCurrentDate();
+    private User currentUser;
+    private String currentUserId;
+    private List<String> selectorsNameList = new ArrayList<>();
+    private String selectionId;
+    private String selectionDate;
+    private String selectionName;
+    private String selectionAddress;
+    private String notificationPrefs;
+    private String notificationBodyText;
+    private UserManager userManager = UserManager.getInstance();
 
 
     @Override
@@ -57,6 +62,8 @@ public class NotificationService extends FirebaseMessagingService {
                         currentUserId = user.getUid();
                         selectionId = user.getSelectionId();
                         selectionDate = user.getSelectionDate();
+                        selectionName = user.getSelectionName();
+                        selectionAddress = user.getSelectionAddress();
                         notificationPrefs = user.getNotificationsPrefs();
 
                         // Check if current user has selected a restaurant
@@ -66,19 +73,36 @@ public class NotificationService extends FirebaseMessagingService {
                         if (aRestaurantIsSelected) {
                             // Send notification with message if preferences parameter is set true
                             if (Boolean.parseBoolean(notificationPrefs)) {
-                                // Get selected restaurant data from restaurants collection in database
-                                getSelectedRestaurantData();    // TODO
+                                // Get the list of workmates names with the same selection (other than current user)
+                                // Get workmates list
+                                userManager.getUsersList(task -> {
+                                    if (task.isSuccessful()) {
+                                        if (task.getResult() != null) {
+                                            // Clear the selectors list of this restaurant
+                                            if (selectorsNameList != null) selectorsNameList.clear();
+                                            // For each workmate, get his/her name and the selected restaurant id and date
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                String wId = document.getData().get("uid").toString();
+                                                String wName = document.getData().get("username").toString();
+                                                String wSelId = (document.getData().get("selectionId") != null) ?
+                                                        document.getData().get("selectionId").toString() : "";
+                                                String wSelDate = (document.getData().get("selectionDate") != null) ?
+                                                        document.getData().get("selectionDate").toString() : "";
+                                                // Check if selection of the workmate matches that of the current user
+                                                boolean isSelector = (selectionId.equals(wSelId) && currentDate.equals(wSelDate));
+                                                // If it does, add workmate name to the selectors list (except current user name)
+                                                if (isSelector && !(currentUserId.equals(wId))) selectorsNameList.add(wName);
+                                            }
+                                            // Create notification body text
+                                            createNotificationBodyText(selectionName, selectionAddress, selectorsNameList);
+                                            // Send notification
+                                            sendLunchNotification();
 
-
-
-                                    // Get the list of workmates with the same selection (other than current user)
-                                    getSelectorsList();             // TODO
-
-
-                                        // Create notification body text
-                                        createNotificationBodyText(rName, rAddress, selectorsNameList);
-                                        // Send notification
-                                        sendLunchNotification();
+                                        }
+                                    } else {
+                                        Log.w("UserViewModel", "Error getting documents: ", task.getException());
+                                    }
+                                });
                             }
                         }
                     })
@@ -135,28 +159,5 @@ public class NotificationService extends FirebaseMessagingService {
         Log.i("NotificationService", notificationBodyText);
     }
 
-    /*
-    private void getSelectorsList() {
-        selectorsList = new ArrayList<>();
-        List<User> workmatesList = FirestoreUtils.getWorkmatesList();
-        for (User workmate : workmatesList) {
-            // Check selected restaurant id and date and get users list
-            boolean isSelector = (selectionId.equals(workmate.getSelectionId())
-                    && currentDate.equals(workmate.getSelectionDate()));
-            // Don't add current user to the list of (other) selectors
-            if (isSelector && !(currentUserId.equals(workmate.getUid()))) selectorsList.add(workmate);
-        }
-    }
-
-    private void getSelectedRestaurantData() {
-        List<Restaurant> restaurantsList = FirestoreUtils.getRestaurantsList();
-        for (Restaurant restaurant : restaurantsList) {
-            if (selectionId.equals(restaurant.getRid())) {
-                rName = restaurant.getName();
-                rAddress = restaurant.getAddress();
-            }
-        }
-    }
-    */
 
 }

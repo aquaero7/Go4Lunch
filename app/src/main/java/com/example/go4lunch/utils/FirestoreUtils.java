@@ -33,23 +33,21 @@ public class FirestoreUtils {
     private static List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private static User currentUser;
     private static boolean currentUserLogStatus;
-    // private static boolean taskCompleted;    // TODO : To be deleted
 
-    /*  // TODO : To be deleted
-    public static boolean isTaskCompleted() {
-        return  taskCompleted;
-    }
-    */
-
-    public static void updateCurrentUser(String tag, String selectionId, String selectionDate) {
+    // Called il FirestoreUtilsTest
+    public static void updateCurrentUser(String tag, String selectionId, String selectionDate,
+                                         String selectionName, String selectionAddress) {
         if (Objects.equals(tag, "SEL")) {
             currentUser.setSelectionId(selectionId);
             currentUser.setSelectionDate(selectionDate);
+            currentUser.setSelectionName(selectionName);
+            currentUser.setSelectionAddress(selectionAddress);
         } else {
             Log.e("FirestoreUtils", "Wrong tag for selection");
         }
     }
 
+    // Called il FirestoreUtilsTest
     public static void updateCurrentUser(String tag, String value) {
         switch (tag) {
             case "RAD":
@@ -63,12 +61,15 @@ public class FirestoreUtils {
         }
     }
 
-    public static void updateWorkmatesList(String tag, String selectionId, String selectionDate) {
+    public static void updateWorkmatesList(String tag, String selectionId, String selectionDate,
+                                           String selectionName, String selectionAddress) {
         for (User workmate : workmatesList) {
             if (currentUser.getUid().equals(workmate.getUid())) {
                 if (Objects.equals(tag, "SEL")) {
                     workmate.setSelectionId(selectionId);
                     workmate.setSelectionDate(selectionDate);
+                    workmate.setSelectionName(selectionName);
+                    workmate.setSelectionAddress(selectionAddress);
                     break;
                 } else {
                     Log.e("FirestoreUtils", "Wrong tag for selection");
@@ -115,6 +116,7 @@ public class FirestoreUtils {
         return currentUserLogStatus;
     }
 
+    // Called il FirestoreUtilsTest
     public static User getCurrentUser() {
         return currentUser;
     }
@@ -135,6 +137,7 @@ public class FirestoreUtils {
         currentUserLogStatus = logStatus;
     }
 
+    // Called il FirestoreUtilsTest
     public static void setCurrentUser(User user) {
         currentUser = user;
     }
@@ -160,10 +163,13 @@ public class FirestoreUtils {
         String uUrlPicture = ((document.getData().get("userUrlPicture")) != null) ? document.getData().get("userUrlPicture").toString() : null;
         String selectionId = ((document.getData().get("selectionId")) != null) ? document.getData().get("selectionId").toString() : null;
         String selectionDate = ((document.getData().get("selectionDate")) != null) ? document.getData().get("selectionDate").toString() : null;
+        String selectionName = ((document.getData().get("selectionName")) != null) ? document.getData().get("selectionName").toString() : null;
+        String selectionAddress = ((document.getData().get("selectionAddress")) != null) ? document.getData().get("selectionAddress").toString() : null;
         String searchRadiusPrefs = ((document.getData().get("searchRadiusPrefs")) != null) ? document.getData().get("searchRadiusPrefs").toString() : null;
         String notificationsPrefs = ((document.getData().get("notificationsPrefs")) != null) ? document.getData().get("notificationsPrefs").toString() : null;
 
-        User userFromData = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate, searchRadiusPrefs, notificationsPrefs);
+        User userFromData = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate,
+                selectionName, selectionAddress, searchRadiusPrefs, notificationsPrefs);
 
         return userFromData;
     }
