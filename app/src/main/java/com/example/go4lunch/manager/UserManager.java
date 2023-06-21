@@ -97,5 +97,4 @@ public class UserManager {
         return userRepository.deleteFirebaseUser(context);
     }
 
-
 }
