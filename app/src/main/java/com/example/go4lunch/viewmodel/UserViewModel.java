@@ -32,6 +32,7 @@ public class UserViewModel extends ViewModel {
         return mMutableLiveData;
     }
 
+    /*
 
     private User getUserFromDatabaseDocument(QueryDocumentSnapshot document) {
         String uId = Objects.requireNonNull(document.getData().get("uid")).toString();
@@ -70,5 +71,7 @@ public class UserViewModel extends ViewModel {
             }
         });
     }
+
+    */
 
 }

@@ -6,8 +6,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -17,7 +15,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,34 +29,21 @@ import com.example.go4lunch.fragment.ListViewFragment;
 import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
-import com.example.go4lunch.manager.LikedRestaurantManager;
-import com.example.go4lunch.manager.RestaurantManager;
-import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
-import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
-import com.example.go4lunch.utils.DataProcessingUtils;
-import com.example.go4lunch.utilsforviews.EventListener;
-import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
-import com.example.go4lunch.viewmodel.LikedRestaurantViewModel;
-import com.example.go4lunch.viewmodel.LocationViewModel;
-import com.example.go4lunch.viewmodel.RestaurantViewModel;
-import com.example.go4lunch.viewmodel.UserViewModel;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnFailureListener;
+import com.example.go4lunch.utilsforviews.EventListener;
+import com.example.go4lunch.viewmodel.DrawerViewModel;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, EventListener {
 
@@ -81,20 +65,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     String message;
     private Fragment fmt;
     private SearchView searchView;
-    private final String currentDate = CalendarUtils.getCurrentDate();
-    private String uid;
-    private final UserManager userManager = UserManager.getInstance();
-    private final RestaurantManager restaurantManager = RestaurantManager.getInstance();
-    private final LikedRestaurantManager likedRestaurantManager = LikedRestaurantManager.getInstance();
-    private LocationViewModel locationViewModel;
-    private RestaurantViewModel restaurantViewModel;
-    private UserViewModel userViewModel;
-    private LikedRestaurantViewModel likedRestaurantViewModel;
-    private List<User> workmatesList = new ArrayList<>();
-    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
-    private User currentUser;
-    private LatLng home;
-    private boolean selectionIsNearBy;
+    private DrawerViewModel drawerViewModel;
+    // private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();   // TODO : To be deleted
+    // private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();     // TODO : To be deleted
+    // private User currentUser;   // TODO : To be deleted
+
 
 
     @Override
@@ -105,6 +80,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Initialize ViewModel
+        drawerViewModel = new ViewModelProvider(this).get(DrawerViewModel.class);
         // Get the toolbar view
         this.configureToolbar();
         // Configure ViewPager and tabs
@@ -117,15 +94,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Initialize SearchView and setup listener
         searchView = binding.includedToolbar.searchView;
         this.configureSearchViewListener(searchView);
-        // Initialize ViewModels and fetch data
-        this.initViewModelsAndData();
+        // Fetch data
+        // this.initData(); // TODO : Transferred to AuthActivity
+
+        // Set observers
+        // this.observeLiveData();  // TODO : To be deleted
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Update data
-        this.updateData();
     }
 
     @Override
@@ -138,46 +116,32 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         }
     }
 
-    private void initViewModelsAndData() {
-        // Initialize location ViewModel
-        locationViewModel = new ViewModelProvider(this).get(LocationViewModel.class);
-        /** Get data from MAPS API */
-        locationViewModel.fetchLocation(this);
-        // Initialize restaurant ViewModel
-        restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
-        /** Get data from MAPS API */
-        restaurantViewModel.fetchRestaurants(this, getString(R.string.MAPS_API_KEY));
-        // Initialize user ViewModel
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        /** Get data from Firebase */
-        userViewModel.fetchWorkmates();
-        // Initialize liked restaurant ViewModel
-        likedRestaurantViewModel = new ViewModelProvider(this).get(LikedRestaurantViewModel.class);
-        /** Get data from Firebase */
-        likedRestaurantViewModel.fetchLikedRestaurants();
+    private void initData() {
+        // userManager.fetchCurrentUser();  // TODO : To be deleted
+        // restaurantManager.fetchRestaurants(getString(R.string.MAPS_API_KEY), MapsApisUtils.getSearchRadius());   // TODO : To be deleted
+        drawerViewModel.fetchWorkmates();
+        drawerViewModel.fetchCurrentLocationAndRestaurants(this, getString(R.string.MAPS_API_KEY));
+        drawerViewModel.fetchLikedRestaurants();
     }
 
-    private void updateData() {
-        // Update workmates list
-        userViewModel.fetchWorkmates();
-        // Update liked restaurants list
-        likedRestaurantViewModel.fetchLikedRestaurants();
-
-        // Initialize current location
-        locationViewModel.getMutableLiveData().observe(this, latLng -> {
-            home = latLng;
+    /*  // TODO : To be deleted
+    private void observeLiveData() {
+        // Current user
+        drawerViewModel.getCurrentUserMutableLiveData().observe(this, user -> {
+            currentUser = user;
         });
-        // Initialize workmates data
-        userViewModel.getMutableLiveData().observe(this, workmates -> {
-            workmatesList.clear();
-            workmatesList.addAll(workmates);
+        // Restaurants list
+        drawerViewModel.getRestaurantsMutableLiveData().observe(this, restaurants -> {
+            restaurantsList.clear();
+            restaurantsList.addAll(restaurants);
         });
-        // Initialize liked restaurants data
-        likedRestaurantViewModel.getMutableLiveData().observe(this, likedRestaurants -> {
+        // Liked restaurants list
+        drawerViewModel.getLikedRestaurantsMutableLiveData().observe(this, likedRestaurants -> {
             likedRestaurantsList.clear();
             likedRestaurantsList.addAll(likedRestaurants);
         });
     }
+    */
 
     /**
      * ---------------------
@@ -201,7 +165,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         int id = item.getItemId();
         switch (id){
             case R.id.activity_main_drawer_lunch:
-                checkCurrentUserSelectionAndLaunchActivity();
+                launchDetailRestaurantActivity();
                 break;
             case R.id.activity_main_drawer_settings:
                 launchSettingActivity();
@@ -376,62 +340,20 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
      * ---------------------
      */
 
-    private void checkIfSelectionIsNearBy(String id) {
-        restaurantViewModel.getMutableLiveData().observe(this, restaurants -> {
-            selectionIsNearBy = false;
-            for (Restaurant restaurant : restaurants) {
-                if (Objects.equals(id, restaurant.getRid())) {
-                    selectionIsNearBy = true;
-                    break;
-                }
-            }
-        });
-    }
-
-    private void checkCurrentUserSelectionAndLaunchActivity() {
-        // Get current user from database document
-        userManager.getCurrentUserData()
-                .addOnSuccessListener(user -> {
-                    currentUser = user;
-                    // Get current user selected restaurant
-                    String selectionId = currentUser.getSelectionId();
-                    String selectionDate = currentUser.getSelectionDate();
-                    checkIfSelectionIsNearBy(selectionId);
-                    boolean isSelected = selectionId != null && selectionIsNearBy && currentDate.equals(selectionDate);
-                    if (isSelected) {
-                        // Get selected restaurant from restaurants collection in database
-                        restaurantManager.getRestaurantData(selectionId)
-                                .addOnSuccessListener(restaurant -> {
-                                    Log.w("MainActivity", "success task getRestaurantData");
-                                    int distance = (home != null) ?
-                                            DataProcessingUtils.calculateRestaurantDistance(restaurant, home) : 0;
-                                    RestaurantWithDistance restaurantWithDistance =
-                                            new RestaurantWithDistance(restaurant.getRid(), restaurant.getName(),
-                                                    restaurant.getPhotos(), restaurant.getAddress(),
-                                                    restaurant.getRating(), restaurant.getOpeningHours(),
-                                                    restaurant.getPhoneNumber(), restaurant.getWebsite(),
-                                                    restaurant.getGeometry(), distance);
-
-                                    launchDetailRestaurantActivity(restaurantWithDistance);
-                                })
-                                .addOnFailureListener(e -> Log.w("MainActivity", e.getMessage()));
-                    } else {
-                        showSnackBar(getString(R.string.error_choice));
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.w("UserViewModel", e.getMessage());
-                });
-    }
-
-    private void launchDetailRestaurantActivity(RestaurantWithDistance restaurant) {
-        Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("RESTAURANT", restaurant);
-        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
-        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
-        intent.putExtras(bundle);
-        startActivity(intent);
+    private void launchDetailRestaurantActivity() {
+        RestaurantWithDistance restaurant = drawerViewModel.checkCurrentUserSelection();
+        // Launch DetailActivity or show message
+        if (restaurant != null) {
+            Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("RESTAURANT", restaurant);
+            // bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
+            // bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        } else {
+            showSnackBar(getString(R.string.error_choice));
+        }
     }
 
     private void launchSettingActivity() {
@@ -439,18 +361,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         startActivity(intent);
     }
 
-    // Update user information (using User model and FirestoreUtils instead of FirebaseUser model and UserManager)
+    // Update Firebase user information
     private void updateUIWithUserData(){
-        if(userManager.isCurrentUserLogged()){
-            FirebaseUser user = userManager.getCurrentUser();
-            if(user.getPhotoUrl() != null){
-                setProfilePicture(user.getPhotoUrl());
+        if(drawerViewModel.isFbCurrentUserLogged()){
+            FirebaseUser fbUser = drawerViewModel.getFbCurrentUser();
+            if(fbUser.getPhotoUrl() != null){
+                setProfilePicture(fbUser.getPhotoUrl());
             }
-            setTextUserData(user);
+            setTextUserData(fbUser);
         }
     }
 
-    // Update user picture
+    // Update Firebase user picture
     private void setProfilePicture(Uri profilePictureUrl){
         userPicture.setImageTintList(null);
         Glide.with(this)
@@ -458,11 +380,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 .apply(RequestOptions.circleCropTransform())
                 .into(userPicture);
     }
-    // Update user name and email
-    private void setTextUserData(FirebaseUser user){
+    // Update Firebase user name and email
+    private void setTextUserData(FirebaseUser fbUser){
         //Get email & username from User
-        String email = TextUtils.isEmpty(user.getEmail()) ? getString(R.string.info_no_email_found) : user.getEmail();
-        String username = TextUtils.isEmpty(user.getDisplayName()) ? getString(R.string.info_no_username_found) : user.getDisplayName();
+        String email = TextUtils.isEmpty(fbUser.getEmail()) ? getString(R.string.info_no_email_found) : fbUser.getEmail();
+        String username = TextUtils.isEmpty(fbUser.getDisplayName()) ? getString(R.string.info_no_username_found) : fbUser.getDisplayName();
         //Update views with data
         userName.setText(username);
         userEmail.setText(email);
@@ -496,23 +418,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
 
     private void logout(){
-        userManager.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
+        drawerViewModel.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
     }
 
     private void deleteAccountAndLogout() {
-        uid = userManager.getCurrentUserId();
-        // Clean up liked restaurants list
-        likedRestaurantViewModel.getMutableLiveData().observe(this, likedRestaurants -> {
-            // Delete current user's likes from Firestore liked restaurants collection
-            for (LikedRestaurant likedRestaurant : likedRestaurants) {
-                if (likedRestaurant.getUid().equals(uid))
-                    likedRestaurantManager.deleteLikedRestaurant(likedRestaurant.getId());
-            }
-        });
+        // Delete current user's likes from Firestore liked restaurants collection
+        drawerViewModel.deleteUserLikes();
         // Delete current user from Firestore users collection
-        userManager.deleteUser(uid);
+        drawerViewModel.deleteUser();
         // Delete current user from Firebase and logout
-        userManager.deleteFirebaseUser(MainActivity.this)
+        drawerViewModel.deleteFbUser(MainActivity.this)
                 .addOnSuccessListener(aVoid -> {
                     message = getString(R.string.dialog_info_deletion_confirmation);
                     showSnackBar(message);

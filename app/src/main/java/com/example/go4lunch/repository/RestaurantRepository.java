@@ -27,7 +27,7 @@ public class RestaurantRepository {
     private static volatile RestaurantRepository instance;
 
     // Firestore
-    private static final String COLLECTION_RESTAURANTS = "restaurants";
+    // private static final String COLLECTION_RESTAURANTS = "restaurants";
 
     public RestaurantRepository() {
     }
@@ -45,13 +45,13 @@ public class RestaurantRepository {
         }
     }
 
+    /*
     // Get the Collection Reference
     private CollectionReference getRestaurantsCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_RESTAURANTS);
     }
 
     // Create restaurant in Firestore
-
     public void createRestaurant(String id, String name, List<Photo> photos, String address,
                                  double rating, OpeningHours openingHours, String phoneNumber,
                                  String website, Geometry geometry) {
@@ -75,20 +75,7 @@ public class RestaurantRepository {
             return null;
         }
     }
-
-    /* Clear the restaurants collection
-    public void clearRestaurantsCollection() {
-        getRestaurantsList(task -> {
-            if (task.isSuccessful()) {
-                // Get and delete each document in restaurants collection
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    getRestaurantsCollection().document(document.getId()).delete();
-                }
-            } else {
-                Log.d("RestaurantRepository", "Error getting documents: ", task.getException());
-            }
-        });
-    }
     */
+
 
 }

@@ -49,6 +49,7 @@ public class RestaurantViewModel extends ViewModel {
         return mMutableLiveData;
     }
 
+    /*
     private void getRestaurantDetailsFromApi(Restaurant nearbyRestaurant, String apiKey, Context context) {
 
         String rId = nearbyRestaurant.getRid();
@@ -74,11 +75,11 @@ public class RestaurantViewModel extends ViewModel {
                 String website = restaurantDetails.getWebsite();
                 OpeningHours openingHours = restaurantDetails.getOpeningHours();    // Can be commented to make openingHours come from nearby api
 
-                /** Add restaurant to current restaurants list */
+                // Add restaurant to current restaurants list //
                 restaurantsList.add(new Restaurant(rId, name, photos, address, rating, openingHours,
                         phoneNumber, website, geometry));
 
-                /** Create or update restaurant in Firebase */
+                // Create or update restaurant in Firebase //
                 RestaurantManager.getInstance().createRestaurant(rId, name, photos, address, rating,
                         openingHours, phoneNumber, website, geometry);
             }
@@ -146,5 +147,7 @@ public class RestaurantViewModel extends ViewModel {
             mMutableLiveData.setValue(nearbyRestaurantsList);
         }
     }
+
+    */
 
 }

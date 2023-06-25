@@ -31,6 +31,8 @@ public class LocationViewModel extends ViewModel {
         return mMutableLiveData;
     }
 
+    /*
+
     @SuppressWarnings("MissingPermission")  // Permissions already checked in AuthActivity
     public void fetchLocation(Activity activity) {
         FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
@@ -90,4 +92,6 @@ public class LocationViewModel extends ViewModel {
             Log.w("Exception: %s", e.getMessage(), e);
         }
     }
+
+    */
 }

@@ -31,6 +31,8 @@ public class LikedRestaurantViewModel extends ViewModel {
     }
 
 
+    /*
+
     private LikedRestaurant getLikedRestaurantFromDatabaseDocument(QueryDocumentSnapshot document) {
         String id = Objects.requireNonNull(document.getId());
         String rId = Objects.requireNonNull(document.getData().get("rid")).toString();
@@ -60,5 +62,7 @@ public class LikedRestaurantViewModel extends ViewModel {
             }
         });
     }
+
+    */
 
 }

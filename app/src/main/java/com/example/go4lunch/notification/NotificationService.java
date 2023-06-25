@@ -1,5 +1,6 @@
 package com.example.go4lunch.notification;
 
+import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -32,11 +33,12 @@ import java.util.Map;
 public class NotificationService extends FirebaseMessagingService {
 
     private final int NOTIFICATION_ID = 4;
-    private final String NOTIFICATION_TAG = "GO4LUNCH";
+    // private final String NOTIFICATION_TAG = "GO4LUNCH";
 
     private String currentDate = CalendarUtils.getCurrentDate();
     private User currentUser;
     private String currentUserId;
+    private List<User> workmatesList;
     private List<String> selectorsNameList = new ArrayList<>();
     private String selectionId;
     private String selectionDate;
@@ -50,65 +52,48 @@ public class NotificationService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-
         if (remoteMessage.getNotification() != null) {
             // Get message sent by Firebase
             RemoteMessage.Notification notification = remoteMessage.getNotification();
             Log.i("NotificationService", notification.getTitle() + "\n" + notification.getBody());
+            // Get current user data
+            currentUser = userManager.getCurrentUser();
+            currentUserId = currentUser.getUid();
+            selectionId = currentUser.getSelectionId();
+            selectionDate = currentUser.getSelectionDate();
+            selectionName = currentUser.getSelectionName();
+            selectionAddress = currentUser.getSelectionAddress();
+            notificationPrefs = currentUser.getNotificationsPrefs();
+            // Check if current user has selected a restaurant
+            boolean aRestaurantIsSelected = selectionId != null && currentDate.equals(selectionDate);
 
-            userManager.getCurrentUserData()
-                    .addOnSuccessListener(user -> {
-                        currentUser = user;
-                        currentUserId = user.getUid();
-                        selectionId = user.getSelectionId();
-                        selectionDate = user.getSelectionDate();
-                        selectionName = user.getSelectionName();
-                        selectionAddress = user.getSelectionAddress();
-                        notificationPrefs = user.getNotificationsPrefs();
+            /* Send notification with message only if current user has selected a restaurant
+               and if his notifications preferences parameter is set true */
+            if (aRestaurantIsSelected && Boolean.parseBoolean(notificationPrefs)) {
+                // Get workmates list
+                workmatesList = userManager.getWorkmates();
+                // Get the list of workmates names with the same selection (other than current user)
+                // Clear the selectors list of this restaurant
+                if (selectorsNameList != null) selectorsNameList.clear();
+                // For each workmate, get his/her name and the selected restaurant id and date
+                for (User workmate : workmatesList) {
+                    String wId = workmate.getUid();
+                    // Get workmate selection only if he/she is not the current user
+                    if (!currentUserId.equals(wId)) {
+                        String wName = workmate.getUsername();
+                        String wSelId = (workmate.getSelectionId() != null) ? workmate.getSelectionId() : "";
+                        String wSelDate = (workmate.getSelectionDate() != null) ? workmate.getSelectionDate() : "";
+                        /* If the workmate selection matches that of the current user,
+                           add his/her name to the selectors list */
 
-                        // Check if current user has selected a restaurant
-                        boolean aRestaurantIsSelected = selectionId != null && currentDate.equals(selectionDate);
-
-                        // Send notification with message only if current user has selected a restaurant
-                        if (aRestaurantIsSelected) {
-                            // Send notification with message if preferences parameter is set true
-                            if (Boolean.parseBoolean(notificationPrefs)) {
-                                // Get the list of workmates names with the same selection (other than current user)
-                                // Get workmates list
-                                userManager.getUsersList(task -> {
-                                    if (task.isSuccessful()) {
-                                        if (task.getResult() != null) {
-                                            // Clear the selectors list of this restaurant
-                                            if (selectorsNameList != null) selectorsNameList.clear();
-                                            // For each workmate, get his/her name and the selected restaurant id and date
-                                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                                String wId = document.getData().get("uid").toString();
-                                                String wName = document.getData().get("username").toString();
-                                                String wSelId = (document.getData().get("selectionId") != null) ?
-                                                        document.getData().get("selectionId").toString() : "";
-                                                String wSelDate = (document.getData().get("selectionDate") != null) ?
-                                                        document.getData().get("selectionDate").toString() : "";
-                                                // Check if selection of the workmate matches that of the current user
-                                                boolean isSelector = (selectionId.equals(wSelId) && currentDate.equals(wSelDate));
-                                                // If it does, add workmate name to the selectors list (except current user name)
-                                                if (isSelector && !(currentUserId.equals(wId))) selectorsNameList.add(wName);
-                                            }
-                                            // Create notification body text
-                                            createNotificationBodyText(selectionName, selectionAddress, selectorsNameList);
-                                            // Send notification
-                                            sendLunchNotification();
-
-                                        }
-                                    } else {
-                                        Log.w("UserViewModel", "Error getting documents: ", task.getException());
-                                    }
-                                });
-                            }
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.w("NotificationService", e.getMessage());
-                    });
+                        if (selectionId.equals(wSelId) && currentDate.equals(wSelDate)) selectorsNameList.add(wName);
+                    }
+                }
+                // Create notification body text
+                createNotificationBodyText(selectionName, selectionAddress, selectorsNameList);
+                // Send notification
+                sendLunchNotification();
+            }
         }
     }
 
@@ -135,13 +120,14 @@ public class NotificationService extends FirebaseMessagingService {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Create a new channel for Android versions >= 8
-        CharSequence channelName = "Firebase Messages";
+        CharSequence channelName = getString(R.string.notification_channel_name);   // "Firebase Messages";
         int importance = NotificationManager.IMPORTANCE_HIGH;
         NotificationChannel mChannel = new NotificationChannel(channelId, channelName, importance);
         notificationManager.createNotificationChannel(mChannel);
 
         // Show notification
-        notificationManager.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notificationBuilder.build());
+        // notificationManager.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notificationBuilder.build());
+        notificationManager.notify(getString(R.string.app_name), NOTIFICATION_ID, notificationBuilder.build());
     }
 
 

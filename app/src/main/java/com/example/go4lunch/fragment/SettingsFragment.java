@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +22,8 @@ import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.utilsforviews.EventButtonClick;
+import com.example.go4lunch.viewmodel.DetailRestaurantViewModel;
+import com.example.go4lunch.viewmodel.SettingsViewModel;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class SettingsFragment extends Fragment implements View.OnClickListener {
@@ -35,7 +38,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     private SwitchMaterial mNotificationSwitch;
     private String searchRadiusPrefs;
     private String notificationsPrefs;
-    private UserManager userManager = UserManager.getInstance();
+    private SettingsViewModel settingsViewModel;
 
 
     // Constructor
@@ -58,17 +61,15 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         mSaveButton = binding.buttonSave;
         mNotificationSwitch = binding.switchNotification;
 
+        // Initialize ViewModel
+        settingsViewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
+
         // Initialize preferences
+
         // Search Radius prefs
-        mRadiusEditText.setText(MapsApisUtils.getSearchRadius());
+        mRadiusEditText.setText(settingsViewModel.getSearchRadius());
         // Notifications prefs
-        userManager.getCurrentUserData()
-                .addOnSuccessListener(user -> {
-                    mNotificationSwitch.setChecked(Boolean.parseBoolean(user.getNotificationsPrefs()));
-                })
-                .addOnFailureListener(e -> {
-                    Log.w("DetailRestaurantFragment", e.getMessage());
-                });
+        mNotificationSwitch.setChecked(Boolean.parseBoolean(settingsViewModel.getCurrentUser().getNotificationsPrefs()));
 
         //Set listeners on buttons and switch
         mSaveButton.setOnClickListener(this);

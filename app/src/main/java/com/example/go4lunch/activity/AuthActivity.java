@@ -3,51 +3,36 @@ package com.example.go4lunch.activity;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityAuthBinding;
-import com.example.go4lunch.manager.LikedRestaurantManager;
-import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
-import com.example.go4lunch.model.LikedRestaurant;
-import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.FirestoreUtils;
 import com.example.go4lunch.utils.MapsApisUtils;
-import com.example.go4lunch.viewmodel.RestaurantViewModel;
+import com.example.go4lunch.viewmodel.DrawerViewModel;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 
 public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
@@ -125,7 +110,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     private void setupListeners(){
         // Login Button
         binding.buttonLogin.setOnClickListener(view -> {
-            if(userManager.isCurrentUserLogged()){
+            if(userManager.isFbCurrentUserLogged()){
                 // Update Firestore utils then launch application
                 // updateUtilsAndStartApp();   // TODO : To be deleted if MVVM
                 startApp();
@@ -222,6 +207,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     }
 
     private void startApp(){
+        initData();
+
         // Show progressBar
         progressBar.setVisibility(View.VISIBLE);
         // Launch main activity
@@ -233,11 +220,11 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
     // Update Login Button when activity is resuming
     private void updateLoginButton(){
-        binding.buttonLogin.setText(userManager.isCurrentUserLogged() ? getString(R.string.button_start) : getString(R.string.button_login));
+        binding.buttonLogin.setText(userManager.isFbCurrentUserLogged() ? getString(R.string.button_start) : getString(R.string.button_login));
     }
 
     private void createUser() {
-        FirebaseUser cUser = userManager.getCurrentUser();
+        FirebaseUser cUser = userManager.getFbCurrentUser();
         if(cUser != null){
             // Data from FirebaseAuth
             final String USER_ID = "uid";
@@ -282,6 +269,25 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 }
             });
         }
+    }
+
+    private void initData() {
+        DrawerViewModel drawerViewModel = new ViewModelProvider(this).get(DrawerViewModel.class);
+        // userManager.fetchCurrentUser();  // TODO : To be deleted
+        // restaurantManager.fetchRestaurants(getString(R.string.MAPS_API_KEY), MapsApisUtils.getSearchRadius());   // TODO : To be deleted
+        drawerViewModel.fetchWorkmates();
+        // drawerViewModel.fetchCurrentLocationAndRestaurants(this, getString(R.string.MAPS_API_KEY));
+
+        Activity activity = this;
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                drawerViewModel.fetchCurrentLocationAndRestaurants(activity, getString(R.string.MAPS_API_KEY));
+            }
+        }, 10000);
+
+        drawerViewModel.fetchLikedRestaurants();
     }
 
     /*
