@@ -1,6 +1,5 @@
 package com.example.go4lunch.notification;
 
-import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,24 +10,17 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.MainActivity;
 import com.example.go4lunch.manager.UserManager;
-import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
-import com.example.go4lunch.utils.FirestoreUtils;
-import com.example.go4lunch.viewmodel.RestaurantViewModel;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class NotificationService extends FirebaseMessagingService {
 

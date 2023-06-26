@@ -1,6 +1,5 @@
 package com.example.go4lunch.view;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -11,19 +10,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.RestaurantListItemBinding;
-import com.example.go4lunch.manager.UserManager;
-import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
-import com.example.go4lunch.utils.FirestoreUtils;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class ListViewViewHolder extends RecyclerView.ViewHolder {
 

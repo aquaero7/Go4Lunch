@@ -30,6 +30,7 @@ public class UserManager {
 
     private List<User> workmatesList = new ArrayList<>();
     private User currentUser;
+    private boolean locationPermissionsGranted;
 
     private UserManager() {
         userRepository = UserRepository.getInstance();
@@ -218,5 +219,12 @@ public class UserManager {
         return currentUser;
     }
 
+    public void setPermissions(boolean granted) {
+        locationPermissionsGranted = granted;
+    }
+
+    public boolean arePermissionsGranted() {
+        return locationPermissionsGranted;
+    }
 
 }

@@ -22,22 +22,12 @@ import android.view.ViewGroup;
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
-import com.example.go4lunch.manager.UserManager;
-import com.example.go4lunch.model.LikedRestaurant;
-import com.example.go4lunch.model.Restaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utilsforviews.EventListener;
-import com.example.go4lunch.utils.FirestoreUtils;
-import com.example.go4lunch.utils.MapsApisUtils;
-import com.example.go4lunch.viewmodel.DrawerViewModel;
-import com.example.go4lunch.viewmodel.LikedRestaurantViewModel;
-import com.example.go4lunch.viewmodel.LocationViewModel;
 import com.example.go4lunch.viewmodel.MapViewViewModel;
-import com.example.go4lunch.viewmodel.RestaurantViewModel;
-import com.example.go4lunch.viewmodel.UserViewModel;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -58,11 +48,8 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 
@@ -135,7 +122,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         // Initialize AutocompleteSupportFragment
         // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.fragment_autocomplete);
         autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.fragment_autocomplete);
-        MapsApisUtils.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
+        mapViewViewModel.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
         // Initialize ViewModel
         mapViewViewModel = new ViewModelProvider(requireActivity()).get(MapViewViewModel.class);
         // Initialize current location
@@ -233,7 +220,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     private void initMap() {
         if (mGoogleMap != null) {
             // Display MyLocation button if permissions are granted
-            mGoogleMap.setMyLocationEnabled(MapsApisUtils.arePermissionsGranted());
+            mGoogleMap.setMyLocationEnabled(mapViewViewModel.arePermissionsGranted());
             // Set camera default zoom
             mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
             // Other settings

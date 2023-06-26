@@ -9,8 +9,6 @@ import com.example.go4lunch.databinding.ActivitySettingsBinding;
 import com.example.go4lunch.databinding.FragmentSettingsBinding;
 import com.example.go4lunch.fragment.SettingsFragment;
 import com.example.go4lunch.R;
-import com.example.go4lunch.manager.UserManager;
-import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.utilsforviews.EventButtonClick;
 import com.example.go4lunch.viewmodel.SettingsViewModel;
 import com.google.android.material.snackbar.Snackbar;

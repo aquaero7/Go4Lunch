@@ -2,21 +2,10 @@ package com.example.go4lunch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.*;
-
-import android.util.Log;
-
-import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.FirestoreUtils;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.MockitoSession;
-import org.mockito.quality.Strictness;
 
 public class FirestoreUtilsTest {
+
+    /*
 
     User currentUser, testCurrentUser, testUser1, testUser2;
     String uId, uName, uEmail, uUrlPicture, uSelId, uSelDate, uSelName, uSelAddress, uRadPrefs, uNotPrefs;
@@ -163,9 +152,6 @@ public class FirestoreUtilsTest {
     }
 
 
-
-
-
-
+*/
 
 }

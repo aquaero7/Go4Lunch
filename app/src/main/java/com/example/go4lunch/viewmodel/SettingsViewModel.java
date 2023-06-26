@@ -2,13 +2,9 @@ package com.example.go4lunch.viewmodel;
 
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.R;
 import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.MapsApisUtils;
-
-import java.util.Objects;
 
 public class SettingsViewModel extends ViewModel {
 

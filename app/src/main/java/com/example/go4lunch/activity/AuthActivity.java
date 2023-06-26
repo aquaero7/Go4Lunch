@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Application;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -22,7 +21,6 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityAuthBinding;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.viewmodel.DrawerViewModel;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
@@ -85,7 +83,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 locationPermissionsGranted = false;
             }
             /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment */
-            MapsApisUtils.setPermissions(locationPermissionsGranted);
+            userManager.setPermissions(locationPermissionsGranted);
         });
 
         // Check and request permissions
@@ -102,7 +100,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
             locationPermissionsGranted = true;
             // getDataFromApi();    // TODO : Test MVVM
             /** Initialize permissions in Utils to make them available for fragments */
-            MapsApisUtils.setPermissions(locationPermissionsGranted);
+            userManager.setPermissions(locationPermissionsGranted);
         }
     }
 

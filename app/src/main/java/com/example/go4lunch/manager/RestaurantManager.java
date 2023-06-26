@@ -36,9 +36,9 @@ import retrofit2.Response;
 public class RestaurantManager {
 
     /** DEFAULT VALUES **/
-    private final String DEFAULT_RADIUS = "1"; // Distance in km
     private final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
     private final double DEF_LONGITUDE = 0;  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
+    private final String DEFAULT_RADIUS = "1"; // Distance in km
     /********************/
 
     private static volatile RestaurantManager instance;

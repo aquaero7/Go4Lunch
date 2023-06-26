@@ -29,11 +29,7 @@ import com.example.go4lunch.fragment.ListViewFragment;
 import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
-import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
-import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.CalendarUtils;
-import com.example.go4lunch.utils.MapsApisUtils;
 import com.example.go4lunch.utilsforviews.EventListener;
 import com.example.go4lunch.viewmodel.DrawerViewModel;
 import com.google.android.material.navigation.NavigationView;
@@ -41,9 +37,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, EventListener {
 

@@ -8,7 +8,10 @@ import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 
+import java.util.Collections;
 import java.util.List;
 
 public class MapViewViewModel extends ViewModel {
@@ -56,6 +59,20 @@ public class MapViewViewModel extends ViewModel {
     /***********
      * Methods *
      ***********/
+
+    public void initializeAutocompleteSupportFragment(AutocompleteSupportFragment autocompleteFragment) {
+        // Specify the types of place data to return.
+        // autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        autocompleteFragment.setPlaceFields(Collections.singletonList(Place.Field.ID));
+        // Specify the type values of place data to return.
+        autocompleteFragment.setTypesFilter(Collections.singletonList("restaurant"));
+        // Specify the country of place data to return.
+        autocompleteFragment.setCountries("FR");
+    }
+
+    public boolean arePermissionsGranted() {
+        return userManager.arePermissionsGranted();
+    }
 
     public LatLng getDefaultLocation() {
         return restaurantManager.getDefaultLocation();

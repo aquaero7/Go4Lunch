@@ -1,27 +1,5 @@
 package com.example.go4lunch.repository;
 
-import android.util.Log;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-
-import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.model.User;
-import com.example.go4lunch.model.api.Geometry;
-import com.example.go4lunch.model.api.OpeningHours;
-import com.example.go4lunch.model.api.Photo;
-import com.example.go4lunch.utils.FirestoreUtils;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.List;
-import java.util.Map;
-
 public class RestaurantRepository {
 
     private static volatile RestaurantRepository instance;
