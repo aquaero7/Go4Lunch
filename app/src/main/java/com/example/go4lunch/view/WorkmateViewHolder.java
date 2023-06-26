@@ -1,7 +1,6 @@
 package com.example.go4lunch.view;
 
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,11 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.databinding.WorkmateListItemBinding;
-import com.example.go4lunch.manager.RestaurantManager;
-import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.CalendarUtils;
+import com.example.go4lunch.utils.DataProcessingUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -25,7 +22,7 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
     private final ImageView imageView;
     private final TextView textView;
     private String mText;
-    private final String currentDate = CalendarUtils.getCurrentDate();
+    private final String currentDate = DataProcessingUtils.getCurrentDate();
 
     public WorkmateViewHolder(@NonNull View itemView) {
         super(itemView);

@@ -15,7 +15,7 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.activity.MainActivity;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.CalendarUtils;
+import com.example.go4lunch.utils.DataProcessingUtils;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -27,7 +27,7 @@ public class NotificationService extends FirebaseMessagingService {
     private final int NOTIFICATION_ID = 4;
     // private final String NOTIFICATION_TAG = "GO4LUNCH";
 
-    private String currentDate = CalendarUtils.getCurrentDate();
+    private String currentDate = DataProcessingUtils.getCurrentDate();
     private User currentUser;
     private String currentUserId;
     private List<User> workmatesList;

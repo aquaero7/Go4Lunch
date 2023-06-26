@@ -14,6 +14,8 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,10 +61,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private Fragment fmt;
     private SearchView searchView;
     private DrawerViewModel drawerViewModel;
-    // private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();   // TODO : To be deleted
-    // private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();     // TODO : To be deleted
-    // private User currentUser;   // TODO : To be deleted
-
 
 
     @Override
@@ -88,10 +86,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         searchView = binding.includedToolbar.searchView;
         this.configureSearchViewListener(searchView);
         // Fetch data
-        // this.initData(); // TODO : Transferred to AuthActivity
-
-        // Set observers
-        // this.observeLiveData();  // TODO : To be deleted
+        this.initData(); // TODO : Test implementation in MainActivity or AuthActivity
     }
 
     @Override
@@ -108,33 +103,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             view.setVisibility(View.VISIBLE);
         }
     }
-
-    private void initData() {
-        // userManager.fetchCurrentUser();  // TODO : To be deleted
-        // restaurantManager.fetchRestaurants(getString(R.string.MAPS_API_KEY), MapsApisUtils.getSearchRadius());   // TODO : To be deleted
-        drawerViewModel.fetchWorkmates();
-        drawerViewModel.fetchCurrentLocationAndRestaurants(this, getString(R.string.MAPS_API_KEY));
-        drawerViewModel.fetchLikedRestaurants();
-    }
-
-    /*  // TODO : To be deleted
-    private void observeLiveData() {
-        // Current user
-        drawerViewModel.getCurrentUserMutableLiveData().observe(this, user -> {
-            currentUser = user;
-        });
-        // Restaurants list
-        drawerViewModel.getRestaurantsMutableLiveData().observe(this, restaurants -> {
-            restaurantsList.clear();
-            restaurantsList.addAll(restaurants);
-        });
-        // Liked restaurants list
-        drawerViewModel.getLikedRestaurantsMutableLiveData().observe(this, likedRestaurants -> {
-            likedRestaurantsList.clear();
-            likedRestaurantsList.addAll(likedRestaurants);
-        });
-    }
-    */
 
     /**
      * ---------------------
@@ -332,6 +300,23 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
      * METHODS
      * ---------------------
      */
+
+    // TODO : Test implementation in MainActivity or AuthActivity
+    private void initData() {
+        drawerViewModel.fetchWorkmates();
+
+        // drawerViewModel.fetchCurrentLocationAndRestaurants(this, getString(R.string.MAPS_API_KEY));
+        Activity activity = this;
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                drawerViewModel.fetchCurrentLocationAndRestaurants(activity, getString(R.string.MAPS_API_KEY));
+            }
+        }, 10000);
+
+        drawerViewModel.fetchLikedRestaurants();
+    }
 
     private void launchDetailRestaurantActivity() {
         RestaurantWithDistance restaurant = drawerViewModel.checkCurrentUserSelection();

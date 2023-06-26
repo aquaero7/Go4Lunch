@@ -12,7 +12,6 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.RestaurantListItemBinding;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.squareup.picasso.Picasso;
 
@@ -30,7 +29,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
     private final RatingBar mRatingBar;
     private final ImageView ivPicture;
 
-    private final String currentDate = CalendarUtils.getCurrentDate();
+    private final String currentDate = DataProcessingUtils.getCurrentDate();
 
 
     public ListViewViewHolder(@NonNull View itemView) {

@@ -28,7 +28,6 @@ import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Photo;
-import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utilsforviews.EventButtonClick;
 import com.example.go4lunch.utilsforviews.ItemClickSupport;
 import com.example.go4lunch.view.DetailRestaurantWorkmateAdapter;

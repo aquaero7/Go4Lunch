@@ -24,7 +24,6 @@ import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utilsforviews.EventListener;
 import com.example.go4lunch.viewmodel.MapViewViewModel;
@@ -73,7 +72,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     private List<User> workmatesList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
     private int selectionsCount;
-    private final String currentDate = CalendarUtils.getCurrentDate();
+    private final String currentDate = DataProcessingUtils.getCurrentDate();
 
     public MapViewFragment() {
     }
@@ -117,14 +116,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
+        // Initialize ViewModel
+        mapViewViewModel = new ViewModelProvider(requireActivity()).get(MapViewViewModel.class);
         // Initialize CardView
         autocompleteCardView = binding.includedCardViewAutocomplete.cardViewAutocomplete;
         // Initialize AutocompleteSupportFragment
         // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.fragment_autocomplete);
         autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.fragment_autocomplete);
         mapViewViewModel.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
-        // Initialize ViewModel
-        mapViewViewModel = new ViewModelProvider(requireActivity()).get(MapViewViewModel.class);
         // Initialize current location
         home = mapViewViewModel.getDefaultLocation();
         // return rootView;
@@ -258,6 +257,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
                 // No more home focus after first display (except if MyLocationButton is triggered)
                 focusHome = false;
             }
+            // displayRestaurantsOnMap();
         });
 
     }

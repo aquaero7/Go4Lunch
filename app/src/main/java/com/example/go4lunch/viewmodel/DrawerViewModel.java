@@ -12,7 +12,7 @@ import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.CalendarUtils;
+import com.example.go4lunch.utils.DataProcessingUtils;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -40,7 +40,7 @@ public class DrawerViewModel extends ViewModel {
         restaurantManager = RestaurantManager.getInstance();
         likedRestaurantManager = LikedRestaurantManager.getInstance();
 
-        currentDate = CalendarUtils.getCurrentDate();
+        currentDate = DataProcessingUtils.getCurrentDate();
     }
 
     /************

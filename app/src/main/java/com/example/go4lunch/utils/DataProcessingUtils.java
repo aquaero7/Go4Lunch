@@ -11,10 +11,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.maps.android.SphericalUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DataProcessingUtils {
 
@@ -36,8 +40,8 @@ public class DataProcessingUtils {
             /** Information must be either 3 char (code) or 7 char (code+schedule) length */
 
             boolean openNow;
-            long currentDayOfWeek = CalendarUtils.getCurrentDayOfWeek();
-            String currentTime = CalendarUtils.getCurrentTime();
+            long currentDayOfWeek = getCurrentDayOfWeek();
+            String currentTime = getCurrentTime();
 
             // Get the list of opening periods
             List<Period> periods = restaurant.getOpeningHours().getPeriods();
@@ -228,4 +232,33 @@ public class DataProcessingUtils {
         // periods.sort((o1, o2) -> o2.getOpen().getTime().compareTo(o1.getOpen().getTime()));
     }
 
+
+    /******************
+     * Calendar utils *
+     ******************/
+
+    // Get current day of week
+    public static long getCurrentDayOfWeek() {
+        Calendar calendar = Calendar.getInstance();
+        return calendar.get(Calendar.DAY_OF_WEEK) - 1;
+    }
+
+    // Get current formatted time
+    public static String getCurrentTime() {
+        Calendar calendar = Calendar.getInstance();
+
+        String hod = (calendar.get(Calendar.HOUR_OF_DAY) > 9) ?
+                String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) : "0" + String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
+        String min = (calendar.get(Calendar.MINUTE) > 9) ?
+                String.valueOf(calendar.get(Calendar.MINUTE)) : "0" + String.valueOf(calendar.get(Calendar.MINUTE));
+
+        return hod + min;
+    }
+
+    public static String getCurrentDate() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.FRANCE);
+        Date date = calendar.getTime();
+        return sdf.format(date);
+    }
 }

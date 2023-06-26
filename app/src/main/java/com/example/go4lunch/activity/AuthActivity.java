@@ -98,7 +98,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
             /** Permissions granted */
             Log.w("checkPermissions", "Permissions granted");
             locationPermissionsGranted = true;
-            // getDataFromApi();    // TODO : Test MVVM
             /** Initialize permissions in Utils to make them available for fragments */
             userManager.setPermissions(locationPermissionsGranted);
         }
@@ -109,8 +108,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         // Login Button
         binding.buttonLogin.setOnClickListener(view -> {
             if(userManager.isFbCurrentUserLogged()){
-                // Update Firestore utils then launch application
-                // updateUtilsAndStartApp();   // TODO : To be deleted if MVVM
                 startApp();
             }else{
                 startSignInActivity();
@@ -204,18 +201,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
 
-    private void startApp(){
-        initData();
-
-        // Show progressBar
-        progressBar.setVisibility(View.VISIBLE);
-        // Launch main activity
-        Intent intent = new Intent(this,MainActivity.class);
-        mainActivityResultLauncher.launch(intent);
-        // Hide progressBar
-        progressBar.setVisibility(View.INVISIBLE);
-    }
-
     // Update Login Button when activity is resuming
     private void updateLoginButton(){
         binding.buttonLogin.setText(userManager.isFbCurrentUserLogged() ? getString(R.string.button_start) : getString(R.string.button_login));
@@ -244,8 +229,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                                     USER_URL_PICTURE, userUrlPicture)
                             .addOnSuccessListener(command -> {
                                 Log.w("AuthActivity","Update successful");
-                                // Update Firestore utils then launch application
-                                // updateUtilsAndStartApp();   // TODO : To be deleted if MVVM
                                 startApp();
                             })
                             .addOnFailureListener(e -> Log.w("AuthActivity",
@@ -258,8 +241,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                             .set(userToCreate)
                             .addOnSuccessListener(command -> {
                                 Log.w("AuthActivity","Creation successful");
-                                // Update Firestore utils then launch application
-                                // updateUtilsAndStartApp();   // TODO : To be deleted if MVVM
                                 startApp();
                             })
                             .addOnFailureListener(e -> Log.w("AuthActivity",
@@ -269,13 +250,27 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         }
     }
 
+    private void startApp(){
+
+        // Fetch data
+        // initData(); // TODO : Test implementation in MainActivity or AuthActivity
+
+        // Show progressBar
+        progressBar.setVisibility(View.VISIBLE);
+        // Launch main activity
+        Intent intent = new Intent(this,MainActivity.class);
+        mainActivityResultLauncher.launch(intent);
+        // Hide progressBar
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    // TODO : Test implementation in MainActivity or AuthActivity
     private void initData() {
         DrawerViewModel drawerViewModel = new ViewModelProvider(this).get(DrawerViewModel.class);
-        // userManager.fetchCurrentUser();  // TODO : To be deleted
-        // restaurantManager.fetchRestaurants(getString(R.string.MAPS_API_KEY), MapsApisUtils.getSearchRadius());   // TODO : To be deleted
-        drawerViewModel.fetchWorkmates();
-        // drawerViewModel.fetchCurrentLocationAndRestaurants(this, getString(R.string.MAPS_API_KEY));
 
+        drawerViewModel.fetchWorkmates();
+
+        // drawerViewModel.fetchCurrentLocationAndRestaurants(this, getString(R.string.MAPS_API_KEY));
         Activity activity = this;
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
@@ -287,112 +282,5 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
         drawerViewModel.fetchLikedRestaurants();
     }
-
-    /*
-    private void updateUtilsAndStartApp() {
-        // Call step 1/4: Update current user in FirestoreUtils
-        updateCurrentUserInFirestoreUtils();
-    }
-
-    private void updateCurrentUserInFirestoreUtils() {
-        FirestoreUtils.setCurrentUserLogStatus(userManager.isCurrentUserLogged());
-
-        // Get current user from database document
-        userManager.getCurrentUserData()
-                .addOnSuccessListener(user -> {
-                    String uId = user.getUid();
-                    String uName = user.getUsername();
-                    String uEmail = user.getUserEmail();
-                    String uUrlPicture = user.getUserUrlPicture();
-                    String selectionId = user.getSelectionId();
-                    String selectionDate = user.getSelectionDate();
-                    String selectionName = user.getSelectionName();
-                    String selectionAddress = user.getSelectionAddress();
-                    String searchRadiusPrefs = user.getSearchRadiusPrefs();
-                    String notificationsPrefs = user.getNotificationsPrefs();
-
-                    // Update currentUser in FirestoreUtils
-                    FirestoreUtils.setCurrentUser(new User(uId, uName, uEmail, uUrlPicture, selectionId,
-                            selectionDate, selectionName, selectionAddress, searchRadiusPrefs, notificationsPrefs));
-                    // Call step 2/4: Update current user in FirestoreUtils
-                    updateRestaurantsListInFirestoreUtils();
-                })
-                .addOnFailureListener(e -> {
-                    Log.w("AuthActivity", e.getMessage());
-                });
-    }
-
-    private void updateRestaurantsListInFirestoreUtils() {
-        // Get restaurants list from database document
-        RestaurantManager.getInstance().getRestaurantsList(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult() != null) {
-                    // Get restaurants list
-                    List<Restaurant> restaurantsList = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> restaurantData = document.getData(); // Map data for debug.
-                        Restaurant restaurantToAdd = FirestoreUtils.getRestaurantFromDatabaseDocument(document);
-                        restaurantsList.add(restaurantToAdd);
-                    }
-
-                    // Update restaurantsList in FirestoreUtils
-                    FirestoreUtils.setRestaurantsList(restaurantsList);
-                    // Call step 3/4: Update workmates list in FirestoreUtils
-                    updateWorkmatesListInFirestoreUtils();
-                }
-            } else {
-                Log.d("AuthActivity", "Error getting documents: ", task.getException());
-            }
-        });
-    }
-
-    private void updateWorkmatesListInFirestoreUtils() {
-        // Get workmates list from database document
-        UserManager.getInstance().getUsersList(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult() != null) {
-                    // Get users list
-                    List<User> workmatesList = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> userData = document.getData(); // Map data for debug.
-                        User workmateToAdd = FirestoreUtils.getUserFromDatabaseDocument(document);
-                        workmatesList.add(workmateToAdd);
-                    }
-
-                    // Update workmatesList in FirestoreUtils
-                    FirestoreUtils.setWorkmatesList(workmatesList);
-                    // Call step 4/4: Update liked restaurants list in FirestoreUtils
-                    updateLikedRestaurantsListInFirestoreUtils();
-                }
-            } else {
-                Log.w("FirestoreUtils", "Error getting documents: ", task.getException());
-            }
-        });
-    }
-
-    private void updateLikedRestaurantsListInFirestoreUtils() {
-        // Get liked restaurants list from database document
-        LikedRestaurantManager.getInstance().getLikedRestaurantsList(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult() != null) {
-                    // Get liked restaurants list
-                    List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> likedRestaurantData = document.getData(); // Map data for debug.
-                        LikedRestaurant likedRestaurantToAdd = FirestoreUtils.getLikedRestaurantFromDatabaseDocument(document);
-                        likedRestaurantsList.add(likedRestaurantToAdd);
-                    }
-
-                    // Update likedRestaurantsList in FirestoreUtils
-                    FirestoreUtils.setLikedRestaurantsList(likedRestaurantsList);
-                    // Start application
-                    startApp();
-                }
-            } else {
-                Log.d("FirestoreUtils", "Error getting documents: ", task.getException());
-            }
-        });
-    }
-    */
 
 }

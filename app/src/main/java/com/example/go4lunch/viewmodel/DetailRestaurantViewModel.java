@@ -6,7 +6,6 @@ import com.example.go4lunch.manager.LikedRestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class DetailRestaurantViewModel extends ViewModel {
         likedRestaurantManager = LikedRestaurantManager.getInstance();
         userManager = UserManager.getInstance();
 
-        currentDate = CalendarUtils.getCurrentDate();
+        currentDate = DataProcessingUtils.getCurrentDate();
     }
 
     /************

@@ -2,13 +2,8 @@ package com.example.go4lunch;
 
 import static org.junit.Assert.assertEquals;
 
-import com.example.go4lunch.activity.MainActivity;
-import com.example.go4lunch.fragment.SettingsFragment;
-import com.example.go4lunch.fragment.WorkmatesFragment;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.CalendarUtils;
-import com.example.go4lunch.utilsforviews.EventButtonClick;
-import com.example.go4lunch.utilsforviews.EventListener;
+import com.example.go4lunch.utils.DataProcessingUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,8 +17,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
-
-import android.view.View;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -119,42 +112,42 @@ public class _ExampleMockitoTest {
     @Test
     public void calendarUtilsTest() {
         System.out.println(currentDate);
-        System.out.println(CalendarUtils.getCurrentDate());
+        System.out.println(DataProcessingUtils.getCurrentDate());
 
-        assertEquals("Wrong date", currentDate, CalendarUtils.getCurrentDate());
+        assertEquals("Wrong date", currentDate, DataProcessingUtils.getCurrentDate());
     }
 
     @Test
     public void calendarUtilsMockitoTest() {
-        System.out.println(CalendarUtils.getCurrentDate());
-        assertEquals("Wrong date", currentDate, CalendarUtils.getCurrentDate());
+        System.out.println(DataProcessingUtils.getCurrentDate());
+        assertEquals("Wrong date", currentDate, DataProcessingUtils.getCurrentDate());
 
         /** Use a try with resources to limit the scope of the static method mocking to its test method.
          * So we only mock the static class in that test method */
-        try (MockedStatic<CalendarUtils> utilities = Mockito.mockStatic(CalendarUtils.class)) {
-            System.out.println(CalendarUtils.getCurrentDate());
-            assertNull("Wrong date", CalendarUtils.getCurrentDate());
-            utilities.when(CalendarUtils::getCurrentDate).thenReturn("myDate");
-            System.out.println(CalendarUtils.getCurrentDate());
-            assertEquals("Wrong date", "myDate", CalendarUtils.getCurrentDate());
+        try (MockedStatic<DataProcessingUtils> utilities = Mockito.mockStatic(DataProcessingUtils.class)) {
+            System.out.println(DataProcessingUtils.getCurrentDate());
+            assertNull("Wrong date", DataProcessingUtils.getCurrentDate());
+            utilities.when(DataProcessingUtils::getCurrentDate).thenReturn("myDate");
+            System.out.println(DataProcessingUtils.getCurrentDate());
+            assertEquals("Wrong date", "myDate", DataProcessingUtils.getCurrentDate());
         }
 
-        System.out.println(CalendarUtils.getCurrentDate());
-        assertEquals("Wrong date", currentDate, CalendarUtils.getCurrentDate());
+        System.out.println(DataProcessingUtils.getCurrentDate());
+        assertEquals("Wrong date", currentDate, DataProcessingUtils.getCurrentDate());
     }
 
     @Test
     public void calendarUtilsMockitoTest2() {
         // assertEquals("Wrong date", "myDate", CalendarUtils.getCurrentDate());
         // assertNull("Wrong date", CalendarUtils.getCurrentDate());
-        assertEquals("Wrong date", currentDate, CalendarUtils.getCurrentDate());
+        assertEquals("Wrong date", currentDate, DataProcessingUtils.getCurrentDate());
 
-        MockedStatic<CalendarUtils> utilities = Mockito.mockStatic(CalendarUtils.class);
-        assertNull("Wrong date", CalendarUtils.getCurrentDate());
-        utilities.when(CalendarUtils::getCurrentDate).thenReturn("myDate");
+        MockedStatic<DataProcessingUtils> utilities = Mockito.mockStatic(DataProcessingUtils.class);
+        assertNull("Wrong date", DataProcessingUtils.getCurrentDate());
+        utilities.when(DataProcessingUtils::getCurrentDate).thenReturn("myDate");
         // calendarUtilsMock.when(CalendarUtils::getCurrentDate).thenReturn("myDate");
 
-        assertEquals("Wrong date", "myDate", CalendarUtils.getCurrentDate());
+        assertEquals("Wrong date", "myDate", DataProcessingUtils.getCurrentDate());
     }
 
     @Test
@@ -228,15 +221,15 @@ public class _ExampleMockitoTest {
         assertEquals("Wrond name", "Toto", mock.getUsername());
 
         // Test on static method
-        try (MockedStatic<CalendarUtils> staticMock = mockStatic(CalendarUtils.class)) {
-            staticMock.when(CalendarUtils::getCurrentDate).thenReturn("20230101");
+        try (MockedStatic<DataProcessingUtils> staticMock = mockStatic(DataProcessingUtils.class)) {
+            staticMock.when(DataProcessingUtils::getCurrentDate).thenReturn("20230101");
 
-            CalendarUtils.getCurrentDate();                         // Method called once
-            String dateResult =  CalendarUtils.getCurrentDate();    // Method called twice
+            DataProcessingUtils.getCurrentDate();                         // Method called once
+            String dateResult =  DataProcessingUtils.getCurrentDate();    // Method called twice
 
             System.out.println(dateResult);
-            staticMock.verify(CalendarUtils::getCurrentDate, times(2));
-            assertEquals("Wrond date", "20230101", CalendarUtils.getCurrentDate());
+            staticMock.verify(DataProcessingUtils::getCurrentDate, times(2));
+            assertEquals("Wrond date", "20230101", DataProcessingUtils.getCurrentDate());
         }
         //
     }

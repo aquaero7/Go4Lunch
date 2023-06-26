@@ -24,7 +24,6 @@ import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utilsforviews.EventListener;
 import com.example.go4lunch.utilsforviews.ItemClickSupport;
 import com.example.go4lunch.view.WorkmateAdapter;

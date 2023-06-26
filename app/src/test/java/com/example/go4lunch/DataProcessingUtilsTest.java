@@ -10,7 +10,6 @@ import com.example.go4lunch.model.api.Location;
 import com.example.go4lunch.model.api.OpenClose;
 import com.example.go4lunch.model.api.OpeningHours;
 import com.example.go4lunch.model.api.Period;
-import com.example.go4lunch.utils.CalendarUtils;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -19,10 +18,14 @@ import com.google.maps.android.SphericalUtil;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DataProcessingUtilsTest {
     LatLng testLatLng1, testLatLng2, testLatLng3, testLatLng4;
@@ -41,10 +44,12 @@ public class DataProcessingUtilsTest {
     List<String> weekDayTexts13, weekDayTexts4, weekDayTexts0;
     OpeningHours openingHours13, openingHours4, openingHours0, openingHoursPerNull;
     LatLng refLatLng;
+    String currentDate;
+    String currentTime;
+    long currentDayOfWeek;
 
 
-    @Before // Before each test
-    public void setup() {
+    private void initializeData() {
         // Reference LatLng for test restaurants
         refLatLng = new LatLng(0, 0);    // Equator - Greenwich meridian
         // LatLng for test restaurants
@@ -117,6 +122,29 @@ public class DataProcessingUtilsTest {
         period2 = new Period(new OpenClose(1, cl2), new OpenClose(1, op2));
         period3 = new Period(new OpenClose(1, cl3), new OpenClose(1, op3));
         period4 = new Period(new OpenClose(1, cl4), new OpenClose(1, op4));
+    }
+
+    private void initializeCalendar() {
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.FRANCE);
+        Date date = calendar.getTime();
+        currentDate = sdf.format(date);
+
+        String hod = (calendar.get(Calendar.HOUR_OF_DAY) > 9) ?
+                String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) : "0" + String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
+        String min = (calendar.get(Calendar.MINUTE) > 9) ?
+                String.valueOf(calendar.get(Calendar.MINUTE)) : "0" + String.valueOf(calendar.get(Calendar.MINUTE));
+        currentTime = hod + min;
+
+        currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+    }
+
+
+    @Before // Before each test
+    public void setup() {
+        initializeData();
+        initializeCalendar();
     }
 
 
@@ -192,8 +220,8 @@ public class DataProcessingUtilsTest {
         final String OPW = "OP*";   // Open 24/7
         final String CLO = "CLO";   // Closed
         final String UNK = "???";   // Unknown opening hours
-        long currentDayOfWeek = CalendarUtils.getCurrentDayOfWeek();
-        String currentTime = CalendarUtils.getCurrentTime();
+        long currentDayOfWeek = DataProcessingUtils.getCurrentDayOfWeek();
+        String currentTime = DataProcessingUtils.getCurrentTime();
 
         /** Test openingInformation (if at least one period exists today) */
         for (RestaurantWithDistance restaurantWithDistance : testRestaurantsWithDistance) {
@@ -366,6 +394,25 @@ public class DataProcessingUtilsTest {
         assertEquals("Wrong order", op3, testPeriods.get(1).getOpen().getTime());
         assertEquals("Wrong order", op2, testPeriods.get(2).getOpen().getTime());
         assertEquals("Wrong order", op1, testPeriods.get(3).getOpen().getTime());
+    }
+
+    /******************
+     * Calendar tests *
+     ******************/
+
+    @Test
+    public void getCurrentDayOfWeekWithSuccess() {
+        assertEquals("Wrong day of week", currentDayOfWeek, DataProcessingUtils.getCurrentDayOfWeek());
+    }
+
+    @Test
+    public void getCurrentTimeWithSuccess() {
+        assertEquals("Wrong time", currentTime, DataProcessingUtils.getCurrentTime());
+    }
+
+    @Test
+    public void getCurrentDateWithSuccess() {
+        assertEquals("Wrong date", currentDate, DataProcessingUtils.getCurrentDate());
     }
 
 }

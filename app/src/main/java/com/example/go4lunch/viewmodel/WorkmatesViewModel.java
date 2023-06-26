@@ -7,7 +7,7 @@ import com.example.go4lunch.manager.RestaurantManager;
 import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.utils.CalendarUtils;
+import com.example.go4lunch.utils.DataProcessingUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +30,7 @@ public class WorkmatesViewModel extends ViewModel {
         userManager = UserManager.getInstance();
         restaurantManager = RestaurantManager.getInstance();
 
-        currentDate = CalendarUtils.getCurrentDate();
+        currentDate = DataProcessingUtils.getCurrentDate();
     }
 
     /************
