@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utilsforviews.EventListener;
@@ -30,6 +31,7 @@ import com.example.go4lunch.view.WorkmateAdapter;
 import com.example.go4lunch.viewmodel.WorkmatesViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +40,10 @@ public class WorkmatesFragment extends Fragment {
     private FragmentWorkmatesBinding binding;
     private RecyclerView mRecyclerView;
     private WorkmateAdapter workmateAdapter;
+    private User currentUser;
     private List<User> workmatesList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
+    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private WorkmatesViewModel workmatesViewModel;
     private EventListener eventListener;
 
@@ -134,7 +138,7 @@ public class WorkmatesFragment extends Fragment {
                         // Get workmate
                         User workmate = workmatesList.get(position);
                         // Get workmate selection
-                        RestaurantWithDistance restaurant = workmatesViewModel.checkWorkmateSelection(workmate);
+                        RestaurantWithDistance restaurant = workmatesViewModel.checkWorkmateSelection(workmate, restaurantsList);
                         // Launch DetailActivity or show message
                         if (restaurant != null) {
                             launchDetailRestaurantActivity(restaurant);
@@ -147,17 +151,23 @@ public class WorkmatesFragment extends Fragment {
 
     @SuppressLint("NotifyDataSetChanged")
     private void initData() {
-        // TODO : owner =  getViewLifecycleOwner() or requireActivity()
-        // Initialize restaurants data
-        workmatesViewModel.getRestaurantsMutableLiveData().observe(requireActivity(), restaurants -> {
-            restaurantsList.clear();
-            restaurantsList.addAll(restaurants);
-        });
+        // Initialize current user
+        workmatesViewModel.getCurrentUserMutableLiveData().observe(requireActivity(), user -> currentUser = user);
         // Initialize workmates data
         workmatesViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmates -> {
             workmatesList.clear();
             workmatesList.addAll(workmates);
             workmateAdapter.notifyDataSetChanged();
+        });
+        // Initialize restaurants data
+        workmatesViewModel.getRestaurantsMutableLiveData().observe(requireActivity(), restaurants -> {
+            restaurantsList.clear();
+            restaurantsList.addAll(restaurants);
+        });
+        // Initialize liked restaurants list
+        workmatesViewModel.getLikedRestaurantsMutableLiveData().observe(requireActivity(), likedRestaurants -> {
+            likedRestaurantsList.clear();
+            likedRestaurantsList.addAll(likedRestaurants);
         });
     }
 
@@ -165,8 +175,9 @@ public class WorkmatesFragment extends Fragment {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurantWithDistance);
-        // bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
-        // bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
+        bundle.putSerializable("CURRENT_USER", currentUser);
+        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
+        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
         intent.putExtras(bundle);
         startActivity(intent);
     }

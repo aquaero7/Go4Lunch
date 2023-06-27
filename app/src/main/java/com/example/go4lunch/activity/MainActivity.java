@@ -31,14 +31,20 @@ import com.example.go4lunch.fragment.ListViewFragment;
 import com.example.go4lunch.fragment.MapViewFragment;
 import com.example.go4lunch.fragment.PagerAdapter;
 import com.example.go4lunch.R;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
+import com.example.go4lunch.model.User;
 import com.example.go4lunch.utilsforviews.EventListener;
-import com.example.go4lunch.viewmodel.DrawerViewModel;
+import com.example.go4lunch.viewmodel.MainViewModel;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, EventListener {
 
@@ -60,7 +66,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     String message;
     private Fragment fmt;
     private SearchView searchView;
-    private DrawerViewModel drawerViewModel;
+    private MainViewModel mainViewModel;
+    private User currentUser;
+    private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
+    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
+    private List<User> workmatesList = new ArrayList<>();
 
 
     @Override
@@ -72,7 +82,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Initialize ViewModel
-        drawerViewModel = new ViewModelProvider(this).get(DrawerViewModel.class);
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         // Get the toolbar view
         this.configureToolbar();
         // Configure ViewPager and tabs
@@ -86,7 +96,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         searchView = binding.includedToolbar.searchView;
         this.configureSearchViewListener(searchView);
         // Fetch data
-        this.initData(); // TODO : Test implementation in MainActivity or AuthActivity
+        this.fetchData(); // TODO : Test implementation in MainActivity or AuthActivity
+        // Init data
+        this.initData();
     }
 
     @Override
@@ -302,31 +314,53 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
      */
 
     // TODO : Test implementation in MainActivity or AuthActivity
+    private void fetchData() {
+        mainViewModel.fetchCurrentUser();   // Fetch current user
+        mainViewModel.fetchWorkmates();     // Fetch workmates list
+        mainViewModel.fetchCurrentLocation(this);   // Fetch current location
+        // Initialize current location to get home needed for fetching restaurants list
+        mainViewModel.getCurrentLocationMutableLiveData().observe(this, latLng -> {
+            // Initialize current user to get search radius prefs needed for getting restaurants list
+            if (latLng != null) mainViewModel.getCurrentUserMutableLiveData().observe(this, user -> {
+                currentUser = user;
+                // Fetch restaurants list
+                if (user != null) mainViewModel.fetchRestaurants(latLng, mainViewModel.getSearchRadius(user), getString(R.string.MAPS_API_KEY));
+            });
+        });
+        // Fetch liked restaurants list
+        mainViewModel.fetchLikedRestaurants();
+    }
+
     private void initData() {
-        drawerViewModel.fetchWorkmates();
-
-        // drawerViewModel.fetchCurrentLocationAndRestaurants(this, getString(R.string.MAPS_API_KEY));
-        Activity activity = this;
-        final Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                drawerViewModel.fetchCurrentLocationAndRestaurants(activity, getString(R.string.MAPS_API_KEY));
-            }
-        }, 10000);
-
-        drawerViewModel.fetchLikedRestaurants();
+        // Initialize current user... not to do if already done in fetchData() to fetch restaurants list ! // TODO : Test implementation in MainActivity or AuthActivity
+        // mainViewModel.getCurrentUserMutableLiveData().observe(this, user -> currentUser = user);
+        // Initialize workmates list
+        mainViewModel.getWorkmatesMutableLiveData().observe(this, workmates -> {
+            workmatesList.clear();
+            workmatesList.addAll(workmates);
+        });
+        // Initialize restaurants list
+        mainViewModel.getRestaurantsMutableLiveData().observe(this, restaurants -> {
+            restaurantsList.clear();
+            restaurantsList.addAll(restaurants);
+        });
+        // Initialize liked restaurants list
+        mainViewModel.getLikedRestaurantsMutableLiveData().observe(this, likedRestaurants -> {
+            likedRestaurantsList.clear();
+            likedRestaurantsList.addAll(likedRestaurants);
+        });
     }
 
     private void launchDetailRestaurantActivity() {
-        RestaurantWithDistance restaurant = drawerViewModel.checkCurrentUserSelection();
+        RestaurantWithDistance restaurant = mainViewModel.checkCurrentUserSelection(currentUser, restaurantsList);
         // Launch DetailActivity or show message
         if (restaurant != null) {
             Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
             Bundle bundle = new Bundle();
             bundle.putSerializable("RESTAURANT", restaurant);
-            // bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
-            // bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
+            bundle.putSerializable("CURRENT_USER", currentUser);
+            bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
+            bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
             intent.putExtras(bundle);
             startActivity(intent);
         } else {
@@ -336,13 +370,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     private void launchSettingActivity() {
         Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("CURRENT_USER", currentUser);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 
     // Update Firebase user information
     private void updateUIWithUserData(){
-        if(drawerViewModel.isFbCurrentUserLogged()){
-            FirebaseUser fbUser = drawerViewModel.getFbCurrentUser();
+        if(mainViewModel.isFbCurrentUserLogged()){
+            FirebaseUser fbUser = mainViewModel.getFbCurrentUser();
             if(fbUser.getPhotoUrl() != null){
                 setProfilePicture(fbUser.getPhotoUrl());
             }
@@ -396,16 +433,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
 
     private void logout(){
-        drawerViewModel.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
+        mainViewModel.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
     }
 
     private void deleteAccountAndLogout() {
         // Delete current user's likes from Firestore liked restaurants collection
-        drawerViewModel.deleteUserLikes();
+        mainViewModel.deleteUserLikes(currentUser, likedRestaurantsList);
         // Delete current user from Firestore users collection
-        drawerViewModel.deleteUser();
+        mainViewModel.deleteUser(currentUser);
         // Delete current user from Firebase and logout
-        drawerViewModel.deleteFbUser(MainActivity.this)
+        mainViewModel.deleteFbUser(MainActivity.this)
                 .addOnSuccessListener(aVoid -> {
                     message = getString(R.string.dialog_info_deletion_confirmation);
                     showSnackBar(message);

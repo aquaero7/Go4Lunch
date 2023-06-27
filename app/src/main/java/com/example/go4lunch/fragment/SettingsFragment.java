@@ -2,12 +2,14 @@ package com.example.go4lunch.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.go4lunch.databinding.FragmentSettingsBinding;
+import com.example.go4lunch.model.User;
 import com.example.go4lunch.utilsforviews.EventButtonClick;
 import com.example.go4lunch.viewmodel.SettingsViewModel;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -33,6 +36,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     private String searchRadiusPrefs;
     private String notificationsPrefs;
     private SettingsViewModel settingsViewModel;
+    private User currentUser;
 
 
     // Constructor
@@ -58,12 +62,15 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         // Initialize ViewModel
         settingsViewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
 
+        // Get data from calling activity
+        getIntentData();
+
         // Initialize preferences
 
         // Search Radius prefs
-        mRadiusEditText.setText(settingsViewModel.getSearchRadius());
+        mRadiusEditText.setText(settingsViewModel.getSearchRadius(currentUser));
         // Notifications prefs
-        mNotificationSwitch.setChecked(Boolean.parseBoolean(settingsViewModel.getCurrentUser().getNotificationsPrefs()));
+        mNotificationSwitch.setChecked(Boolean.parseBoolean(settingsViewModel.getNotificationsPrefs(currentUser)));
 
         //Set listeners on buttons and switch
         mSaveButton.setOnClickListener(this);
@@ -108,6 +115,17 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             mCallback = (SettingsFragment.OnButtonClickedListener) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(e + " must implement OnButtonClickedListener");
+        }
+    }
+
+    private void getIntentData() {
+        Intent intent = requireActivity().getIntent();
+        if (intent != null) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                currentUser = (User) bundle.getSerializable("CURRENT_USER");
+                Log.w("SettingsFragment", "Name of current user : " + currentUser.getUsername());
+            }
         }
     }
 

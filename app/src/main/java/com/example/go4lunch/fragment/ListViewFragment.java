@@ -31,6 +31,7 @@ import com.example.go4lunch.view.ListViewAdapter;
 import com.example.go4lunch.viewmodel.ListViewViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -40,10 +41,13 @@ public class ListViewFragment extends Fragment {
     private FragmentListViewBinding binding;
     private RecyclerView mRecyclerView;
     private ListViewAdapter listViewAdapter;
+
+    private User currentUser;
     private List<User> workmatesList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
     private List<RestaurantWithDistance> filteredRestaurantsList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsListToDisplay = new ArrayList<>();
+    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private boolean filterIsOn = false;
     private ListViewViewModel listViewViewModel;
     private EventListener eventListener;
@@ -147,7 +151,8 @@ public class ListViewFragment extends Fragment {
 
     @SuppressLint("NotifyDataSetChanged")
     private void initData() {
-        // TODO : owner =  getViewLifecycleOwner() or requireActivity()
+        // Initialize current user
+        listViewViewModel.getCurrentUserMutableLiveData().observe(requireActivity(), user -> currentUser = user);
         // Initialize workmates data
         listViewViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmates -> {
             workmatesList.clear();
@@ -162,7 +167,14 @@ public class ListViewFragment extends Fragment {
                 restaurantsListToDisplay.clear();
                 restaurantsListToDisplay.addAll(restaurantsList);
                 listViewAdapter.notifyDataSetChanged();
+            } else {
+                listViewAdapter.notifyDataSetChanged();
             }
+        });
+        // Initialize liked restaurants list
+        listViewViewModel.getLikedRestaurantsMutableLiveData().observe(requireActivity(), likedRestaurants -> {
+            likedRestaurantsList.clear();
+            likedRestaurantsList.addAll(likedRestaurants);
         });
     }
 
@@ -170,8 +182,9 @@ public class ListViewFragment extends Fragment {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurantWithDistance);
-        // bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
-        // bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
+        bundle.putSerializable("CURRENT_USER", currentUser);
+        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
+        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
         intent.putExtras(bundle);
         startActivity(intent);
     }

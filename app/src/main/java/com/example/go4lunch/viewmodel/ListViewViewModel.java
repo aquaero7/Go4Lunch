@@ -1,49 +1,66 @@
 package com.example.go4lunch.viewmodel;
 
+import android.app.Activity;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.manager.LikedRestaurantManager;
-import com.example.go4lunch.manager.RestaurantManager;
-import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
+import com.example.go4lunch.repository.LikedRestaurantRepository;
+import com.example.go4lunch.repository.LocationRepository;
+import com.example.go4lunch.repository.RestaurantRepository;
+import com.example.go4lunch.repository.UserRepository;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
 public class ListViewViewModel extends ViewModel {
 
-    private MutableLiveData<List<User>> workmatesMutableLiveData;
-    private MutableLiveData<List<RestaurantWithDistance>> restaurantsMutableLiveData;
+    // private MutableLiveData<List<User>> workmatesMutableLiveData;
+    // private MutableLiveData<List<RestaurantWithDistance>> restaurantsMutableLiveData;
 
-    private final UserManager userManager;
-    private final RestaurantManager restaurantManager;
+    private final UserRepository userRepository;
+    private final LocationRepository locationRepository;
+    private final RestaurantRepository restaurantRepository;
+    private final LikedRestaurantRepository likedRestaurantRepository;
 
 
     // Constructor
     public ListViewViewModel() {
-        workmatesMutableLiveData = new MutableLiveData<>();
-        restaurantsMutableLiveData = new MutableLiveData<>();
+        // workmatesMutableLiveData = new MutableLiveData<>();
+        // restaurantsMutableLiveData = new MutableLiveData<>();
 
-        userManager = UserManager.getInstance();
-        restaurantManager = RestaurantManager.getInstance();
+        userRepository = UserRepository.getInstance();
+        locationRepository = LocationRepository.getInstance();
+        restaurantRepository = RestaurantRepository.getInstance();
+        likedRestaurantRepository = LikedRestaurantRepository.getInstance();
     }
+
 
     /************
      * LiveData *
      ************/
 
+    public MutableLiveData<User> getCurrentUserMutableLiveData() {
+        return userRepository.getCurrentUserMutableLiveData();
+    }
+
     public MutableLiveData<List<User>> getWorkmatesMutableLiveData() {
-        // Populate the LiveData
-        workmatesMutableLiveData.setValue(userManager.getWorkmates());
-        return workmatesMutableLiveData;
+        return userRepository.getWorkmatesMutableLiveData();
+    }
+
+    public MutableLiveData<LatLng> getCurrentLocationMutableLiveData() {
+        return locationRepository.getCurrentLocationMutableLiveData();
     }
 
     public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
-        // Populate the LiveData
-        restaurantsMutableLiveData.setValue(restaurantManager.getRestaurants());
-        return restaurantsMutableLiveData;
+        return restaurantRepository.getRestaurantsMutableLiveData();
+    }
+
+    public MutableLiveData<List<LikedRestaurant>> getLikedRestaurantsMutableLiveData() {
+        return likedRestaurantRepository.getLikedRestaurantsMutableLiveData();
     }
 
 }

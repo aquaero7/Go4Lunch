@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
+import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.DataProcessingUtils;
@@ -47,6 +48,7 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -69,8 +71,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     private static final int DEFAULT_ZOOM = 17;
     private static final int RESTAURANT_ZOOM = 19;
     private LatLng home;
+    private User currentUser;
     private List<User> workmatesList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
+    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private int selectionsCount;
     private final String currentDate = DataProcessingUtils.getCurrentDate();
 
@@ -124,8 +128,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.fragment_autocomplete);
         autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.fragment_autocomplete);
         mapViewViewModel.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
-        // Initialize current location
-        home = mapViewViewModel.getDefaultLocation();
+        // Initialize data
+        initData();
         // return rootView;
         return binding.getRoot();
     }
@@ -213,6 +217,19 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
+    private void initData() {
+        // Initialize current location
+        // home = mapViewViewModel.getDefaultLocation();
+
+        // Initialize currentUser
+        mapViewViewModel.getCurrentUserMutableLiveData().observe(requireActivity(), user -> currentUser = user);
+
+        // Initialize liked restaurants list
+        mapViewViewModel.getLikedRestaurantsMutableLiveData().observe(requireActivity(), likedRestaurants -> {
+            likedRestaurantsList.clear();
+            likedRestaurantsList.addAll(likedRestaurants);
+        });
+    }
 
 
     @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
@@ -239,15 +256,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
                (sometimes it is... and I don't know why) */
             // mGoogleMap.setMyLocationEnabled(MapsApisUtils.arePermissionsGranted());  // TODO : To be confirmed
             // Set Focus to home
-            setFocusToHome();
+            setFocusToHome();   // and display restaurants
             // Display restaurants
-            displayRestaurantsOnMap();
+            // displayRestaurantsOnMap();
         }
     }
 
     private void setFocusToHome() {
         // Initialize or update location data
-        // TODO : owner =  getViewLifecycleOwner() or requireActivity()
         mapViewViewModel.getCurrentLocationMutableLiveData().observe(requireActivity(), latLng -> {
             home = latLng;
 
@@ -257,15 +273,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
                 // No more home focus after first display (except if MyLocationButton is triggered)
                 focusHome = false;
             }
-            // displayRestaurantsOnMap();
+            displayRestaurantsOnMap();
         });
 
     }
 
     @SuppressLint("PotentialBehaviorOverride")  // This remark concerns OnMarkerClickListener below
     private void displayRestaurantsOnMap() {
-        // Initialize or update restaurants data
-        // TODO : owner =  getViewLifecycleOwner() or requireActivity()
+        // Initialize restaurants data
         mapViewViewModel.getRestaurantsMutableLiveData().observe(requireActivity(), restaurants -> {
             restaurantsList.clear();
             restaurantsList.addAll(restaurants);
@@ -311,8 +326,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurant);
-        // bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
-        // bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
+        bundle.putSerializable("CURRENT_USER", currentUser);
+        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
+        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
         intent.putExtras(bundle);
         startActivity(intent);
     }
@@ -325,7 +341,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
 
     private void configureAutocompleteSupportFragment(String text) {
         // Specify the limitation to only show results within the defined region
-        LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, Integer.parseInt(mapViewViewModel.getSearchRadius())*1000);
+        LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, Integer.parseInt(mapViewViewModel.getSearchRadius(currentUser))*1000);
         autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
         autocompleteFragment.setActivityMode(AutocompleteActivityMode.valueOf("FULLSCREEN"));
         autocompleteFragment.setText(text);

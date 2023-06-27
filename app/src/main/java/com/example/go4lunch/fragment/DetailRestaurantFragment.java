@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
-import com.example.go4lunch.manager.UserManager;
 import com.example.go4lunch.model.LikedRestaurant;
 import com.example.go4lunch.model.RestaurantWithDistance;
 import com.example.go4lunch.model.User;
@@ -37,7 +36,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class DetailRestaurantFragment extends Fragment implements View.OnClickListener {
 
@@ -70,11 +68,16 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     // Declare ViewModel
     DetailRestaurantViewModel detailRestaurantViewModel;
 
-    // Declare and initialize selectors list
+    // Initialize current user
+    private User currentUser;
+
+    // Declare and initialize list
+    private List<User> workmatesList = new ArrayList<>();
     private List<User> selectorsList = new ArrayList<>();
+    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
 
     // Declare and initialize Google Maps API key
-    private final String KEY = getString(R.string.MAPS_API_KEY);
+    private String KEY;
 
 
     // Constructor
@@ -121,7 +124,10 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         // Get data from calling activity
         getIntentData();
 
-        // Initialize and display restaurant data
+        // Initialize API key
+        KEY = getString(R.string.MAPS_API_KEY);
+
+        // Initialize data and display restaurant data
         if (restaurant != null) {
             initData();
             displayRestaurantData();
@@ -211,7 +217,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
         // Initialize selectors list
         selectorsList.clear();
-        selectorsList.addAll(detailRestaurantViewModel.getSelectors(rId));
+        selectorsList.addAll(detailRestaurantViewModel.getSelectors(rId, workmatesList));
 
         detailRestaurantWorkmateAdapter.notifyDataSetChanged();
 
@@ -226,12 +232,10 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         if (intent != null) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
-                // likedRestaurantsList = (List<LikedRestaurant>) bundle.getSerializable("LIKED_RESTAURANTS");
-                // workmatesList = (List<User>) bundle.getSerializable("WORKMATES");
                 restaurant = (RestaurantWithDistance) bundle.getSerializable("RESTAURANT");
-                // rId = restaurant.getRid();
-                // rName = restaurant.getName();
-                // rAddress = restaurant.getAddress();
+                currentUser = (User) bundle.getSerializable("CURRENT_USER");
+                workmatesList = (List<User>) bundle.getSerializable("WORKMATES");
+                likedRestaurantsList = (List<LikedRestaurant>) bundle.getSerializable("LIKED_RESTAURANTS");
                 Log.w("DetailRestaurantFragment", "Name of this restaurant : " + restaurant.getName());
             }
         }
@@ -245,10 +249,10 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         mTextView2.setText(rAddress);
         mRatingBar.setRating((float) (rRating * 3/5));
 
-        isLiked = (detailRestaurantViewModel.checkCurrentUserLikes(rId));
+        isLiked = (detailRestaurantViewModel.checkCurrentUserLikes(currentUser, likedRestaurantsList));
         updateLikeButton();
 
-        isSelected = (detailRestaurantViewModel.checkCurrentUserSelection(rId));
+        isSelected = (detailRestaurantViewModel.checkCurrentUserSelection(currentUser, rId));
         updateSelectionFab();
     }
 

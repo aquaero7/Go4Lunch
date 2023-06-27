@@ -19,9 +19,9 @@ import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityAuthBinding;
-import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.repository.UserRepository;
 import com.example.go4lunch.model.User;
-import com.example.go4lunch.viewmodel.DrawerViewModel;
+import com.example.go4lunch.viewmodel.MainViewModel;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -35,7 +35,7 @@ import java.util.List;
 
 public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
-    private final UserManager userManager = UserManager.getInstance();
+    private final UserRepository userRepository = UserRepository.getInstance();
     private ProgressBar progressBar;
     private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private ActivityResultLauncher<String[]> requestPermissionsLauncher;
@@ -83,7 +83,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 locationPermissionsGranted = false;
             }
             /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment */
-            userManager.setPermissions(locationPermissionsGranted);
+            userRepository.setPermissions(locationPermissionsGranted);
         });
 
         // Check and request permissions
@@ -99,7 +99,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
             Log.w("checkPermissions", "Permissions granted");
             locationPermissionsGranted = true;
             /** Initialize permissions in Utils to make them available for fragments */
-            userManager.setPermissions(locationPermissionsGranted);
+            userRepository.setPermissions(locationPermissionsGranted);
         }
     }
 
@@ -107,7 +107,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     private void setupListeners(){
         // Login Button
         binding.buttonLogin.setOnClickListener(view -> {
-            if(userManager.isFbCurrentUserLogged()){
+            if(userRepository.isFbCurrentUserLogged()){
                 startApp();
             }else{
                 startSignInActivity();
@@ -203,11 +203,11 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
     // Update Login Button when activity is resuming
     private void updateLoginButton(){
-        binding.buttonLogin.setText(userManager.isFbCurrentUserLogged() ? getString(R.string.button_start) : getString(R.string.button_login));
+        binding.buttonLogin.setText(userRepository.isFbCurrentUserLogged() ? getString(R.string.button_start) : getString(R.string.button_login));
     }
 
     private void createUser() {
-        FirebaseUser cUser = userManager.getFbCurrentUser();
+        FirebaseUser cUser = userRepository.getFbCurrentUser();
         if(cUser != null){
             // Data from FirebaseAuth
             final String USER_ID = "uid";
@@ -220,11 +220,11 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
             String uid = cUser.getUid();
 
             // If the current user already exist in Firestore, we get his data from Firestore
-            userManager.getCurrentUserData().addOnSuccessListener(user -> {
+            userRepository.getCurrentUserData().addOnSuccessListener(user -> {
                 if (user != null) {
                     // If the current user already exist in Firestore, we update his data
                     Log.w("AuthActivity", "User already exists and will be updated");
-                    userManager.getUsersCollection().document(uid)
+                    userRepository.getUsersCollection().document(uid)
                             .update(USER_ID, uid, USER_NAME, username, USER_EMAIL, userEmail,
                                     USER_URL_PICTURE, userUrlPicture)
                             .addOnSuccessListener(command -> {
@@ -237,7 +237,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                     // If the current user doesn't exist in Firestore, we create this user
                     Log.w("AuthActivity", "User doesn't exist and will be created");
                     User userToCreate = new User(uid, username, userEmail, userUrlPicture);
-                    userManager.getUsersCollection().document(uid)
+                    userRepository.getUsersCollection().document(uid)
                             .set(userToCreate)
                             .addOnSuccessListener(command -> {
                                 Log.w("AuthActivity","Creation successful");
@@ -253,7 +253,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     private void startApp(){
 
         // Fetch data
-        // initData(); // TODO : Test implementation in MainActivity or AuthActivity
+        // fetchData(); // TODO : Test implementation in MainActivity or AuthActivity
 
         // Show progressBar
         progressBar.setVisibility(View.VISIBLE);
@@ -265,22 +265,36 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     }
 
     // TODO : Test implementation in MainActivity or AuthActivity
-    private void initData() {
-        DrawerViewModel drawerViewModel = new ViewModelProvider(this).get(DrawerViewModel.class);
+    private void fetchData() {
+        MainViewModel mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
-        drawerViewModel.fetchWorkmates();
+        mainViewModel.fetchCurrentUser();   // Fetch current user
+        mainViewModel.fetchWorkmates();     // Fetch workmates list
+        mainViewModel.fetchCurrentLocation(this);   // Fetch current location
+        // Initialize current location to get home needed for fetching restaurants list
+        mainViewModel.getCurrentLocationMutableLiveData().observe(this, latLng -> {
+            // Initialize current user to get search radius prefs needed for getting restaurants list
+            if (latLng != null) mainViewModel.getCurrentUserMutableLiveData().observe(this, user -> {
+                // Fetch restaurants list
+                if (user != null) mainViewModel.fetchRestaurants(latLng, mainViewModel.getSearchRadius(user), getString(R.string.MAPS_API_KEY));
+            });
+        });
+        // Fetch liked restaurants list
+        mainViewModel.fetchLikedRestaurants();
 
-        // drawerViewModel.fetchCurrentLocationAndRestaurants(this, getString(R.string.MAPS_API_KEY));
+        /*
+        mainViewModel.fetchWorkmates();
+        // mainViewModel.fetchCurrentLocationAndRestaurants(this, getString(R.string.MAPS_API_KEY));
         Activity activity = this;
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                drawerViewModel.fetchCurrentLocationAndRestaurants(activity, getString(R.string.MAPS_API_KEY));
+                mainViewModel.fetchCurrentLocation(activity);
             }
         }, 10000);
-
-        drawerViewModel.fetchLikedRestaurants();
+        mainViewModel.fetchLikedRestaurants();
+        */
     }
 
 }

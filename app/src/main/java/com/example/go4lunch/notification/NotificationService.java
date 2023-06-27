@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.activity.MainActivity;
-import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.repository.UserRepository;
 import com.example.go4lunch.model.User;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -38,7 +38,7 @@ public class NotificationService extends FirebaseMessagingService {
     private String selectionAddress;
     private String notificationPrefs;
     private String notificationBodyText;
-    private UserManager userManager = UserManager.getInstance();
+    private UserRepository userRepository = UserRepository.getInstance();
 
 
     @Override
@@ -49,7 +49,7 @@ public class NotificationService extends FirebaseMessagingService {
             RemoteMessage.Notification notification = remoteMessage.getNotification();
             Log.i("NotificationService", notification.getTitle() + "\n" + notification.getBody());
             // Get current user data
-            currentUser = userManager.getCurrentUser();
+            currentUser = userRepository.getCurrentUser();
             currentUserId = currentUser.getUid();
             selectionId = currentUser.getSelectionId();
             selectionDate = currentUser.getSelectionDate();
@@ -63,7 +63,7 @@ public class NotificationService extends FirebaseMessagingService {
                and if his notifications preferences parameter is set true */
             if (aRestaurantIsSelected && Boolean.parseBoolean(notificationPrefs)) {
                 // Get workmates list
-                workmatesList = userManager.getWorkmates();
+                workmatesList = userRepository.getWorkmates();
                 // Get the list of workmates names with the same selection (other than current user)
                 // Clear the selectors list of this restaurant
                 if (selectorsNameList != null) selectorsNameList.clear();

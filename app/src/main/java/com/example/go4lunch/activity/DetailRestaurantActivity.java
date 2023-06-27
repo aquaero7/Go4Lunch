@@ -4,6 +4,7 @@ package com.example.go4lunch.activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -12,7 +13,9 @@ import com.example.go4lunch.databinding.ActivityDetailRestaurantBinding;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.example.go4lunch.fragment.DetailRestaurantFragment;
 import com.example.go4lunch.R;
-import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.model.LikedRestaurant;
+import com.example.go4lunch.model.RestaurantWithDistance;
+import com.example.go4lunch.model.User;
 import com.example.go4lunch.model.api.Photo;
 import com.example.go4lunch.utilsforviews.EventButtonClick;
 import com.example.go4lunch.viewmodel.DetailRestaurantViewModel;
@@ -25,6 +28,8 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         implements DetailRestaurantFragment.OnButtonClickedListener {
 
     private DetailRestaurantViewModel detailRestaurantViewModel;
+
+    private User currentUser;
     private String message;
 
     @Override
@@ -38,6 +43,8 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         configureAndShowDetailRestaurantFragment();
         // Initialize ViewModel
         detailRestaurantViewModel = new ViewModelProvider(this).get(DetailRestaurantViewModel.class);
+        // Get data from calling activity
+        getIntentData();
     }
 
     // --------------
@@ -80,6 +87,18 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         }
     }
 
+    // Get restaurant from calling activity
+    private void getIntentData() {
+        Intent intent = this.getIntent();
+        if (intent != null) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                currentUser = (User) bundle.getSerializable("CURRENT_USER");
+                Log.w("DetailRestaurantActivity", "Name of current user : " + currentUser.getUsername());
+            }
+        }
+    }
+
     private void updateSelection(boolean isSelected, String rId, String rName, String rAddress) {
         if (isSelected) {
             // Add selected restaurant ID to current user
@@ -99,10 +118,10 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
 
     private void updateLike(boolean isLiked, String rId){
         if (isLiked) {
-            detailRestaurantViewModel.createLikedRestaurant(rId);
+            detailRestaurantViewModel.createLikedRestaurant(currentUser, rId);
             message = getString(R.string.btn_like_checked);
         } else {
-            detailRestaurantViewModel.deleteLikedRestaurant(rId);
+            detailRestaurantViewModel.deleteLikedRestaurant(currentUser, rId);
             message = getString(R.string.btn_like_unchecked);
         }
         showSnackBar(message);

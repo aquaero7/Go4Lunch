@@ -1,54 +1,68 @@
 package com.example.go4lunch.viewmodel;
 
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.manager.RestaurantManager;
-import com.example.go4lunch.manager.UserManager;
+import com.example.go4lunch.repository.RestaurantRepository;
+import com.example.go4lunch.repository.UserRepository;
 import com.example.go4lunch.model.User;
 
 public class SettingsViewModel extends ViewModel {
 
-    private UserManager userManager;
-    private RestaurantManager restaurantManager;
+    private UserRepository userRepository;
+    private RestaurantRepository restaurantRepository;
+
 
     // Constructor
     public SettingsViewModel() {
-        userManager = UserManager.getInstance();
-        restaurantManager = RestaurantManager.getInstance();
+        userRepository = UserRepository.getInstance();
+        restaurantRepository = RestaurantRepository.getInstance();
     }
+
 
     /************
      * LiveData *
      ************/
 
-    // NIL
+    /*
+    public MutableLiveData<User> getCurrentUserMutableLiveData() {
+        return userRepository.getCurrentUserMutableLiveData();
+    }
+    */
+
 
     /***********
      * Methods *
      ***********/
 
-    public User getCurrentUser() {
-        return userManager.getCurrentUser();
-    }
+    // Actions
 
     public void updateSearchRadiusPrefs(String searchRadiusPrefs) {
             // Update search radius preference to user document in database
-            userManager.updateSearchRadiusPrefs(searchRadiusPrefs);
-            // Update search radius preference to user into local workmates list
-            userManager.updateWorkmates("RAD", searchRadiusPrefs);
+            userRepository.updateSearchRadiusPrefs(searchRadiusPrefs);
+            // Update search radius preference to local user and local workmates list
+            userRepository.updateCurrentUser("RAD", searchRadiusPrefs);
+            userRepository.updateWorkmates("RAD", searchRadiusPrefs);
     }
 
     public void updateNotificationsPrefs(String notificationsPrefs) {
         // Update notifications preference to user document in database
-        userManager.updateNotificationsPrefs(notificationsPrefs);
-        // Update notifications preference to user into local workmates list
-        userManager.updateWorkmates("NOT", notificationsPrefs);
+        userRepository.updateNotificationsPrefs(notificationsPrefs);
+        // Update notifications preference to local user and local workmates list
+        userRepository.updateCurrentUser("NOT", notificationsPrefs);
+        userRepository.updateWorkmates("NOT", notificationsPrefs);
     }
 
-    public String getSearchRadius() {
-        String searchRadius = getCurrentUser().getSearchRadiusPrefs();
-        return (searchRadius != null) ? searchRadius : restaurantManager.getDefaultRadius();
+
+    // Getters
+
+    public String getSearchRadius(User user) {
+        String searchRadius = user.getSearchRadiusPrefs();
+        return (searchRadius != null) ? searchRadius : restaurantRepository.getDefaultRadius();
     }
 
+    public String getNotificationsPrefs(User user) {
+        return user.getNotificationsPrefs();
+    }
 
 }
