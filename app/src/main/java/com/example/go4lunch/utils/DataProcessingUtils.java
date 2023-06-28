@@ -3,10 +3,10 @@ package com.example.go4lunch.utils;
 
 import android.util.Log;
 
-import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.model.RestaurantWithDistance;
-import com.example.go4lunch.model.User;
-import com.example.go4lunch.model.api.Period;
+import com.example.go4lunch.model.model.Restaurant;
+import com.example.go4lunch.model.model.RestaurantWithDistance;
+import com.example.go4lunch.model.model.User;
+import com.example.go4lunch.model.api.model.Period;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.maps.android.SphericalUtil;

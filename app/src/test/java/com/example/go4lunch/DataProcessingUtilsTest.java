@@ -2,14 +2,14 @@ package com.example.go4lunch;
 
 import static org.junit.Assert.assertEquals;
 
-import com.example.go4lunch.model.Restaurant;
-import com.example.go4lunch.model.RestaurantWithDistance;
-import com.example.go4lunch.model.User;
-import com.example.go4lunch.model.api.Geometry;
-import com.example.go4lunch.model.api.Location;
-import com.example.go4lunch.model.api.OpenClose;
-import com.example.go4lunch.model.api.OpeningHours;
-import com.example.go4lunch.model.api.Period;
+import com.example.go4lunch.model.model.Restaurant;
+import com.example.go4lunch.model.model.RestaurantWithDistance;
+import com.example.go4lunch.model.model.User;
+import com.example.go4lunch.model.api.model.Geometry;
+import com.example.go4lunch.model.api.model.Location;
+import com.example.go4lunch.model.api.model.OpenClose;
+import com.example.go4lunch.model.api.model.OpeningHours;
+import com.example.go4lunch.model.api.model.Period;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;

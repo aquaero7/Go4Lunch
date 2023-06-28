@@ -2,7 +2,7 @@ package com.example.go4lunch;
 
 import static org.junit.Assert.assertEquals;
 
-import com.example.go4lunch.model.User;
+import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.DataProcessingUtils;
 
 import org.junit.After;

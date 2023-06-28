@@ -1,25 +1,20 @@
 package com.example.go4lunch.viewmodel;
 
-import android.app.Activity;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.model.LikedRestaurant;
-import com.example.go4lunch.repository.LikedRestaurantRepository;
-import com.example.go4lunch.repository.LocationRepository;
-import com.example.go4lunch.repository.RestaurantRepository;
-import com.example.go4lunch.repository.UserRepository;
-import com.example.go4lunch.model.RestaurantWithDistance;
-import com.example.go4lunch.model.User;
+import com.example.go4lunch.model.model.LikedRestaurant;
+import com.example.go4lunch.model.repository.LikedRestaurantRepository;
+import com.example.go4lunch.model.repository.LocationRepository;
+import com.example.go4lunch.model.repository.RestaurantRepository;
+import com.example.go4lunch.model.repository.UserRepository;
+import com.example.go4lunch.model.model.RestaurantWithDistance;
+import com.example.go4lunch.model.model.User;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
 public class ListViewViewModel extends ViewModel {
-
-    // private MutableLiveData<List<User>> workmatesMutableLiveData;
-    // private MutableLiveData<List<RestaurantWithDistance>> restaurantsMutableLiveData;
 
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
@@ -29,9 +24,6 @@ public class ListViewViewModel extends ViewModel {
 
     // Constructor
     public ListViewViewModel() {
-        // workmatesMutableLiveData = new MutableLiveData<>();
-        // restaurantsMutableLiveData = new MutableLiveData<>();
-
         userRepository = UserRepository.getInstance();
         locationRepository = LocationRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();

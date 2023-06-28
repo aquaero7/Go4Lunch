@@ -16,7 +16,7 @@
     app:titleTextAppearance="@style/Toolbar.TitleText"
     android:id="@+id/toolbar">
 
-    <SearchView
+    <androidx.appcompat.widget.SearchView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="8dp"

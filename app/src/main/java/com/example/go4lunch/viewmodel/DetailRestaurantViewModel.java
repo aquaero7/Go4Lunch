@@ -1,13 +1,11 @@
 package com.example.go4lunch.viewmodel;
 
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.model.RestaurantWithDistance;
-import com.example.go4lunch.repository.LikedRestaurantRepository;
-import com.example.go4lunch.repository.UserRepository;
-import com.example.go4lunch.model.LikedRestaurant;
-import com.example.go4lunch.model.User;
+import com.example.go4lunch.model.repository.LikedRestaurantRepository;
+import com.example.go4lunch.model.repository.UserRepository;
+import com.example.go4lunch.model.model.LikedRestaurant;
+import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.DataProcessingUtils;
 
 import java.util.ArrayList;

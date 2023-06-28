@@ -2,17 +2,19 @@ package com.example.go4lunch.viewmodel;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.repository.LikedRestaurantRepository;
-import com.example.go4lunch.repository.LocationRepository;
-import com.example.go4lunch.repository.RestaurantRepository;
-import com.example.go4lunch.repository.UserRepository;
-import com.example.go4lunch.model.LikedRestaurant;
-import com.example.go4lunch.model.RestaurantWithDistance;
-import com.example.go4lunch.model.User;
+import com.example.go4lunch.R;
+import com.example.go4lunch.model.repository.LikedRestaurantRepository;
+import com.example.go4lunch.model.repository.LocationRepository;
+import com.example.go4lunch.model.repository.RestaurantRepository;
+import com.example.go4lunch.model.repository.UserRepository;
+import com.example.go4lunch.model.model.LikedRestaurant;
+import com.example.go4lunch.model.model.RestaurantWithDistance;
+import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.DataProcessingUtils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
@@ -23,11 +25,7 @@ import java.util.Objects;
 
 public class MainViewModel extends ViewModel {
 
-    // private MutableLiveData<User> currentUserMutableLiveData;
-    // private MutableLiveData<List<RestaurantWithDistance>> restaurantsMutableLiveData;
-    // private MutableLiveData<List<LikedRestaurant>> likedRestaurantsMutableLiveData;
     private final UserRepository userRepository;
-    private final LocationRepository locationRepository;
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
     private final String currentDate;
@@ -35,12 +33,7 @@ public class MainViewModel extends ViewModel {
 
     // Constructor
     public MainViewModel() {
-        // currentUserMutableLiveData = new MutableLiveData<>();
-        // restaurantsMutableLiveData = new MutableLiveData<>();
-        // likedRestaurantsMutableLiveData = new MutableLiveData<>();
-
         userRepository = UserRepository.getInstance();
-        locationRepository = LocationRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
         likedRestaurantRepository = LikedRestaurantRepository.getInstance();
 
@@ -60,10 +53,6 @@ public class MainViewModel extends ViewModel {
         return userRepository.getWorkmatesMutableLiveData();
     }
 
-    public MutableLiveData<LatLng> getCurrentLocationMutableLiveData() {
-        return locationRepository.getCurrentLocationMutableLiveData();
-    }
-
     public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
         return restaurantRepository.getRestaurantsMutableLiveData();
     }
@@ -76,29 +65,6 @@ public class MainViewModel extends ViewModel {
     /***********
      * Methods *
      ***********/
-
-    // Fetchers (using Maps and Firebase APIs)
-
-    public void fetchCurrentUser() {
-        userRepository.fetchCurrentUser();
-    }
-
-    public void fetchWorkmates() {
-        userRepository.fetchWorkmates();
-    }
-
-    public void fetchCurrentLocation(Activity activity) {
-        locationRepository.fetchCurrentLocation(activity);
-    }
-
-    public void fetchRestaurants(LatLng home, String radius, String apiKey) {
-        restaurantRepository.fetchRestaurants(home, radius, apiKey);
-    }
-
-    public void fetchLikedRestaurants() {
-        likedRestaurantRepository.fetchLikedRestaurants();
-    }
-
 
     // Actions
 
@@ -151,9 +117,5 @@ public class MainViewModel extends ViewModel {
         return userRepository.getFbCurrentUser();
     }
 
-    public String getSearchRadius(User user) {
-        String searchRadius = user.getSearchRadiusPrefs();
-        return (searchRadius != null) ? searchRadius : restaurantRepository.getDefaultRadius();
-    }
 
 }
