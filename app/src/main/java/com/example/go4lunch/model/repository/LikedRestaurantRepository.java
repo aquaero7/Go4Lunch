@@ -104,12 +104,15 @@ public class LikedRestaurantRepository {
     // Update local list
     public void updateLikedRestaurants(String id) {
         for (LikedRestaurant likedRestaurant : likedRestaurantsList) {
-            if (Objects.equals(id, likedRestaurant.getId())) likedRestaurantsList.remove(likedRestaurant);
-            break;
+            if (Objects.equals(id, likedRestaurant.getId())) {
+                likedRestaurantsList.remove(likedRestaurant);
+                // Populate the LiveData
+                likedRestaurantsMutableLiveData.setValue(likedRestaurantsList);
+                break;
+            }
         }
-        // Populate the LiveData
-        likedRestaurantsMutableLiveData.setValue(likedRestaurantsList);
     }
+
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

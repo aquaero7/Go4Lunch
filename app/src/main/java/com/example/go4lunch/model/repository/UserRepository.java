@@ -259,7 +259,7 @@ public class UserRepository {
     }
 
 
-    // For notification service
+    // For notification service and detail restaurant activity
     public User getCurrentUser() {
         return currentUser;
     }

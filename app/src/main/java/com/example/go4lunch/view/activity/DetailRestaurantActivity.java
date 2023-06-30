@@ -41,8 +41,8 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         configureAndShowDetailRestaurantFragment();
         // Initialize ViewModel
         detailRestaurantViewModel = new ViewModelProvider(this).get(DetailRestaurantViewModel.class);
-        // Get data from calling activity
-        getIntentData();
+        // Initialize data
+        initData();
     }
 
     // --------------
@@ -85,16 +85,8 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         }
     }
 
-    // Get restaurant from calling activity
-    private void getIntentData() {
-        Intent intent = this.getIntent();
-        if (intent != null) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                currentUser = (User) bundle.getSerializable("CURRENT_USER");
-                Log.w("DetailRestaurantActivity", "Name of current user : " + currentUser.getUsername());
-            }
-        }
+    private void initData() {
+        currentUser = detailRestaurantViewModel.getCurrentUser();
     }
 
     private void updateSelection(boolean isSelected, String rId, String rName, String rAddress) {

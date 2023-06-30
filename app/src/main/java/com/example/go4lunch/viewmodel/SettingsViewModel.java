@@ -23,11 +23,7 @@ public class SettingsViewModel extends ViewModel {
      * LiveData *
      ************/
 
-    /*
-    public MutableLiveData<User> getCurrentUserMutableLiveData() {
-        return userRepository.getCurrentUserMutableLiveData();
-    }
-    */
+    // NIL //
 
 
     /***********
@@ -54,6 +50,10 @@ public class SettingsViewModel extends ViewModel {
 
 
     // Getters
+
+    public User getCurrentUser() {
+        return userRepository.getCurrentUser();
+    }
 
     public String getSearchRadius(User user) {
         String searchRadius = user.getSearchRadiusPrefs();

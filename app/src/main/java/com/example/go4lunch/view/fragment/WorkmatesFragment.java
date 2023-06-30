@@ -40,10 +40,8 @@ public class WorkmatesFragment extends Fragment {
     private FragmentWorkmatesBinding binding;
     private RecyclerView mRecyclerView;
     private WorkmateAdapter workmateAdapter;
-    private User currentUser;
     private List<User> workmatesList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
-    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private WorkmatesViewModel workmatesViewModel;
     private EventListener eventListener;
 
@@ -87,6 +85,7 @@ public class WorkmatesFragment extends Fragment {
 
         // Initialize ViewModel
         workmatesViewModel = new ViewModelProvider(requireActivity()).get(WorkmatesViewModel.class);
+
         // Initialize data
         initData();
 
@@ -151,8 +150,6 @@ public class WorkmatesFragment extends Fragment {
 
     @SuppressLint("NotifyDataSetChanged")
     private void initData() {
-        // Initialize current user
-        workmatesViewModel.getCurrentUserMutableLiveData().observe(requireActivity(), user -> currentUser = user);
         // Initialize workmates data
         workmatesViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmates -> {
             workmatesList.clear();
@@ -164,20 +161,12 @@ public class WorkmatesFragment extends Fragment {
             restaurantsList.clear();
             restaurantsList.addAll(restaurants);
         });
-        // Initialize liked restaurants list
-        workmatesViewModel.getLikedRestaurantsMutableLiveData().observe(requireActivity(), likedRestaurants -> {
-            likedRestaurantsList.clear();
-            likedRestaurantsList.addAll(likedRestaurants);
-        });
     }
 
     private void launchDetailRestaurantActivity(RestaurantWithDistance restaurantWithDistance) {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurantWithDistance);
-        bundle.putSerializable("CURRENT_USER", currentUser);
-        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
-        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
         intent.putExtras(bundle);
         startActivity(intent);
     }

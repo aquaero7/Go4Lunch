@@ -62,8 +62,8 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         // Initialize ViewModel
         settingsViewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
 
-        // Get data from calling activity
-        getIntentData();
+        // Initialize data
+        initData();
 
         // Initialize preferences
 
@@ -118,15 +118,8 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void getIntentData() {
-        Intent intent = requireActivity().getIntent();
-        if (intent != null) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                currentUser = (User) bundle.getSerializable("CURRENT_USER");
-                Log.w("SettingsFragment", "Name of current user : " + currentUser.getUsername());
-            }
-        }
+    private void initData() {
+        currentUser = settingsViewModel.getCurrentUser();
     }
 
     public void hideVirtualKeyboard(Context context, View view) {

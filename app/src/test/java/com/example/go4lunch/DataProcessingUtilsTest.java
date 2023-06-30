@@ -2,6 +2,8 @@ package com.example.go4lunch;
 
 import static org.junit.Assert.assertEquals;
 
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
@@ -11,6 +13,8 @@ import com.example.go4lunch.model.api.model.OpenClose;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Period;
 import com.example.go4lunch.utils.DataProcessingUtils;
+import com.example.go4lunch.view.activity.DetailRestaurantActivity;
+import com.example.go4lunch.viewmodel.DetailRestaurantViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.maps.android.SphericalUtil;
@@ -48,8 +52,11 @@ public class DataProcessingUtilsTest {
     String currentTime;
     long currentDayOfWeek;
 
+    DetailRestaurantViewModel detailRestaurantViewModel;
+
 
     private void initializeData() {
+        detailRestaurantViewModel = new DetailRestaurantViewModel();
         // Reference LatLng for test restaurants
         refLatLng = new LatLng(0, 0);    // Equator - Greenwich meridian
         // LatLng for test restaurants
@@ -225,7 +232,7 @@ public class DataProcessingUtilsTest {
 
         /** Test openingInformation (if at least one period exists today) */
         for (RestaurantWithDistance restaurantWithDistance : testRestaurantsWithDistance) {
-            String openingInformation = DataProcessingUtils.getOpeningInformation(restaurantWithDistance);
+            String openingInformation = detailRestaurantViewModel.getOpeningInformation(restaurantWithDistance);
             String rId = restaurantWithDistance.getRid();
             // Test verifications
             switch (rId) {
@@ -273,18 +280,18 @@ public class DataProcessingUtilsTest {
         }
 
         /** Test opening information (if no period exists today) */
-        String openingInformation0 = DataProcessingUtils.getOpeningInformation(testRestaurantsWithDistance0.get(0));
+        String openingInformation0 = detailRestaurantViewModel.getOpeningInformation(testRestaurantsWithDistance0.get(0));
         // Test verification
         assertEquals("Wrong information 0", CLO, openingInformation0);
 
         /** Test opening information (if periods list is null) */
-        String openingInformationPerNull = DataProcessingUtils.getOpeningInformation(testRestaurantsWithDistancePerNull.get(0));
+        String openingInformationPerNull = detailRestaurantViewModel.getOpeningInformation(testRestaurantsWithDistancePerNull.get(0));
         // Test verification
         assertEquals("Wrong information 00", UNK, openingInformationPerNull);
 
 
         /** Test opening information (openingInformation object is null) */
-        String openingInformationOpHoNull = DataProcessingUtils.getOpeningInformation(testRestaurantsWithDistanceOpHoNull.get(0));
+        String openingInformationOpHoNull = detailRestaurantViewModel.getOpeningInformation(testRestaurantsWithDistanceOpHoNull.get(0));
         // Test verification
         assertEquals("Wrong information 000", UNK, openingInformationOpHoNull);
     }

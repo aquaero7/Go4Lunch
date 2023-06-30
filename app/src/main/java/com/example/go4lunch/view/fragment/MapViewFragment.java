@@ -76,7 +76,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     private User currentUser;
     private List<User> workmatesList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
-    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private int selectionsCount;
     private final String currentDate = DataProcessingUtils.getCurrentDate();
 
@@ -173,8 +172,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         mGoogleMap = googleMap;
         // Initialize the map
         initMap();
-        // Display map with or without home focus
-        // displayMap();
         setFocusToHome();
         displayRestaurantsOnMap();
 
@@ -184,9 +181,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     public boolean onMyLocationButtonClick() {
         // Request for home focus and default zoom
         focusHome = true;
+        // Reset the zoom
         mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
-        // Display restaurant list
-        displayRestaurantsOnMap();
         return false;
     }
 
@@ -223,17 +219,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void initData() {
-        // Initialize current location
-        // home = mapViewViewModel.getDefaultLocation();
-
         // Initialize currentUser
         mapViewViewModel.getCurrentUserMutableLiveData().observe(requireActivity(), user -> currentUser = user);
-
-        // Initialize liked restaurants list
-        mapViewViewModel.getLikedRestaurantsMutableLiveData().observe(requireActivity(), likedRestaurants -> {
-            likedRestaurantsList.clear();
-            likedRestaurantsList.addAll(likedRestaurants);
-        });
     }
 
 
@@ -251,17 +238,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
 
         // Request for home focus at first display
         focusHome = true;
-    }
-
-    @SuppressLint("MissingPermission")  // Permissions already checked in AuthActivity
-    private void displayMap() {
-        /* If necessary, displays again MyLocation button if permissions are granted
-           (sometimes it is... and I don't know why) */
-        // mGoogleMap.setMyLocationEnabled(MapsApisUtils.arePermissionsGranted());  // TODO : To be confirmed
-        // Set Focus to home
-        setFocusToHome();
-        // Display restaurants
-        displayRestaurantsOnMap();
     }
 
     @SuppressLint("MissingPermission")  // Permissions already checked in AuthActivity
@@ -308,7 +284,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
 
     private void getSelectionsCountAndUpdateMarkerIcon(String rId, Marker marker) {
         // Initialize or update restaurants data
-        // TODO : owner =  getViewLifecycleOwner() or requireActivity()
         mapViewViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmates -> {
             workmatesList.clear();
             workmatesList.addAll(workmates);
@@ -329,11 +304,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurant);
-        //
-        bundle.putSerializable("CURRENT_USER", currentUser);
-        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
-        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
-        //
         intent.putExtras(bundle);
         startActivity(intent);
     }
@@ -372,13 +342,11 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
 
             @Override
             public void onError(@NonNull Status status) {
-                // TODO: Handle the error.
                 Log.i("MapViewFragment", "An error occurred: " + status);
                 autocompleteFragment.setText("");
                 autocompleteCardView.setVisibility(View.GONE);
             }
         });
     }
-
 
 }

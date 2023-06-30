@@ -3,6 +3,7 @@ package com.example.go4lunch.viewmodel;
 import android.app.Activity;
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.model.model.User;
@@ -32,7 +33,9 @@ public class AuthViewModel extends ViewModel {
      * LiveData *
      ************/
 
-    // NIL //
+    public MutableLiveData<LatLng> getCurrentLocationMutableLiveData() {
+        return locationRepository.getCurrentLocationMutableLiveData();
+    }
 
 
     /***********
@@ -41,11 +44,7 @@ public class AuthViewModel extends ViewModel {
 
     // Fetchers (using Maps and Firebase APIs)
 
-    public void fetchData(Activity activity, String apiKey) {
-        if (userRepository.arePermissionsGranted()) {
-            fetchCurrentLocation(activity);   // Fetch current location
-            fetchRestaurants(apiKey);   // Fetching restaurants list
-        }
+    public void fetchOtherData() {
         fetchCurrentUser();   // Fetch current user
         fetchWorkmates();     // Fetch workmates list
         fetchLikedRestaurants();  // Fetch liked restaurants list
@@ -63,10 +62,10 @@ public class AuthViewModel extends ViewModel {
         locationRepository.fetchCurrentLocation(activity);
     }
 
-    public void fetchRestaurants(String apiKey) {
+    public void fetchRestaurants(LatLng home, String apiKey) {
         userRepository.getCurrentUserData()
                 .addOnSuccessListener(user -> {
-                    restaurantRepository.fetchRestaurants(getCurrentLocation(), getSearchRadius(user), apiKey);
+                    restaurantRepository.fetchRestaurants(home, getSearchRadius(user), apiKey);
                     Log.w("MainViewModel", "user radius: " + getSearchRadius(user));
                 })
                 .addOnFailureListener(e -> {
@@ -80,10 +79,6 @@ public class AuthViewModel extends ViewModel {
 
 
     // Getters
-
-    public LatLng getCurrentLocation() {
-        return locationRepository.getCurrentLocation();
-    }
 
     public String getSearchRadius(User user) {
         String searchRadius = user.getSearchRadiusPrefs();

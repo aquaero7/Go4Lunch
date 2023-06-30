@@ -110,12 +110,6 @@ public class LocationRepository {
 
 
 
-    // For test
-
-    public LatLng getCurrentLocation() {
-        return home;
-    }
-
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

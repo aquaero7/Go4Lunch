@@ -35,7 +35,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DetailRestaurantFragment extends Fragment implements View.OnClickListener {
 
@@ -51,6 +53,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private TextView mTextView1;
     private RatingBar mRatingBar;
     private TextView mTextView2;
+    private TextView mTextView3;
     private FloatingActionButton mSelectionFab;
     private TextView mEmptyListMessage;
     private Button mCallButton;
@@ -59,7 +62,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
     // Declare restaurant
     private RestaurantWithDistance restaurant;
-    private String rId, rName, rAddress, rPhotoUrl;
+    private String rId, rName, rAddress, rOpeningInfo, rPhotoUrl;
     private List<Photo> rPhotos;
     private double rRating;
     private boolean isSelected;
@@ -72,11 +75,10 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private User currentUser;
 
     // Declare and initialize list
-    private List<User> workmatesList = new ArrayList<>();
     private List<User> selectorsList = new ArrayList<>();
     private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
 
-    // Declare and initialize Google Maps API key
+    // Declare Google Maps API key
     private String KEY;
 
 
@@ -100,6 +102,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         mImageView = binding.ivRestaurant;
         mTextView1 = binding.tv1Restaurant;
         mTextView2 = binding.tv2Restaurant;
+        mTextView3 = binding.tv3Restaurant;
         mRatingBar = binding.ratingBarRestaurant;
         mSelectionFab = binding.fabSelection;
         mEmptyListMessage = binding.messageEmptyList;
@@ -121,6 +124,9 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         // Initialize ViewModel
         detailRestaurantViewModel = new ViewModelProvider(requireActivity()).get(DetailRestaurantViewModel.class);
 
+        // Initialize the list of opening information to display
+        initInfoList();
+
         // Get data from calling activity
         getIntentData();
 
@@ -141,6 +147,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         super.onResume();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     /* Spread the click to the parent activity
     Binding added as an argument to make it available in the activity */
@@ -148,20 +155,14 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         switch (EventButtonClick.from(v)) {
             case BTN_CALL:
             case BTN_WEBSITE:
-                break;
             case BTN_LIKE:
-                isLiked = !isLiked;
-                updateLikeButton();
-                break;
             case FAB_SELECT:
-                isSelected = !isSelected;
-                updateSelectionFab();
-                // updateLocalObjectsWithSelection();
+                // Actions are managed in activity. Useless with livedata.
                 break;
         }
         mCallback.onButtonClicked(v, binding, restaurant.getRid(), restaurant.getName(),
                 restaurant.getAddress(), restaurant.getPhoneNumber(), restaurant.getWebsite(),
-                restaurant.getRating(), restaurant.getPhotos(), isSelected, isLiked);
+                restaurant.getRating(), restaurant.getPhotos(), !isSelected, !isLiked);
     }
 
     @Override
@@ -205,25 +206,17 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                 .setOnItemClickListener((recyclerView, position, v) -> Log.w("TAG", "Position : "+position));
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void initData() {
-        // Initialize restaurant data
-        rId = restaurant.getRid();
-        rName = restaurant.getName();
-        rAddress = restaurant.getAddress();
-        rPhotos = restaurant.getPhotos();
-        rRating = restaurant.getRating();
-        if (rPhotos != null) rPhotoUrl = rPhotos.get(0).getPhotoUrl(KEY);
-
-        // Initialize selectors list
-        selectorsList.clear();
-        selectorsList.addAll(detailRestaurantViewModel.getSelectors(rId, workmatesList));
-
-        detailRestaurantWorkmateAdapter.notifyDataSetChanged();
-
-        // Configure empty selectors list message visibility according to selectors list
-        int emptyListMessageVisibility = (selectorsList.isEmpty()) ? View.VISIBLE : View.GONE;
-        mEmptyListMessage.setVisibility(emptyListMessageVisibility);
+    // Initialize the list of opening information to display
+    private void initInfoList() {
+        Map<String, String> infoList = new HashMap<>();
+        infoList.put("OPE", getString(R.string.status_open));
+        infoList.put("CLO", getString(R.string.status_closed));
+        infoList.put("OP*", getString(R.string.status_open247));
+        infoList.put("OPD", getString(R.string.status_open24));
+        infoList.put("OPU", getString(R.string.status_open_until));
+        infoList.put("OPA", getString(R.string.status_open_at));
+        infoList.put("???", getString(R.string.status_unknown));
+        detailRestaurantViewModel.setInfoList(infoList);
     }
 
     // Get restaurant from calling activity
@@ -233,27 +226,76 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 restaurant = (RestaurantWithDistance) bundle.getSerializable("RESTAURANT");
-                currentUser = (User) bundle.getSerializable("CURRENT_USER");
-                workmatesList = (List<User>) bundle.getSerializable("WORKMATES");
-                likedRestaurantsList = (List<LikedRestaurant>) bundle.getSerializable("LIKED_RESTAURANTS");
                 Log.w("DetailRestaurantFragment", "Name of this restaurant : " + restaurant.getName());
             }
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    private void initData() {
+        // Initialize restaurant data
+        initRestaurantData();
+        // Initialize current user
+        initCurrentUser();
+        // Initialize selectors list
+        initSelectors();
+        // Initialize liked restaurants list
+        initLikedRestaurants();
+    }
+
+    private void initRestaurantData() {
+        rId = restaurant.getRid();
+        rName = restaurant.getName();
+        rPhotos = restaurant.getPhotos();
+        rRating = restaurant.getRating();
+        if (rPhotos != null) rPhotoUrl = rPhotos.get(0).getPhotoUrl(KEY);
+
+        // Get restaurant details
+        detailRestaurantViewModel.fetchRestaurantDetails(restaurant, KEY);
+        detailRestaurantViewModel.getRestaurantDetailsMutableLiveData().observe(requireActivity(), restaurant -> {
+            rAddress = restaurant.getAddress();
+            rOpeningInfo = detailRestaurantViewModel.getOpeningInformation(restaurant);
+            displayRestaurantDetailData();
+        });
+    }
+
+    private void initCurrentUser() {
+        currentUser = detailRestaurantViewModel.getCurrentUser();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void initSelectors() {
+        detailRestaurantViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmates -> {
+            selectorsList.clear();
+            selectorsList.addAll(detailRestaurantViewModel.getSelectors(rId, workmates));
+            isSelected = (detailRestaurantViewModel.checkCurrentUserSelection(rId));
+            updateSelectionFab();
+
+            detailRestaurantWorkmateAdapter.notifyDataSetChanged();
+            // Configure empty selectors list message visibility according to selectors list
+            int emptyListMessageVisibility = (selectorsList.isEmpty()) ? View.VISIBLE : View.GONE;
+            mEmptyListMessage.setVisibility(emptyListMessageVisibility);
+        });
+    }
+
+    private void initLikedRestaurants() {
+        detailRestaurantViewModel.getLikedRestaurantsMutableLiveData().observe(requireActivity(), likedRestaurants -> {
+            likedRestaurantsList.clear();
+            likedRestaurantsList.addAll(likedRestaurants);
+            isLiked = (detailRestaurantViewModel.checkCurrentUserLikes(rId, likedRestaurantsList));
+            updateLikeButton();
+        });
+    }
+
     private void displayRestaurantData() {
-        if (rPhotos != null) Picasso
-                .get()
-                .load(rPhotoUrl).into(mImageView);
+        if (rPhotos != null) Picasso.get().load(rPhotoUrl).into(mImageView);
         mTextView1.setText(rName);
-        mTextView2.setText(rAddress);
         mRatingBar.setRating((float) (rRating * 3/5));
+    }
 
-        isLiked = (detailRestaurantViewModel.checkCurrentUserLikes(currentUser, likedRestaurantsList));
-        updateLikeButton();
-
-        isSelected = (detailRestaurantViewModel.checkCurrentUserSelection(currentUser, rId));
-        updateSelectionFab();
+    private void displayRestaurantDetailData() {
+        mTextView2.setText(rAddress);
+        mTextView3.setText(rOpeningInfo);
     }
 
     @SuppressLint("UseCompatTextViewDrawableApis")  // For the use of setCompoundDrawableTintList()
@@ -273,44 +315,5 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         // Set up the new foreground of the selection FAB
         mSelectionFab.setForeground(AppCompatResources.getDrawable(requireContext(),resId));
     }
-
-    /*
-    private void updateLocalObjectsWithSelection() {
-        String selIdUpdate, selDateUpdate, selNameUpdate, selAddressUpdate;
-        if (isSelected) {
-            selIdUpdate = rId;
-            selDateUpdate = currentDate;
-            selNameUpdate = rName;
-            selAddressUpdate = rAddress;
-        } else {
-            selIdUpdate = null;
-            selDateUpdate = null;
-            selNameUpdate = null;
-            selAddressUpdate = null;
-        }
-        userManager.getCurrentUserData()
-                .addOnSuccessListener(currentUser -> {
-                    // Update current user
-                    currentUser.setSelectionId(selIdUpdate);
-                    currentUser.setSelectionDate(selDateUpdate);
-                    currentUser.setSelectionName(selNameUpdate);
-                    currentUser.setSelectionAddress(selAddressUpdate);
-                    // Update workmates list
-                    for (User workmate : workmatesList) {
-                        if (currentUser.getUid().equals(workmate.getUid())) {
-                            workmate.setSelectionId(selIdUpdate);
-                            workmate.setSelectionDate(selDateUpdate);
-                            workmate.setSelectionName(selNameUpdate);
-                            workmate.setSelectionAddress(selAddressUpdate);
-                            break;
-                        }
-                    }
-                    initData(); // To update recyclerView with local data updated
-                })
-                .addOnFailureListener(e -> {
-                    Log.w("DetailRestaurantFragment", e.getMessage());
-                });
-    }
-    */
 
 }

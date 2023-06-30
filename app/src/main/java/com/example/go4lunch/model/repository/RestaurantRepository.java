@@ -31,11 +31,13 @@ public class RestaurantRepository {
 
     private static volatile RestaurantRepository instance;
     private MutableLiveData<List<RestaurantWithDistance>> restaurantsMutableLiveData;
+    private MutableLiveData<RestaurantWithDistance> restaurantDetailsMutableLiveData;
     private List<Restaurant> restaurantsList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsListWithDistance = new ArrayList<>();
 
     private RestaurantRepository() {
         restaurantsMutableLiveData = new MutableLiveData<>();
+        restaurantDetailsMutableLiveData = new MutableLiveData<>();
     }
 
     public static RestaurantRepository getInstance() {
@@ -72,64 +74,28 @@ public class RestaurantRepository {
                     Log.w("RestaurantRepository", "Nearby restaurants list not empty");
                     restaurantsList.clear();
                     for (Restaurant nearbyRestaurant : nearbyRestaurants) {
-                        // getRestaurantDetailsFromApi(nearbyRestaurant, apiKey);
-
-                        //
                         String rId = nearbyRestaurant.getRid();
                         String name = nearbyRestaurant.getName();
-                        String address = nearbyRestaurant.getAddress(); // ?
-                        String phoneNumber = nearbyRestaurant.getPhoneNumber(); // ?
-                        String website = nearbyRestaurant.getWebsite(); // ?
+                        String address = nearbyRestaurant.getAddress(); // Not implemented by this API
+                        String phoneNumber = nearbyRestaurant.getPhoneNumber(); // Not implemented by this API
+                        String website = nearbyRestaurant.getWebsite(); // Not implemented by this API
                         double rating = nearbyRestaurant.getRating();
-                        OpeningHours openingHours = nearbyRestaurant.getOpeningHours(); // Can be commented if openingHours come from details api
+                        OpeningHours openingHours = nearbyRestaurant.getOpeningHours();
                         List<Photo> photos = nearbyRestaurant.getPhotos();
                         Geometry geometry = nearbyRestaurant.getGeometry();
 
                         // Add restaurant to current restaurants list
                         restaurantsList.add(new Restaurant(rId, name, photos, address, rating, openingHours,
                                 phoneNumber, website, geometry));
-
-                        /* Call Place Details API //////////////////////////////////////////////////
-                        // getRestaurantDetailsFromApi(nearbyRestaurant, apiKey, context);
-                        Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(rId,
-                                "formatted_address,formatted_phone_number,website,opening_hours",
-                                apiKey
-                        );
-                        call2.enqueue(new Callback<GmapsRestaurantDetailsPojo>() {
-                            @Override
-                            public void onResponse(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Response<GmapsRestaurantDetailsPojo> response2) {
-                                GmapsRestaurantDetailsPojo placeDetails = response2.body();
-                                Restaurant restaurantDetails = placeDetails.getRestaurantDetails();
-
-                                String address = restaurantDetails.getAddress();
-                                String phoneNumber = restaurantDetails.getPhoneNumber();
-                                String website = restaurantDetails.getWebsite();
-                                OpeningHours openingHours = restaurantDetails.getOpeningHours(); // Can be commented to make openingHours come from nearby api
-
-                                // Add restaurant to current restaurants list
-                                restaurantsList.add(new Restaurant(rId, name, photos, address, rating, openingHours,
-                                        phoneNumber, website, geometry));
-                            }
-
-                            @Override
-                            public void onFailure(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Throwable t) {
-                                // Toast.makeText(context, R.string.error, Toast.LENGTH_SHORT).show();
-                                Log.w("RestaurantRepository", t.getMessage(), t);
-                            }
-                        });
-                        */
-
                     }
-                    // restaurantsListWithDistance = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
-                    // DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistance);
+
+                    restaurantsListWithDistance = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
+                    DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistance);
+                    // Populate the LiveData
+                    restaurantsMutableLiveData.setValue(restaurantsListWithDistance);
                 } else {
                     Log.w("RestaurantRepository", "Empty nearby restaurants list");
                 }
-
-                restaurantsListWithDistance = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
-                DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistance);
-                // Populate the LiveData
-                restaurantsMutableLiveData.setValue(restaurantsListWithDistance);
             }
 
             @Override
@@ -138,23 +104,13 @@ public class RestaurantRepository {
                 Log.w("RestaurantRepository", t.getMessage(), t);
             }
         });
-
-        //
-
-        //
     }
 
-    private void getRestaurantDetailsFromApi(Restaurant nearbyRestaurant, String apiKey) {
-        String rId = nearbyRestaurant.getRid();
-        String name = nearbyRestaurant.getName();
-        double rating = nearbyRestaurant.getRating();
-        OpeningHours openingHours = nearbyRestaurant.getOpeningHours(); // Can be commented if openingHours come from details api
-        List<Photo> photos = nearbyRestaurant.getPhotos();
-        Geometry geometry = nearbyRestaurant.getGeometry();
+    public void fetchRestaurantDetails(RestaurantWithDistance nearbyRestaurant, String apiKey) {
 
         // Call Place Details API //////////////////////////////////////////////////
-        // getRestaurantDetailsFromApi(nearbyRestaurant, apiKey, context);
-        Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(rId,
+        Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(
+                nearbyRestaurant.getRid(),
                 "formatted_address,formatted_phone_number,website,opening_hours",
                 apiKey
         );
@@ -164,30 +120,29 @@ public class RestaurantRepository {
                 GmapsRestaurantDetailsPojo placeDetails = response2.body();
                 Restaurant restaurantDetails = placeDetails.getRestaurantDetails();
 
-                String address = restaurantDetails.getAddress();
-                String phoneNumber = restaurantDetails.getPhoneNumber();
-                String website = restaurantDetails.getWebsite();
-                OpeningHours openingHours = restaurantDetails.getOpeningHours(); // Can be commented to make openingHours come from nearby api
+                // Update fields with detail information
+                nearbyRestaurant.setAddress(restaurantDetails.getAddress());
+                nearbyRestaurant.setOpeningHours(restaurantDetails.getOpeningHours());  // Updated with full information
+                nearbyRestaurant.setPhoneNumber(restaurantDetails.getPhoneNumber());
+                nearbyRestaurant.setWebsite(restaurantDetails.getWebsite());
 
-                // Add restaurant to current restaurants list
-                restaurantsList.add(new Restaurant(rId, name, photos, address, rating, openingHours,
-                        phoneNumber, website, geometry));
+                // Populate the LiveData
+                restaurantDetailsMutableLiveData.setValue(nearbyRestaurant);
             }
 
             @Override
             public void onFailure(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Throwable t) {
-                restaurantsList.add(new Restaurant(rId, name, photos, null, rating, openingHours,
-                        null, null, geometry));
-
                 Log.w("RestaurantRepository", t.getMessage(), t);
             }
         });
     }
 
     public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
-        // Populate the LiveData
-        // restaurantsMutableLiveData.setValue(restaurantsListWithDistance);
         return restaurantsMutableLiveData;
+    }
+
+    public MutableLiveData<RestaurantWithDistance> getRestaurantDetailsMutableLiveData() {
+        return restaurantDetailsMutableLiveData;
     }
 
     public String getDefaultRadius() {

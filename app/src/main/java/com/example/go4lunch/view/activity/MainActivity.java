@@ -70,8 +70,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private User currentUser;
     private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
     private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
-    private List<User> workmatesList = new ArrayList<>();   // Needed for bundle only
-
 
     @Override
     ActivityMainBinding getViewBinding() {
@@ -95,8 +93,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Initialize SearchView and setup listener
         searchView = binding.includedToolbar.searchView;
         this.configureSearchViewListener(searchView);
-        // Fetch data
-        // mainViewModel.fetchData(this, getString(R.string.MAPS_API_KEY)); // TODO : Test implementation in MainActivity or AuthActivity
         // Init data
         this.initData();
     }
@@ -104,8 +100,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     @Override
     protected void onResume() {
         super.onResume();
-        // Fetch data
-        // this.fetchData(); // TODO : Test implementation in MainActivity or AuthActivity
     }
 
     @Override
@@ -318,11 +312,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void initData() {
         // Initialize current user
         mainViewModel.getCurrentUserMutableLiveData().observe(this, user -> currentUser = user);
-        // Initialize workmates list
-        mainViewModel.getWorkmatesMutableLiveData().observe(this, workmates -> {
-            workmatesList.clear();
-            workmatesList.addAll(workmates);
-        });
         // Initialize restaurants list
         mainViewModel.getRestaurantsMutableLiveData().observe(this, restaurants -> {
             restaurantsList.clear();
@@ -342,11 +331,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
             Bundle bundle = new Bundle();
             bundle.putSerializable("RESTAURANT", restaurant);
-            //
-            bundle.putSerializable("CURRENT_USER", currentUser);
-            bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
-            bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
-            //
             intent.putExtras(bundle);
             startActivity(intent);
         } else {
@@ -356,9 +340,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     private void launchSettingActivity() {
         Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("CURRENT_USER", currentUser);
-        intent.putExtras(bundle);
         startActivity(intent);
     }
 

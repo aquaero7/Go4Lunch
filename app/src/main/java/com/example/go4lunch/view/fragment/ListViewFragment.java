@@ -41,13 +41,10 @@ public class ListViewFragment extends Fragment {
     private FragmentListViewBinding binding;
     private RecyclerView mRecyclerView;
     private ListViewAdapter listViewAdapter;
-
-    private User currentUser;
     private List<User> workmatesList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
     private List<RestaurantWithDistance> filteredRestaurantsList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsListToDisplay = new ArrayList<>();
-    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private boolean filterIsOn = false;
     private ListViewViewModel listViewViewModel;
     private EventListener eventListener;
@@ -92,6 +89,7 @@ public class ListViewFragment extends Fragment {
 
         // Initialize ViewModel
         listViewViewModel = new ViewModelProvider(requireActivity()).get(ListViewViewModel.class);
+
         // Initialize data
         initData();
 
@@ -129,9 +127,7 @@ public class ListViewFragment extends Fragment {
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
         listViewAdapter = new ListViewAdapter(restaurantsListToDisplay, workmatesList, getString(R.string.MAPS_API_KEY),
-                getString(R.string.status_open), getString(R.string.status_closed), getString(R.string.status_open247),
-                getString(R.string.status_open24), getString(R.string.status_open_until),
-                getString(R.string.status_open_at), getString(R.string.status_unknown));
+                getString(R.string.status_open), getString(R.string.status_closed));
         // 3.3 - Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(listViewAdapter);
         // 3.4 - Set layout manager to position the items
@@ -151,8 +147,6 @@ public class ListViewFragment extends Fragment {
 
     @SuppressLint("NotifyDataSetChanged")
     private void initData() {
-        // Initialize current user
-        listViewViewModel.getCurrentUserMutableLiveData().observe(requireActivity(), user -> currentUser = user);
         // Initialize workmates data
         listViewViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmates -> {
             workmatesList.clear();
@@ -171,20 +165,12 @@ public class ListViewFragment extends Fragment {
                 listViewAdapter.notifyDataSetChanged();
             }
         });
-        // Initialize liked restaurants list
-        listViewViewModel.getLikedRestaurantsMutableLiveData().observe(requireActivity(), likedRestaurants -> {
-            likedRestaurantsList.clear();
-            likedRestaurantsList.addAll(likedRestaurants);
-        });
     }
 
     private void launchDetailRestaurantActivity(RestaurantWithDistance restaurantWithDistance) {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurantWithDistance);
-        bundle.putSerializable("CURRENT_USER", currentUser);
-        bundle.putSerializable("WORKMATES", (Serializable) workmatesList);
-        bundle.putSerializable("LIKED_RESTAURANTS", (Serializable) likedRestaurantsList);
         intent.putExtras(bundle);
         startActivity(intent);
     }

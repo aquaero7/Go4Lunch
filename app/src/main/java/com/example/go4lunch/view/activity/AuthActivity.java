@@ -19,7 +19,6 @@ import com.example.go4lunch.databinding.ActivityAuthBinding;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.viewmodel.AuthViewModel;
-import com.example.go4lunch.viewmodel.MainViewModel;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -254,8 +253,11 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     private void startApp(){
 
         // Fetch data
-        authViewModel.fetchData(this, getString(R.string.MAPS_API_KEY));
-
+        authViewModel.fetchCurrentLocation(this);
+        authViewModel.getCurrentLocationMutableLiveData().observe(this, home -> {
+            authViewModel.fetchRestaurants(home, getString(R.string.MAPS_API_KEY));
+        });
+        authViewModel.fetchOtherData();
         // Show progressBar
         progressBar.setVisibility(View.VISIBLE);
         // Launch main activity
