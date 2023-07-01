@@ -17,17 +17,12 @@ import java.util.List;
 public class ListViewViewModel extends ViewModel {
 
     private final UserRepository userRepository;
-    private final LocationRepository locationRepository;
     private final RestaurantRepository restaurantRepository;
-    private final LikedRestaurantRepository likedRestaurantRepository;
-
 
     // Constructor
     public ListViewViewModel() {
         userRepository = UserRepository.getInstance();
-        locationRepository = LocationRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
-        likedRestaurantRepository = LikedRestaurantRepository.getInstance();
     }
 
 
@@ -35,24 +30,12 @@ public class ListViewViewModel extends ViewModel {
      * LiveData *
      ************/
 
-    public MutableLiveData<User> getCurrentUserMutableLiveData() {
-        return userRepository.getCurrentUserMutableLiveData();
-    }
-
     public MutableLiveData<List<User>> getWorkmatesMutableLiveData() {
         return userRepository.getWorkmatesMutableLiveData();
     }
 
-    public MutableLiveData<LatLng> getCurrentLocationMutableLiveData() {
-        return locationRepository.getCurrentLocationMutableLiveData();
-    }
-
     public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
         return restaurantRepository.getRestaurantsMutableLiveData();
-    }
-
-    public MutableLiveData<List<LikedRestaurant>> getLikedRestaurantsMutableLiveData() {
-        return likedRestaurantRepository.getLikedRestaurantsMutableLiveData();
     }
 
 }

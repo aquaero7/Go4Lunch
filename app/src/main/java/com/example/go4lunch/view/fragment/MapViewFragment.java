@@ -73,8 +73,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     private static final int DEFAULT_ZOOM = 17;
     private static final int RESTAURANT_ZOOM = 19;
     private LatLng home;
-    private User currentUser;
-    private List<User> workmatesList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
     private int selectionsCount;
     private final String currentDate = DataProcessingUtils.getCurrentDate();
@@ -129,8 +127,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.fragment_autocomplete);
         autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.fragment_autocomplete);
         mapViewViewModel.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
-        // Initialize data
-        initData();
         // return rootView;
         return binding.getRoot();
     }
@@ -218,12 +214,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    private void initData() {
-        // Initialize currentUser
-        mapViewViewModel.getCurrentUserMutableLiveData().observe(requireActivity(), user -> currentUser = user);
-    }
-
-
     @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
     private void initMap() {
         // Display MyLocation button if permissions are granted
@@ -284,9 +274,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
 
     private void getSelectionsCountAndUpdateMarkerIcon(String rId, Marker marker) {
         // Initialize or update restaurants data
-        mapViewViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmates -> {
-            workmatesList.clear();
-            workmatesList.addAll(workmates);
+        mapViewViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmatesList -> {
             // Count selections
             selectionsCount = 0;
             for (User workmate : workmatesList) {
@@ -310,11 +298,13 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
 
     // Autocomplete is launched from activity
     public void launchAutocomplete(String text) {
+        // Configure AutocompleteSupportFragment
+        mapViewViewModel.getCurrentUserMutableLiveData().observe(requireActivity(), currentUser -> configureAutocompleteSupportFragment(currentUser, text));
+        // Launch Autocomplete
         autocompleteCardView.setVisibility(View.VISIBLE);
-        configureAutocompleteSupportFragment(text);
     }
 
-    private void configureAutocompleteSupportFragment(String text) {
+    private void configureAutocompleteSupportFragment(User currentUser, String text) {
         // Specify the limitation to only show results within the defined region
         LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, Integer.parseInt(mapViewViewModel.getSearchRadius(currentUser))*1000);
         autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
@@ -339,7 +329,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
                     }
                 }
             }
-
             @Override
             public void onError(@NonNull Status status) {
                 Log.i("MapViewFragment", "An error occurred: " + status);

@@ -22,7 +22,6 @@ public class MapViewViewModel extends ViewModel {
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final RestaurantRepository restaurantRepository;
-    private final LikedRestaurantRepository likedRestaurantRepository;
 
 
     // Constructor
@@ -30,7 +29,6 @@ public class MapViewViewModel extends ViewModel {
         userRepository = UserRepository.getInstance();
         locationRepository = LocationRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
-        likedRestaurantRepository = LikedRestaurantRepository.getInstance();
     }
 
 
@@ -52,10 +50,6 @@ public class MapViewViewModel extends ViewModel {
 
     public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
         return restaurantRepository.getRestaurantsMutableLiveData();
-    }
-
-    public MutableLiveData<List<LikedRestaurant>> getLikedRestaurantsMutableLiveData() {
-        return likedRestaurantRepository.getLikedRestaurantsMutableLiveData();
     }
 
 
@@ -80,10 +74,6 @@ public class MapViewViewModel extends ViewModel {
 
     public boolean arePermissionsGranted() {
         return userRepository.arePermissionsGranted();
-    }
-
-    public LatLng getDefaultLocation() {
-        return locationRepository.getDefaultLocation();
     }
 
     public String getSearchRadius(User user) {

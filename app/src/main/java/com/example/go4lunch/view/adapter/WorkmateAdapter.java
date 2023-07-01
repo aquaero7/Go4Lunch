@@ -20,14 +20,12 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateViewHolder> {
     private List<User> workmatesList;
     private List<RestaurantWithDistance> restaurantsList;
     private final String CHOICE_TEXT;
-    private final String NO_CHOICE_TEXT;
 
     // Constructor
-    public WorkmateAdapter(List<User> workmatesList, List<RestaurantWithDistance> restaurantsList, String CHOICE_TEXT, String NO_CHOICE_TEXT) {
+    public WorkmateAdapter(List<User> workmatesList, List<RestaurantWithDistance> restaurantsList, String CHOICE_TEXT) {
         this.workmatesList = workmatesList;
         this.restaurantsList = restaurantsList;
         this.CHOICE_TEXT = CHOICE_TEXT;
-        this.NO_CHOICE_TEXT = NO_CHOICE_TEXT;
     }
 
     @NonNull
@@ -45,7 +43,7 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateViewHolder> {
     // Update view holder with workmates
     @Override
     public void onBindViewHolder(@NonNull WorkmateViewHolder viewHolder, int position) {
-        viewHolder.updateWithWorkmate(this.workmatesList.get(position), restaurantsList,this.CHOICE_TEXT, this.NO_CHOICE_TEXT);
+        viewHolder.updateWithWorkmate(this.workmatesList.get(position), restaurantsList,this.CHOICE_TEXT);
     }
 
     // Return the total count of workmates

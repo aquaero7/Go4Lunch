@@ -190,6 +190,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                             // It is currently open
                             for (Period period : todayPeriods) {
                                 String schedule = period.getClose().getTime();
+                                schedule = schedule.substring(0,2) + "h" + schedule.substring(2);
                                 if (currentTime.compareTo(schedule) < 0 ) {
                                     // Closing today at...
                                     openingInformation = infoList.get("OPU") + schedule; // Open until...
@@ -202,6 +203,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                                 if (todayLastPeriod.getClose().getDay() != todayLastPeriod.getOpen().getDay()) {
                                     // Closing after midnight (last period schedule)
                                     String schedule = todayLastPeriod.getClose().getTime();
+                                    schedule = schedule.substring(0,2) + "h" + schedule.substring(2);
                                     openingInformation = infoList.get("OPU") + schedule; // Open until...
                                 } else {
                                     // Unexpected case... A problem occurs somewhere !
@@ -214,6 +216,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                             // It is currently closed
                             for (Period period : todayPeriods) {
                                 String schedule = period.getOpen().getTime();
+                                schedule = schedule.substring(0,2) + "h" + schedule.substring(2);
                                 if (currentTime.compareTo(schedule) < 0 ) {
                                     // Opening today at...
                                     openingInformation = infoList.get("OPA") + schedule; // Open at...
@@ -257,16 +260,11 @@ public class DetailRestaurantViewModel extends ViewModel {
         return selectors;
     }
 
-    public Map<String, String> getInfoList() {
-        return infoList;
-    }
-
 
     // Setters
 
     public void setInfoList(Map<String, String> map) {
-        infoList.clear();
-        infoList.putAll(map);
+        infoList = map;
     }
 
 }

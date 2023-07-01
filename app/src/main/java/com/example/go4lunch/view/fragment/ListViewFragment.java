@@ -160,10 +160,8 @@ public class ListViewFragment extends Fragment {
             if (!filterIsOn) {
                 restaurantsListToDisplay.clear();
                 restaurantsListToDisplay.addAll(restaurantsList);
-                listViewAdapter.notifyDataSetChanged();
-            } else {
-                listViewAdapter.notifyDataSetChanged();
             }
+            listViewAdapter.notifyDataSetChanged();
         });
     }
 

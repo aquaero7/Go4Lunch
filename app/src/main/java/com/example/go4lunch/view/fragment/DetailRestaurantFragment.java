@@ -62,17 +62,12 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
     // Declare restaurant
     private RestaurantWithDistance restaurant;
-    private String rId, rName, rAddress, rOpeningInfo, rPhotoUrl;
-    private List<Photo> rPhotos;
-    private double rRating;
+    private String rId;
     private boolean isSelected;
     private boolean isLiked;
 
     // Declare ViewModel
     DetailRestaurantViewModel detailRestaurantViewModel;
-
-    // Initialize current user
-    private User currentUser;
 
     // Declare and initialize list
     private List<User> selectorsList = new ArrayList<>();
@@ -134,10 +129,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         KEY = getString(R.string.MAPS_API_KEY);
 
         // Initialize data and display restaurant data
-        if (restaurant != null) {
-            initData();
-            displayRestaurantData();
-        }
+        if (restaurant != null) initData();
 
         return binding.getRoot();
     }
@@ -234,33 +226,19 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     @SuppressLint("NotifyDataSetChanged")
     private void initData() {
         // Initialize restaurant data
-        initRestaurantData();
-        // Initialize current user
-        initCurrentUser();
+        initAndDisplayRestaurantData();
         // Initialize selectors list
         initSelectors();
         // Initialize liked restaurants list
         initLikedRestaurants();
     }
 
-    private void initRestaurantData() {
+    private void initAndDisplayRestaurantData() {
         rId = restaurant.getRid();
-        rName = restaurant.getName();
-        rPhotos = restaurant.getPhotos();
-        rRating = restaurant.getRating();
-        if (rPhotos != null) rPhotoUrl = rPhotos.get(0).getPhotoUrl(KEY);
-
         // Get restaurant details
         detailRestaurantViewModel.fetchRestaurantDetails(restaurant, KEY);
-        detailRestaurantViewModel.getRestaurantDetailsMutableLiveData().observe(requireActivity(), restaurant -> {
-            rAddress = restaurant.getAddress();
-            rOpeningInfo = detailRestaurantViewModel.getOpeningInformation(restaurant);
-            displayRestaurantDetailData();
-        });
-    }
-
-    private void initCurrentUser() {
-        currentUser = detailRestaurantViewModel.getCurrentUser();
+        detailRestaurantViewModel.getRestaurantDetailsMutableLiveData()
+                .observe(requireActivity(), restaurant -> displayRestaurantData());
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -279,23 +257,21 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     }
 
     private void initLikedRestaurants() {
-        detailRestaurantViewModel.getLikedRestaurantsMutableLiveData().observe(requireActivity(), likedRestaurants -> {
-            likedRestaurantsList.clear();
-            likedRestaurantsList.addAll(likedRestaurants);
+        detailRestaurantViewModel.getLikedRestaurantsMutableLiveData().observe(requireActivity(), likedRestaurantsList -> {
             isLiked = (detailRestaurantViewModel.checkCurrentUserLikes(rId, likedRestaurantsList));
             updateLikeButton();
         });
     }
 
     private void displayRestaurantData() {
-        if (rPhotos != null) Picasso.get().load(rPhotoUrl).into(mImageView);
-        mTextView1.setText(rName);
-        mRatingBar.setRating((float) (rRating * 3/5));
-    }
-
-    private void displayRestaurantDetailData() {
-        mTextView2.setText(rAddress);
-        mTextView3.setText(rOpeningInfo);
+        // Nearby API data
+        List<Photo> rPhotos = restaurant.getPhotos();
+        if (rPhotos != null) Picasso.get().load(rPhotos.get(0).getPhotoUrl(KEY)).into(mImageView);
+        mTextView1.setText(restaurant.getName());
+        mRatingBar.setRating((float) (restaurant.getRating() * 3/5));
+        // Place Details API data
+        mTextView2.setText(restaurant.getAddress());
+        mTextView3.setText(detailRestaurantViewModel.getOpeningInformation(restaurant));
     }
 
     @SuppressLint("UseCompatTextViewDrawableApis")  // For the use of setCompoundDrawableTintList()

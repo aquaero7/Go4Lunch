@@ -68,8 +68,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private SearchView searchView;
     private MainViewModel mainViewModel;
     private User currentUser;
-    private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
-    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
 
     @Override
     ActivityMainBinding getViewBinding() {
@@ -312,30 +310,22 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void initData() {
         // Initialize current user
         mainViewModel.getCurrentUserMutableLiveData().observe(this, user -> currentUser = user);
-        // Initialize restaurants list
-        mainViewModel.getRestaurantsMutableLiveData().observe(this, restaurants -> {
-            restaurantsList.clear();
-            restaurantsList.addAll(restaurants);
-        });
-        // Initialize liked restaurants list
-        mainViewModel.getLikedRestaurantsMutableLiveData().observe(this, likedRestaurants -> {
-            likedRestaurantsList.clear();
-            likedRestaurantsList.addAll(likedRestaurants);
-        });
     }
 
     private void launchDetailRestaurantActivity() {
-        RestaurantWithDistance restaurant = mainViewModel.checkCurrentUserSelection(currentUser, restaurantsList);
-        // Launch DetailActivity or show message
-        if (restaurant != null) {
-            Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("RESTAURANT", restaurant);
-            intent.putExtras(bundle);
-            startActivity(intent);
-        } else {
-            showSnackBar(getString(R.string.error_choice));
-        }
+        mainViewModel.getRestaurantsMutableLiveData().observe(this, restaurantsList -> {
+            RestaurantWithDistance restaurant = mainViewModel.checkCurrentUserSelection(currentUser, restaurantsList);
+            // Launch DetailActivity or show message
+            if (restaurant != null) {
+                Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("RESTAURANT", restaurant);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            } else {
+                showSnackBar(getString(R.string.error_choice));
+            }
+        });
     }
 
     private void launchSettingActivity() {
@@ -405,7 +395,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     private void deleteAccountAndLogout() {
         // Delete current user's likes from Firestore liked restaurants collection
-        mainViewModel.deleteUserLikes(currentUser, likedRestaurantsList);
+        mainViewModel.getLikedRestaurantsMutableLiveData()
+                .observe(this, likedRestaurantsList -> mainViewModel.deleteUserLikes(currentUser, likedRestaurantsList));
         // Delete current user from Firestore users collection
         mainViewModel.deleteUser(currentUser);
         // Delete current user from Firebase and logout

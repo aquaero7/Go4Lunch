@@ -31,11 +31,11 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
         textView = binding.workmateItemTitle;
     }
 
-    public void updateWithWorkmate(User workmate, List<RestaurantWithDistance> restaurantsList, String CHOICE_TEXT, String NO_CHOICE_TEXT) {
+    public void updateWithWorkmate(User workmate, List<RestaurantWithDistance> restaurantsList, String CHOICE_TEXT) {
         // Display workmate picture
         displayWorkmatePicture(workmate);
         // Display workmate name
-        displayWorkmateName(workmate, restaurantsList, CHOICE_TEXT, NO_CHOICE_TEXT);
+        displayWorkmateName(workmate, restaurantsList, CHOICE_TEXT);
     }
 
 
@@ -47,7 +47,7 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    private void displayWorkmateName(User workmate, List<RestaurantWithDistance> restaurantsList, String CHOICE_TEXT, String NO_CHOICE_TEXT) {
+    private void displayWorkmateName(User workmate, List<RestaurantWithDistance> restaurantsList, String CHOICE_TEXT) {
         boolean isSelected = (workmate.getSelectionId() != null && currentDate.equals(workmate.getSelectionDate()));
         // Get user name
         mText = workmate.getUsername();

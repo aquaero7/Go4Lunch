@@ -60,6 +60,7 @@ public class AuthViewModel extends ViewModel {
 
     public void fetchCurrentLocation(Activity activity) {
         locationRepository.fetchCurrentLocation(activity);
+        // TODO : Is there a way to avoid VM linked to View with Activity ?
     }
 
     public void fetchRestaurants(LatLng home, String apiKey) {

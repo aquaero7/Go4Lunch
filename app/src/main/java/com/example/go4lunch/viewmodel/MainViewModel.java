@@ -49,10 +49,6 @@ public class MainViewModel extends ViewModel {
         return userRepository.getCurrentUserMutableLiveData();
     }
 
-    public MutableLiveData<List<User>> getWorkmatesMutableLiveData() {
-        return userRepository.getWorkmatesMutableLiveData();
-    }
-
     public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
         return restaurantRepository.getRestaurantsMutableLiveData();
     }
@@ -100,10 +96,12 @@ public class MainViewModel extends ViewModel {
 
     public Task<Void> deleteFbUser(Context context) {
         return userRepository.deleteFbUser(context);
+        // TODO : Is there a way to avoid VM linked to View with Context ?
     }
 
     public Task<Void> signOut(Context context) {
         return userRepository.signOut(context);
+        // TODO : Is there a way to avoid VM linked to View with Context ?
     }
 
 
