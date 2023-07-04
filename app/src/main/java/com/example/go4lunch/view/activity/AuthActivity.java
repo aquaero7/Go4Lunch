@@ -19,6 +19,7 @@ import com.example.go4lunch.databinding.ActivityAuthBinding;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.viewmodel.AuthViewModel;
+import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -50,7 +51,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         // Bind progress bar
         progressBar = binding.progressBarAuth.progressBar;
         // Initialize ViewModel
-        authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+        // authViewModel = new ViewModelProvider(this, new ViewModelFactory(getApplication())).get(AuthViewModel.class); // If VM extends AndroidViewModel
+        authViewModel = new ViewModelProvider(this, new ViewModelFactory()).get(AuthViewModel.class); // If VM extends ViewModel
         // Listen to the clicks on button(s)
         setupListeners();
         // Check permissions and get device location
@@ -253,7 +255,8 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     private void startApp(){
 
         // Fetch data
-        authViewModel.fetchCurrentLocation(this);
+        authViewModel.fetchCurrentLocation();
+
         authViewModel.getCurrentLocationMutableLiveData().observe(this, home -> {
             authViewModel.fetchRestaurants(home, getString(R.string.MAPS_API_KEY));
         });

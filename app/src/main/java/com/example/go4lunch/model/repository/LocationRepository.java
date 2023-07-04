@@ -1,6 +1,7 @@
 package com.example.go4lunch.model.repository;
 
 import android.app.Activity;
+import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
@@ -43,13 +44,13 @@ public class LocationRepository {
 
 
     @SuppressWarnings("MissingPermission")  // Permissions already checked in AuthActivity
-    public void fetchCurrentLocation(Activity activity) {
+    public void fetchCurrentLocation(Context context) {
         // Get current location from API
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
         try {
             Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
             // Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);
-            locationResult.addOnCompleteListener(activity, task -> {
+            locationResult.addOnCompleteListener(context.getMainExecutor(), task -> {
                 if (task.isSuccessful()) {
                     Location lastKnownLocation = task.getResult();
                     if (lastKnownLocation != null) {

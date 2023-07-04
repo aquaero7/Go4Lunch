@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,25 +25,20 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.databinding.ActivityMainBinding;
-import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.view.fragment.ListViewFragment;
 import com.example.go4lunch.view.fragment.MapViewFragment;
 import com.example.go4lunch.view.fragment.PagerAdapter;
 import com.example.go4lunch.R;
-import com.example.go4lunch.model.model.LikedRestaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.viewmodel.MainViewModel;
+import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, EventListener {
 
@@ -78,7 +72,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Initialize ViewModel
-        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        // mainViewModel = new ViewModelProvider(this, new ViewModelFactory(getApplication())).get(MainViewModel.class); // If VM extends AndroidViewModel
+        mainViewModel = new ViewModelProvider(this, new ViewModelFactory()).get(MainViewModel.class); // If VM extends ViewModel
         // Get the toolbar view
         this.configureToolbar();
         // Configure ViewPager and tabs
@@ -390,7 +385,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
 
     private void logout(){
-        mainViewModel.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
+        // Involves the use of the reference to a View inside ViewModel
+        // mainViewModel.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
+        mainViewModel.signOut().addOnSuccessListener(aVoid -> closeActivity());
+
+        // Avoid the use of the reference to a View inside ViewModel
+        // mainViewModel.signOut();
+        // closeActivity();
     }
 
     private void deleteAccountAndLogout() {
@@ -400,12 +401,23 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Delete current user from Firestore users collection
         mainViewModel.deleteUser(currentUser);
         // Delete current user from Firebase and logout
+
+        /* Involves the use of the reference to a View inside ViewModel
         mainViewModel.deleteFbUser(MainActivity.this)
                 .addOnSuccessListener(aVoid -> {
                     message = getString(R.string.dialog_info_deletion_confirmation);
                     showSnackBar(message);
                     logout();
                 });
+        */
+        // Avoid the use of the reference to a View inside ViewModel
+        mainViewModel.deleteFbUser()
+                .addOnSuccessListener(aVoid -> {
+                    message = getString(R.string.dialog_info_deletion_confirmation);
+                    showSnackBar(message);
+                    logout();
+                });
+        //
     }
 
     private void closeActivity() {

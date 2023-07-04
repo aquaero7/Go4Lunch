@@ -30,6 +30,7 @@ import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.example.go4lunch.viewmodel.MapViewViewModel;
+import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -120,7 +121,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         setHasOptionsMenu(true);
 
         // Initialize ViewModel
-        mapViewViewModel = new ViewModelProvider(requireActivity()).get(MapViewViewModel.class);
+        mapViewViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(MapViewViewModel.class);
         // Initialize CardView
         autocompleteCardView = binding.includedCardViewAutocomplete.cardViewAutocomplete;
         // Initialize AutocompleteSupportFragment

@@ -1,22 +1,20 @@
 package com.example.go4lunch.viewmodel;
 
-import android.app.Activity;
-import android.content.Context;
-import android.util.Log;
+import android.app.Application;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.R;
+import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
-import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.model.model.LikedRestaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.DataProcessingUtils;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -29,10 +27,14 @@ public class MainViewModel extends ViewModel {
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
     private final String currentDate;
+    // private final Application application; // Only if MainViewModel extends AndroidViewModel
 
 
     // Constructor
-    public MainViewModel() {
+    public MainViewModel(/*@NonNull Application application*/) { // Only if MainViewModel extends AndroidViewModel
+        // super(application); // Only if MainViewModel extends AndroidViewModel
+        // this.application = application; // Only if MainViewModel extends AndroidViewModel
+
         userRepository = UserRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
         likedRestaurantRepository = LikedRestaurantRepository.getInstance();
@@ -94,15 +96,26 @@ public class MainViewModel extends ViewModel {
         userRepository.deleteUser(user.getUid());
     }
 
-    public Task<Void> deleteFbUser(Context context) {
-        return userRepository.deleteFbUser(context);
-        // TODO : Is there a way to avoid VM linked to View with Context ?
+
+    public Task<Void> deleteFbUser() {
+        // Method using AuthUI
+        // return userRepository.deleteFbUser(application.getApplicationContext()); // Only if MainViewModel extends AndroidViewModel
+        return userRepository.deleteFbUser(MainApplication.getContext());
+        // Method using FirebaseAuth
+        // return userRepository.deleteFbUser();
     }
 
-    public Task<Void> signOut(Context context) {
-        return userRepository.signOut(context);
-        // TODO : Is there a way to avoid VM linked to View with Context ?
+    // Method using AuthUI
+    public Task<Void> signOut() {
+        // return userRepository.signOut(application.getApplicationContext()); // Only if MainViewModel extends AndroidViewModel
+        return userRepository.signOut(MainApplication.getContext());
     }
+    /*
+    // Method using FirebaseAuth
+    public void signOut() {
+        userRepository.signOut();
+    }
+    */
 
 
     // Getters

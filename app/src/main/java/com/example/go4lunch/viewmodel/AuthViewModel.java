@@ -1,11 +1,15 @@
 package com.example.go4lunch.viewmodel;
 
-import android.app.Activity;
+import android.app.Application;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.MainApplication;
+import com.example.go4lunch.R;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
@@ -19,9 +23,13 @@ public class AuthViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
+    // private final Application application; // Only if AuthViewModel extends AndroidViewModel
 
     // Constructor
-    public AuthViewModel() {
+    public AuthViewModel(/*@NonNull Application application*/) { // Only if AuthViewModel extends AndroidViewModel
+        // super(application); // Only if AuthViewModel extends AndroidViewModel
+        // this.application = application; // Only if AuthViewModel extends AndroidViewModel
+
         userRepository = UserRepository.getInstance();
         locationRepository = LocationRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
@@ -58,9 +66,9 @@ public class AuthViewModel extends ViewModel {
         userRepository.fetchWorkmates();
     }
 
-    public void fetchCurrentLocation(Activity activity) {
-        locationRepository.fetchCurrentLocation(activity);
-        // TODO : Is there a way to avoid VM linked to View with Activity ?
+    public void fetchCurrentLocation() {
+        // locationRepository.fetchCurrentLocation(application.getApplicationContext()); // Only if AuthViewModel extends AndroidViewModel
+        locationRepository.fetchCurrentLocation(MainApplication.getContext());
     }
 
     public void fetchRestaurants(LatLng home, String apiKey) {

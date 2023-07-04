@@ -21,6 +21,7 @@ import com.example.go4lunch.databinding.FragmentSettingsBinding;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.EventButtonClick;
 import com.example.go4lunch.viewmodel.SettingsViewModel;
+import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class SettingsFragment extends Fragment implements View.OnClickListener {
@@ -60,7 +61,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         mNotificationSwitch = binding.switchNotification;
 
         // Initialize ViewModel
-        settingsViewModel = new ViewModelProvider(requireActivity()).get(SettingsViewModel.class);
+        settingsViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(SettingsViewModel.class);
 
         // Initialize data
         initData();

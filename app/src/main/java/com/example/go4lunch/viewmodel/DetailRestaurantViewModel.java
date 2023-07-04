@@ -1,10 +1,13 @@
 package com.example.go4lunch.viewmodel;
 
+import android.app.Application;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.MainApplication;
+import com.example.go4lunch.R;
 import com.example.go4lunch.model.api.model.Period;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
@@ -27,7 +30,7 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final LikedRestaurantRepository likedRestaurantRepository;
 
     private final String currentDate;
-    private Map<String, String> infoList;
+    // private Map<String, String> infoList;
 
 
     // Constructor
@@ -37,7 +40,7 @@ public class DetailRestaurantViewModel extends ViewModel {
         likedRestaurantRepository = LikedRestaurantRepository.getInstance();
 
         currentDate = DataProcessingUtils.getCurrentDate();
-        infoList = new HashMap<>();
+        // infoList = new HashMap<>();
     }
 
 
@@ -127,6 +130,8 @@ public class DetailRestaurantViewModel extends ViewModel {
     }
 
     public String getOpeningInformation(RestaurantWithDistance restaurant) {
+        Application application = MainApplication.getInstance(); // To get access to 'getString()'
+
         // Built restaurant opening hours information to display
         String openingInformation = "";
         if (restaurant.getOpeningHours() != null) {
@@ -145,7 +150,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                         && periods.get(0).getClose() == null
                         && periods.get(0).getOpen().getTime().equals("0000")) {
                     // If there is only one period, and it is open all week
-                    openingInformation = infoList.get("OP*");                           // Open 24/7
+                    openingInformation = application.getString(R.string.status_open247); // Open 24/7
                 } else {
                     /* There is at least one period, so, we get details for each period...
                        ...and we get today's periods */
@@ -157,14 +162,14 @@ public class DetailRestaurantViewModel extends ViewModel {
                     // Analyze today's periods
                     if (todayPeriods.size() == 0) {
                         // There is no period for today, so it is closed
-                        openingInformation = infoList.get("CLO");                          // Closed
+                        openingInformation = application.getString(R.string.status_closed); // Closed
                     } else if (todayPeriods.size() == 1
                             && todayPeriods.get(0).getOpen().getTime().equals("0000")
                             && todayPeriods.get(0).getClose() != null
                             && todayPeriods.get(0).getClose().getTime().equals("0000")
                             && todayPeriods.get(0).getClose().getDay() == currentDayOfWeek + 1) {
                         // If there is only one period for today, so it is open all day
-                        openingInformation = infoList.get("OPD");                  // Open H24 today
+                        openingInformation = application.getString(R.string.status_open24); // Open H24 today
                     } else {
                         // If there is at least one period for today : ...
 
@@ -193,7 +198,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                                 schedule = schedule.substring(0,2) + "h" + schedule.substring(2);
                                 if (currentTime.compareTo(schedule) < 0 ) {
                                     // Closing today at...
-                                    openingInformation = infoList.get("OPU") + schedule; // Open until...
+                                    openingInformation = application.getString(R.string.status_open_until) + schedule; // Open until...
                                     break;
                                 }
                             }
@@ -204,10 +209,10 @@ public class DetailRestaurantViewModel extends ViewModel {
                                     // Closing after midnight (last period schedule)
                                     String schedule = todayLastPeriod.getClose().getTime();
                                     schedule = schedule.substring(0,2) + "h" + schedule.substring(2);
-                                    openingInformation = infoList.get("OPU") + schedule; // Open until...
+                                    openingInformation = application.getString(R.string.status_open_until) + schedule; // Open until...
                                 } else {
                                     // Unexpected case... A problem occurs somewhere !
-                                    openingInformation = infoList.get("???"); // Unknown opening hours
+                                    openingInformation = application.getString(R.string.status_unknown); // Unknown opening hours
                                     Log.w("DataProcessingUtils",
                                             "A problem has occurred when trying to retrieve opening information");
                                 }
@@ -219,23 +224,23 @@ public class DetailRestaurantViewModel extends ViewModel {
                                 schedule = schedule.substring(0,2) + "h" + schedule.substring(2);
                                 if (currentTime.compareTo(schedule) < 0 ) {
                                     // Opening today at...
-                                    openingInformation = infoList.get("OPA") + schedule; // Open at...
+                                    openingInformation = application.getString(R.string.status_open_at) + schedule; // Open at...
                                     break;
                                 }
                             }
                             if (openingInformation.isEmpty()) {
-                                openingInformation = infoList.get("CLO");                  // Closed
+                                openingInformation = application.getString(R.string.status_closed); // Closed
                             }
                         }
                     }
                 }
             } else {
                 // No information about opening hours (periods is null)
-                openingInformation = infoList.get("???");                   // Unknown opening hours
+                openingInformation = application.getString(R.string.status_unknown); // Unknown opening hours
             }
         } else {
             // No information about opening hours (openingHours is null)
-            openingInformation = infoList.get("???");                       // Unknown opening hours
+            openingInformation = application.getString(R.string.status_unknown); // Unknown opening hours
         }
 
         return openingInformation;
@@ -258,13 +263,6 @@ public class DetailRestaurantViewModel extends ViewModel {
         }
         DataProcessingUtils.sortByName(selectors);
         return selectors;
-    }
-
-
-    // Setters
-
-    public void setInfoList(Map<String, String> map) {
-        infoList = map;
     }
 
 }

@@ -104,18 +104,29 @@ public class UserRepository {
         return userHelper.updateNotificationsPrefs(notificationsPrefs);
     }
 
+    // Method using AuthUI
     public Task<Void> signOut(Context context){
         return userHelper.signOut(context);
+    }
+
+    // Method using FirebaseAuth
+    public void signOut(){
+        userHelper.signOut();
     }
 
     public void deleteUser(String id) {
         userHelper.deleteUser(id);
     }
 
+    // Method using AuthUI
     public Task<Void> deleteFbUser(Context context){
         return userHelper.deleteFbUser(context);
     }
 
+    // Method using FirebaseAuth
+    public Task<Void> deleteFbUser(){
+        return userHelper.deleteFbUser();
+    }
 
     public void fetchWorkmates() {
         // Get workmates list from database document

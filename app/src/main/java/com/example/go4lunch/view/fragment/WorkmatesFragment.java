@@ -28,6 +28,7 @@ import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.adapter.WorkmateAdapter;
+import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.example.go4lunch.viewmodel.WorkmatesViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -84,7 +85,7 @@ public class WorkmatesFragment extends Fragment {
         configureOnClickRecyclerView();
 
         // Initialize ViewModel
-        workmatesViewModel = new ViewModelProvider(requireActivity()).get(WorkmatesViewModel.class);
+        workmatesViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(WorkmatesViewModel.class);
 
         // Initialize data
         initData();

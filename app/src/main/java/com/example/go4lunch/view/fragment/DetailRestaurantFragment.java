@@ -31,6 +31,7 @@ import com.example.go4lunch.utils.EventButtonClick;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.adapter.DetailRestaurantWorkmateAdapter;
 import com.example.go4lunch.viewmodel.DetailRestaurantViewModel;
+import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
@@ -117,10 +118,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         configureOnClickRecyclerView();
 
         // Initialize ViewModel
-        detailRestaurantViewModel = new ViewModelProvider(requireActivity()).get(DetailRestaurantViewModel.class);
-
-        // Initialize the list of opening information to display
-        initInfoList();
+        detailRestaurantViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(DetailRestaurantViewModel.class);
 
         // Get data from calling activity
         getIntentData();
@@ -144,6 +142,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     /* Spread the click to the parent activity
     Binding added as an argument to make it available in the activity */
     public void onClick(View v) {
+        /*
         switch (EventButtonClick.from(v)) {
             case BTN_CALL:
             case BTN_WEBSITE:
@@ -152,6 +151,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                 // Actions are managed in activity. Useless with livedata.
                 break;
         }
+        */
         mCallback.onButtonClicked(v, binding, restaurant.getRid(), restaurant.getName(),
                 restaurant.getAddress(), restaurant.getPhoneNumber(), restaurant.getWebsite(),
                 restaurant.getRating(), restaurant.getPhotos(), !isSelected, !isLiked);
@@ -196,19 +196,6 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private void configureOnClickRecyclerView(){
         ItemClickSupport.addTo(mRecyclerView, R.layout.workmate_list_item)
                 .setOnItemClickListener((recyclerView, position, v) -> Log.w("TAG", "Position : "+position));
-    }
-
-    // Initialize the list of opening information to display
-    private void initInfoList() {
-        Map<String, String> infoList = new HashMap<>();
-        infoList.put("OPE", getString(R.string.status_open));
-        infoList.put("CLO", getString(R.string.status_closed));
-        infoList.put("OP*", getString(R.string.status_open247));
-        infoList.put("OPD", getString(R.string.status_open24));
-        infoList.put("OPU", getString(R.string.status_open_until));
-        infoList.put("OPA", getString(R.string.status_open_at));
-        infoList.put("???", getString(R.string.status_unknown));
-        detailRestaurantViewModel.setInfoList(infoList);
     }
 
     // Get restaurant from calling activity

@@ -29,6 +29,7 @@ import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.adapter.ListViewAdapter;
 import com.example.go4lunch.viewmodel.ListViewViewModel;
+import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.Serializable;
@@ -88,7 +89,7 @@ public class ListViewFragment extends Fragment {
         configureOnClickRecyclerView();
 
         // Initialize ViewModel
-        listViewViewModel = new ViewModelProvider(requireActivity()).get(ListViewViewModel.class);
+        listViewViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(ListViewViewModel.class);
 
         // Initialize data
         initData();

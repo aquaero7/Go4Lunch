@@ -14,6 +14,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Objects;
+
 public class UserHelper {
 
     private static volatile UserHelper instance;
@@ -135,16 +137,28 @@ public class UserHelper {
         }
     }
 
+    // Method using AuthUI
     public Task<Void> signOut(Context context){
         return AuthUI.getInstance().signOut(context);
+    }
+
+    // Method using FirebaseAuth
+    public void signOut(){
+        FirebaseAuth.getInstance().signOut();
     }
 
     public void deleteUser (String id) {
         getUsersCollection().document(id).delete();
     }
 
+    // Method using AuthUI
     public Task<Void> deleteFbUser(Context context){
         return AuthUI.getInstance().delete(context);
+    }
+
+    // Method using FirebaseAuth
+    public Task<Void> deleteFbUser(){
+        return Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).delete();
     }
 
 }

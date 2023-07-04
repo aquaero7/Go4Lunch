@@ -16,13 +16,13 @@ import java.util.List;
 
 public class DetailRestaurantWorkmateAdapter extends RecyclerView.Adapter<DetailRestaurantWorkmateViewHolder> {
 
-    private List<User> selectorsList;
-    private final String JOINING_TEXT;
+    private final List<User> selectorsList;
+    private final String selectorText;
 
     // Constructor
-    public DetailRestaurantWorkmateAdapter(List<User> selectorsList, String JOINING_TEXT) {
+    public DetailRestaurantWorkmateAdapter(List<User> selectorsList, String selectorText) {
         this.selectorsList = selectorsList;
-        this.JOINING_TEXT = JOINING_TEXT;
+        this.selectorText = selectorText;
     }
 
     @NonNull
@@ -39,8 +39,8 @@ public class DetailRestaurantWorkmateAdapter extends RecyclerView.Adapter<Detail
     // Update view holder with workmates who have selected this restaurant
     @Override
     public void onBindViewHolder(@NonNull DetailRestaurantWorkmateViewHolder viewHolder, int position) {
-        viewHolder.updateWithSelector(this.selectorsList.get(position), this.JOINING_TEXT);
-
+        User selector = selectorsList.get(position);
+        viewHolder.updateWithSelector(selector.getUserUrlPicture(),selector.getUsername() + selectorText);
     }
 
     // Return the total count of workmates who have selected this restaurant
