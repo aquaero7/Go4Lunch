@@ -1,6 +1,5 @@
 package com.example.go4lunch.view.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +28,7 @@ public class DetailRestaurantWorkmateAdapter extends RecyclerView.Adapter<Detail
     @Override
     public DetailRestaurantWorkmateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Create view holder and inflate its layout
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.workmate_list_item, parent, false);
 
         return new DetailRestaurantWorkmateViewHolder(view);

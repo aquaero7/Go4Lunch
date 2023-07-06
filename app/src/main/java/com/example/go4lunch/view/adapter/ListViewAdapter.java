@@ -1,6 +1,5 @@
 package com.example.go4lunch.view.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,29 +11,20 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.view.viewholder.ListViewViewHolder;
+import com.example.go4lunch.viewmodel.ListViewViewModel;
 
 import java.util.List;
 
 public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
 
-    private final String KEY;
-    private final String STATUS_OPEN;
-    private final String STATUS_CLOSED;
-    private final String STATUS_UNKNOWN;
-
-    private List<RestaurantWithDistance> restaurantsList;
-    private List<User> workmatesList;
-
+    private final List<RestaurantWithDistance> restaurantsList;
+    private final List<User> workmatesList;
 
     // Constructor
-    public ListViewAdapter(List<RestaurantWithDistance> restaurantsList, List<User> workmatesList, String KEY, String STATUS_OPEN,
-                           String STATUS_CLOSED, String STATUS_UNKNOWN) {
+    public ListViewAdapter(List<RestaurantWithDistance> restaurantsList, List<User> workmatesList) {
         this.restaurantsList = restaurantsList;
         this.workmatesList = workmatesList;
-        this.KEY = KEY;
-        this.STATUS_OPEN = STATUS_OPEN;
-        this.STATUS_CLOSED = STATUS_CLOSED;
-        this.STATUS_UNKNOWN = STATUS_UNKNOWN;
+
     }
 
 
@@ -42,8 +32,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     @Override
     public ListViewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Create view holder and inflate its layout
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.restaurant_list_item, parent, false);
 
         return new ListViewViewHolder(view);
@@ -53,10 +42,15 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     // Update view holder with restaurants
     @Override
     public void onBindViewHolder(@NonNull ListViewViewHolder viewHolder, int position) {
-        viewHolder.updateWithRestaurants(this.restaurantsList.get(position), this.workmatesList, this.KEY,
-                this.STATUS_OPEN, this.STATUS_CLOSED, this.STATUS_UNKNOWN);
-    }
+        ListViewViewModel listViewViewModel = new ListViewViewModel();
 
+        RestaurantWithDistance restaurant = restaurantsList.get(position);
+        viewHolder.updateWithRestaurants(restaurant.getName(), restaurant.getRating(),
+                listViewViewModel.getDistance(restaurant.getDistance()),
+                listViewViewModel.countSelections(restaurant.getRid(), workmatesList),
+                listViewViewModel.getOpeningInfo(restaurant.getOpeningHours()),
+                listViewViewModel.getPhotoUrl(restaurant.getPhotos()));
+    }
 
     // Return the total count of restaurants
     @Override

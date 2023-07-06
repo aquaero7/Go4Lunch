@@ -49,7 +49,7 @@ public class WorkmatesViewModel extends ViewModel {
      * Methods *
      ***********/
 
-    // Action
+    // Actions
 
     public RestaurantWithDistance checkWorkmateSelection(User user, List<RestaurantWithDistance> restaurants) {
         // Get workmate selection
@@ -66,6 +66,13 @@ public class WorkmatesViewModel extends ViewModel {
             }
         }
         return selectedRestaurant;
+    }
+
+    public String getTextAndChoice(String choiceText, User workmate) {
+        return (workmate.getSelectionName() != null
+                && workmate.getSelectionDate() != null
+                && Objects.equals(DataProcessingUtils.getCurrentDate(), workmate.getSelectionDate())) ?
+                choiceText + workmate.getSelectionName() : "";
     }
 
 }

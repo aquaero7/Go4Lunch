@@ -123,7 +123,7 @@ public class WorkmatesFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
-        workmateAdapter = new WorkmateAdapter(workmatesList, restaurantsList, getString(R.string.text_choice));
+        workmateAdapter = new WorkmateAdapter(workmatesList, getString(R.string.text_choice));
         // 3.3 - Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(workmateAdapter);
         // 3.4 - Set layout manager to position the items
