@@ -34,6 +34,8 @@ public class RestaurantRepository {
     private MutableLiveData<RestaurantWithDistance> restaurantDetailsMutableLiveData;
     private List<Restaurant> restaurantsList = new ArrayList<>();
     private List<RestaurantWithDistance> restaurantsListWithDistance = new ArrayList<>();
+    private RestaurantWithDistance restaurant;
+    private boolean restaurantIsSelected;
 
     private RestaurantRepository() {
         restaurantsMutableLiveData = new MutableLiveData<>();
@@ -149,7 +151,21 @@ public class RestaurantRepository {
         return DEFAULT_RADIUS;
     }
 
+    public void setRestaurant(RestaurantWithDistance mRestaurant) {
+        restaurant = mRestaurant;
+    }
 
+    public RestaurantWithDistance getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurantSelected(boolean selected) {
+        restaurantIsSelected = selected;
+    }
+
+    public boolean isRestaurantSelected() {
+        return restaurantIsSelected;
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

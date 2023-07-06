@@ -10,20 +10,14 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RatingBar;
-import android.widget.TextView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
-import com.example.go4lunch.model.model.LikedRestaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.model.api.model.Photo;
@@ -32,51 +26,16 @@ import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.adapter.DetailRestaurantWorkmateAdapter;
 import com.example.go4lunch.viewmodel.DetailRestaurantViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DetailRestaurantFragment extends Fragment implements View.OnClickListener {
 
-    // Declare callback
-    private OnButtonClickedListener mCallback;
-    // Declare ViewBinding
     private FragmentDetailRestaurantBinding binding;
-
-    // Declare View items
-    private RecyclerView mRecyclerView;
+    private OnButtonClickedListener mCallback;
     private DetailRestaurantWorkmateAdapter detailRestaurantWorkmateAdapter;
-    private ImageView mImageView;
-    private TextView mTextView1;
-    private RatingBar mRatingBar;
-    private TextView mTextView2;
-    private TextView mTextView3;
-    private FloatingActionButton mSelectionFab;
-    private TextView mEmptyListMessage;
-    private Button mCallButton;
-    private Button mLikeButton;
-    private Button mWebsiteButton;
-
-    // Declare restaurant
-    private RestaurantWithDistance restaurant;
-    private String rId;
-    private boolean isSelected;
-    private boolean isLiked;
-
-    // Declare ViewModel
-    DetailRestaurantViewModel detailRestaurantViewModel;
-
-    // Declare and initialize list
-    private List<User> selectorsList = new ArrayList<>();
-    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
-
-    // Declare Google Maps API key
-    private String KEY;
-
+    private DetailRestaurantViewModel detailRestaurantViewModel;
 
     // Constructor
     public DetailRestaurantFragment() {
@@ -88,46 +47,18 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentDetailRestaurantBinding.inflate(inflater, container, false);
-
-        // Initialize View items
-        mRecyclerView = binding.rvDetailRestaurant;
-        mImageView = binding.ivRestaurant;
-        mTextView1 = binding.tv1Restaurant;
-        mTextView2 = binding.tv2Restaurant;
-        mTextView3 = binding.tv3Restaurant;
-        mRatingBar = binding.ratingBarRestaurant;
-        mSelectionFab = binding.fabSelection;
-        mEmptyListMessage = binding.messageEmptyList;
-        mCallButton = binding.buttonCall;
-        mLikeButton = binding.buttonLike;
-        mWebsiteButton = binding.buttonWebsite;
-
-        //Set onClickListener to selection fab
-        mSelectionFab.setOnClickListener(this);
+        // Initialize ViewModel
+        detailRestaurantViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(DetailRestaurantViewModel.class);
         // Set onClickListener to buttons
-        mCallButton.setOnClickListener(this);
-        mLikeButton.setOnClickListener(this);
-        mWebsiteButton.setOnClickListener(this);
-
+        setListeners();
         // Initialize RecyclerView
         configureRecyclerView();
         configureOnClickRecyclerView();
-
-        // Initialize ViewModel
-        detailRestaurantViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(DetailRestaurantViewModel.class);
-
-        // Get data from calling activity
-        getIntentData();
-
-        // Initialize API key
-        KEY = getString(R.string.MAPS_API_KEY);
-
-        // Initialize data and display restaurant data
-        if (restaurant != null) initData();
+        // Get data from calling activity, get details from API and display all
+        getAndDisplayData();
 
         return binding.getRoot();
     }
@@ -139,22 +70,22 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
-    /* Spread the click to the parent activity
-    Binding added as an argument to make it available in the activity */
+    // Spread the click to the parent activity
     public void onClick(View v) {
-        /*
+        RestaurantWithDistance restaurant = detailRestaurantViewModel.getRestaurant();
+        String message = null;
         switch (EventButtonClick.from(v)) {
             case BTN_CALL:
             case BTN_WEBSITE:
+                break;
             case BTN_LIKE:
+                message = detailRestaurantViewModel.updateLikedRestaurant(restaurant.getRid());
+                break;
             case FAB_SELECT:
-                // Actions are managed in activity. Useless with livedata.
+                message = detailRestaurantViewModel.updateSelection(restaurant.getRid(), restaurant.getName(), restaurant.getAddress());
                 break;
         }
-        */
-        mCallback.onButtonClicked(v, binding, restaurant.getRid(), restaurant.getName(),
-                restaurant.getAddress(), restaurant.getPhoneNumber(), restaurant.getWebsite(),
-                restaurant.getRating(), restaurant.getPhotos(), !isSelected, !isLiked);
+        mCallback.onButtonClicked(v, message, restaurant.getPhoneNumber(), restaurant.getWebsite());
     }
 
     @Override
@@ -164,12 +95,17 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         this.createCallbackToParentActivity();
     }
 
-    /* Declare an interface that will be implemented by any container activity for callback
-    Binding added as an argument to make it available in the activity */
+    // Set onClickListener to buttons
+    private void setListeners() {
+        binding.fabSelection.setOnClickListener(this);
+        binding.buttonCall.setOnClickListener(this);
+        binding.buttonLike.setOnClickListener(this);
+        binding.buttonWebsite.setOnClickListener(this);
+    }
+
+    // Declare an interface that will be implemented by any container activity for callback
     public interface OnButtonClickedListener {
-        void onButtonClicked(View view, FragmentDetailRestaurantBinding binding, String rId, String rName,
-                             String rAddress, String rPhoneNumber, String rWebsite, double rRating,
-                             List<Photo> rPhotos, boolean isSelected, boolean isLiked);
+        void onButtonClicked(View view, String message, String rPhoneNumber, String rWebsite);
     }
 
     // Create callback to parent activity
@@ -185,98 +121,100 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // Declare and create adapter
-        detailRestaurantWorkmateAdapter = new DetailRestaurantWorkmateAdapter(selectorsList, getString(R.string.text_joining));
+        detailRestaurantWorkmateAdapter = new DetailRestaurantWorkmateAdapter(detailRestaurantViewModel.getSelectors(), getString(R.string.text_joining));
         // Attach the adapter to the recyclerview to populate items
-        mRecyclerView.setAdapter(detailRestaurantWorkmateAdapter);
+        binding.rvDetailRestaurant.setAdapter(detailRestaurantWorkmateAdapter);
         // Set layout manager to position the items
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvDetailRestaurant.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     // Configure item click on RecyclerView
     private void configureOnClickRecyclerView(){
-        ItemClickSupport.addTo(mRecyclerView, R.layout.workmate_list_item)
+        ItemClickSupport.addTo(binding.rvDetailRestaurant, R.layout.workmate_list_item)
                 .setOnItemClickListener((recyclerView, position, v) -> Log.w("TAG", "Position : "+position));
     }
 
     // Get restaurant from calling activity
-    private void getIntentData() {
+    private void getAndDisplayData() {
         Intent intent = requireActivity().getIntent();
         if (intent != null) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
-                restaurant = (RestaurantWithDistance) bundle.getSerializable("RESTAURANT");
+                RestaurantWithDistance restaurant = (RestaurantWithDistance) bundle.getSerializable("RESTAURANT");
+                // Init and display data
+                if (restaurant != null) initData(restaurant);
                 Log.w("DetailRestaurantFragment", "Name of this restaurant : " + restaurant.getName());
             }
         }
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private void initData() {
+    private void initData(RestaurantWithDistance restaurant) {
         // Initialize restaurant data
-        initAndDisplayRestaurantData();
+        initAndDisplayRestaurantData(restaurant);
         // Initialize selectors list
-        initSelectors();
+        initSelectors(restaurant.getRid());
         // Initialize liked restaurants list
-        initLikedRestaurants();
+        initLikedRestaurants(restaurant.getRid());
     }
 
-    private void initAndDisplayRestaurantData() {
-        rId = restaurant.getRid();
+    private void initAndDisplayRestaurantData(RestaurantWithDistance restaurant) {
         // Get restaurant details
-        detailRestaurantViewModel.fetchRestaurantDetails(restaurant, KEY);
-        detailRestaurantViewModel.getRestaurantDetailsMutableLiveData()
-                .observe(requireActivity(), restaurant -> displayRestaurantData());
+        detailRestaurantViewModel.fetchRestaurantDetails(restaurant, getString(R.string.MAPS_API_KEY));
+        detailRestaurantViewModel.getRestaurantDetailsMutableLiveData().observe(requireActivity(), restaurantWithDetails -> {
+            displayRestaurantData(restaurantWithDetails);
+            detailRestaurantViewModel.setRestaurant(restaurantWithDetails);
+        });
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private void initSelectors() {
+    private void initSelectors(String rId) {
         detailRestaurantViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmates -> {
-            selectorsList.clear();
-            selectorsList.addAll(detailRestaurantViewModel.getSelectors(rId, workmates));
-            isSelected = (detailRestaurantViewModel.checkCurrentUserSelection(rId));
-            updateSelectionFab();
+            List<User> selectorsList = detailRestaurantViewModel.getSelectors(rId, workmates);
+            updateSelectionFab(detailRestaurantViewModel.checkCurrentUserSelection(selectorsList));
 
             detailRestaurantWorkmateAdapter.notifyDataSetChanged();
+
             // Configure empty selectors list message visibility according to selectors list
             int emptyListMessageVisibility = (selectorsList.isEmpty()) ? View.VISIBLE : View.GONE;
-            mEmptyListMessage.setVisibility(emptyListMessageVisibility);
+            binding.messageEmptyList.setVisibility(emptyListMessageVisibility);
         });
     }
 
-    private void initLikedRestaurants() {
+    private void initLikedRestaurants(String rId) {
         detailRestaurantViewModel.getLikedRestaurantsMutableLiveData().observe(requireActivity(), likedRestaurantsList -> {
-            isLiked = (detailRestaurantViewModel.checkCurrentUserLikes(rId, likedRestaurantsList));
-            updateLikeButton();
+            boolean isLiked = (detailRestaurantViewModel.checkCurrentUserLikes(rId, likedRestaurantsList));
+            updateLikeButton(isLiked);
         });
     }
 
-    private void displayRestaurantData() {
+    private void displayRestaurantData(RestaurantWithDistance restaurantWithDetails) {
         // Nearby API data
-        List<Photo> rPhotos = restaurant.getPhotos();
-        if (rPhotos != null) Picasso.get().load(rPhotos.get(0).getPhotoUrl(KEY)).into(mImageView);
-        mTextView1.setText(restaurant.getName());
-        mRatingBar.setRating((float) (restaurant.getRating() * 3/5));
+        List<Photo> rPhotos = restaurantWithDetails.getPhotos();
+        if (rPhotos != null) Picasso.get().load(rPhotos.get(0).getPhotoUrl(getString(R.string.MAPS_API_KEY))).into(binding.ivRestaurant);
+        binding.tv1Restaurant.setText(restaurantWithDetails.getName());
+        binding.ratingBarRestaurant.setRating((float) (restaurantWithDetails.getRating() * 3/5));
         // Place Details API data
-        mTextView2.setText(restaurant.getAddress());
-        mTextView3.setText(detailRestaurantViewModel.getOpeningInformation(restaurant));
+        binding.tv2Restaurant.setText(restaurantWithDetails.getAddress());
+        binding.tv3Restaurant.setText(detailRestaurantViewModel.getOpeningInformation(restaurantWithDetails));
     }
 
     @SuppressLint("UseCompatTextViewDrawableApis")  // For the use of setCompoundDrawableTintList()
-    private void updateLikeButton() {
+    private void updateLikeButton(boolean isLiked) {
         // Define the foreground of the like button, according to the like status
         int colorId = (isLiked) ? R.color.yellow_ic : R.color.app_background;
         int backgroundColorId = (isLiked) ? R.color.app_background : R.color.white;
         // Set up new colors of the like button
-        mLikeButton.setCompoundDrawableTintList(AppCompatResources.getColorStateList(requireContext(), colorId));
-        mLikeButton.setTextColor(getResources().getColor(colorId, requireContext().getTheme()));
-        mLikeButton.setBackgroundColor(getResources().getColor(backgroundColorId, requireContext().getTheme()));
+        binding.buttonLike.setCompoundDrawableTintList(AppCompatResources.getColorStateList(requireContext(), colorId));
+        binding.buttonLike.setTextColor(getResources().getColor(colorId, requireContext().getTheme()));
+        binding.buttonLike.setBackgroundColor(getResources().getColor(backgroundColorId, requireContext().getTheme()));
     }
 
-    private void updateSelectionFab() {
+    private void updateSelectionFab(boolean isSelected) {
         // Define the foreground of the selection FAB mipmap, according to the selection status
         int resId = (isSelected) ? R.mipmap.im_check_green_white : R.mipmap.im_check_grey_white;
         // Set up the new foreground of the selection FAB
-        mSelectionFab.setForeground(AppCompatResources.getDrawable(requireContext(),resId));
+        binding.fabSelection.setForeground(AppCompatResources.getDrawable(requireContext(),resId));
     }
 
 }

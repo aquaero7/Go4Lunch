@@ -21,6 +21,7 @@ public class LikedRestaurantRepository {
 
     private MutableLiveData<List<LikedRestaurant>> likedRestaurantsMutableLiveData;
     private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
+    private boolean restaurantIsLiked;
 
 
     private LikedRestaurantRepository() {
@@ -111,6 +112,14 @@ public class LikedRestaurantRepository {
                 break;
             }
         }
+    }
+
+    public void setRestaurantLiked(boolean liked) {
+        restaurantIsLiked = liked;
+    }
+
+    public boolean isRestaurantLiked() {
+        return restaurantIsLiked;
     }
 
 

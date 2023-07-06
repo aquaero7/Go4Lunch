@@ -23,18 +23,21 @@ public class UserRepository {
 
     private static volatile UserRepository instance;
     private final UserHelper userHelper;
-
-    private MutableLiveData<List<User>> workmatesMutableLiveData;
-    private MutableLiveData<User> currentUserMutableLiveData;
-
-    private List<User> workmatesList = new ArrayList<>();
+    private final MutableLiveData<List<User>> workmatesMutableLiveData;
+    private final MutableLiveData<User> currentUserMutableLiveData;
+    private final List<User> workmatesList;
+    private final List<User> selectorsList;
     private User currentUser;
     private boolean locationPermissionsGranted;
 
     private UserRepository() {
         userHelper = UserHelper.getInstance();
+
         workmatesMutableLiveData = new MutableLiveData<>();
         currentUserMutableLiveData = new MutableLiveData<>();
+
+        workmatesList = new ArrayList<>();
+        selectorsList = new ArrayList<>();
     }
 
     public static UserRepository getInstance() {
@@ -270,12 +273,21 @@ public class UserRepository {
     }
 
 
-    // For notification service and detail restaurant activity
+    // For notification service
     public User getCurrentUser() {
         return currentUser;
     }
     public List<User> getWorkmates() {
         return workmatesList;
+    }
+
+    public void setSelectors(List<User> selectors) {
+        selectorsList.clear();
+        selectorsList.addAll(selectors);
+    }
+
+    public List<User> getSelectors() {
+        return selectorsList;
     }
 
 

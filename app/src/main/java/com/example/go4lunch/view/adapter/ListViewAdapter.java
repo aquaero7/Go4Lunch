@@ -20,6 +20,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     private final String KEY;
     private final String STATUS_OPEN;
     private final String STATUS_CLOSED;
+    private final String STATUS_UNKNOWN;
 
     private List<RestaurantWithDistance> restaurantsList;
     private List<User> workmatesList;
@@ -27,12 +28,13 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
 
     // Constructor
     public ListViewAdapter(List<RestaurantWithDistance> restaurantsList, List<User> workmatesList, String KEY, String STATUS_OPEN,
-                           String STATUS_CLOSED) {
+                           String STATUS_CLOSED, String STATUS_UNKNOWN) {
         this.restaurantsList = restaurantsList;
         this.workmatesList = workmatesList;
         this.KEY = KEY;
         this.STATUS_OPEN = STATUS_OPEN;
         this.STATUS_CLOSED = STATUS_CLOSED;
+        this.STATUS_UNKNOWN = STATUS_UNKNOWN;
     }
 
 
@@ -52,7 +54,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ListViewViewHolder viewHolder, int position) {
         viewHolder.updateWithRestaurants(this.restaurantsList.get(position), this.workmatesList, this.KEY,
-                this.STATUS_OPEN, this.STATUS_CLOSED);
+                this.STATUS_OPEN, this.STATUS_CLOSED, this.STATUS_UNKNOWN);
     }
 
 

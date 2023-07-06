@@ -18,9 +18,7 @@ import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.DataProcessingUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class DetailRestaurantViewModel extends ViewModel {
@@ -29,18 +27,12 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
 
-    private final String currentDate;
-    // private Map<String, String> infoList;
-
 
     // Constructor
     public DetailRestaurantViewModel() {
         userRepository = UserRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
         likedRestaurantRepository = LikedRestaurantRepository.getInstance();
-
-        currentDate = DataProcessingUtils.getCurrentDate();
-        // infoList = new HashMap<>();
     }
 
 
@@ -74,19 +66,40 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     // Actions
 
-    public void createLikedRestaurant(User user, String rId) {
-        String uId = user.getUid();
+    public String updateLikedRestaurant(String rId) {
+        if (!likedRestaurantRepository.isRestaurantLiked()) {
+            createLikedRestaurant(userRepository.getFbCurrentUserId(), rId);
+            return MainApplication.getInstance().getString(R.string.btn_like_checked);
+        } else {
+            deleteLikedRestaurant(userRepository.getFbCurrentUserId(), rId);
+            return MainApplication.getInstance().getString(R.string.btn_like_unchecked);
+        }
+    }
+
+    public void createLikedRestaurant(String uId, String rId) {
         likedRestaurantRepository.createLikedRestaurant(rId+uId, rId, uId);     // Document in database
         likedRestaurantRepository.updateLikedRestaurants(rId+uId, rId, uId);    // Local list
     }
 
-    public void deleteLikedRestaurant(User user, String rId) {
-        String uId = user.getUid();
+    public void deleteLikedRestaurant(String uId, String rId) {
         likedRestaurantRepository.deleteLikedRestaurant(rId+uId);   // Document in database
         likedRestaurantRepository.updateLikedRestaurants(rId+uId);  // Local list
     }
 
+    public String updateSelection(String rId, String rName, String rAddress) {
+        if (!restaurantRepository.isRestaurantSelected()) {
+            // Add selected restaurant ID to current user
+            createSelection(rId, rName, rAddress);
+            return MainApplication.getInstance().getString(R.string.fab_checked);
+        } else {
+            // Remove selected restaurant ID from current user
+            deleteSelection();
+            return MainApplication.getInstance().getString(R.string.fab_unchecked);
+        }
+    }
+
     public void createSelection(String rId, String rName, String rAddress) {
+        final String currentDate = DataProcessingUtils.getCurrentDate();
         // Document in database
         userRepository.updateSelectionId(rId);
         userRepository.updateSelectionDate(currentDate);
@@ -108,25 +121,29 @@ public class DetailRestaurantViewModel extends ViewModel {
         userRepository.updateWorkmates(null, null, null, null);
     }
 
-    public boolean checkCurrentUserSelection(String rId) {
-        User currentUser = getCurrentUser();
-        String selectionId = currentUser.getSelectionId();
-        String selectionDate = currentUser.getSelectionDate();
-        return (rId.equals(selectionId)) && (currentDate.equals(selectionDate));
+    public boolean checkCurrentUserSelection(List<User> selectors) {
+        restaurantRepository.setRestaurantSelected(false);
+        for (User user : selectors) {
+            if (Objects.equals(userRepository.getFbCurrentUserId(), user.getUid())) {
+                restaurantRepository.setRestaurantSelected(true);
+                break;
+            }
+        }
+        return restaurantRepository.isRestaurantSelected();
     }
 
     public boolean checkCurrentUserLikes(String rId, List<LikedRestaurant> likedRestaurants) {
-        String uId = getCurrentUser().getUid();
-        boolean isLiked = false;
+        String uId = userRepository.getFbCurrentUserId();
+        likedRestaurantRepository.setRestaurantLiked(false);
         if (likedRestaurants != null) {
             for (LikedRestaurant likedRestaurant : likedRestaurants) {
                 if (Objects.equals(rId+uId, likedRestaurant.getId())) {
-                    isLiked = true;
+                    likedRestaurantRepository.setRestaurantLiked(true);
                     break;
                 }
             }
         }
-        return isLiked;
+        return likedRestaurantRepository.isRestaurantLiked();
     }
 
     public String getOpeningInformation(RestaurantWithDistance restaurant) {
@@ -249,8 +266,8 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     // Getters
 
-    public User getCurrentUser() {
-        return userRepository.getCurrentUser();
+    public RestaurantWithDistance getRestaurant() {
+        return restaurantRepository.getRestaurant();
     }
 
     public List<User> getSelectors(String rId, List<User> workmates) {
@@ -258,11 +275,23 @@ public class DetailRestaurantViewModel extends ViewModel {
         // Check selected restaurant id and date
         for (User workmate : workmates) {
             boolean isSelector = (Objects.equals(rId, workmate.getSelectionId())
-                    && currentDate.equals(workmate.getSelectionDate()));
+                    && DataProcessingUtils.getCurrentDate().equals(workmate.getSelectionDate()));
             if (isSelector) selectors.add(workmate);
         }
         DataProcessingUtils.sortByName(selectors);
+        userRepository.setSelectors(selectors);
         return selectors;
+    }
+
+    public List<User> getSelectors() {
+        return userRepository.getSelectors();
+    }
+
+
+    // Setters
+
+    public void setRestaurant(RestaurantWithDistance restaurant) {
+        restaurantRepository.setRestaurant(restaurant);
     }
 
 }

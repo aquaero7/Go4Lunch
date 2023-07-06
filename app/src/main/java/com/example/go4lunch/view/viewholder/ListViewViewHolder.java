@@ -47,7 +47,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
 
 
     public void updateWithRestaurants(RestaurantWithDistance restaurant, List<User> workmatesList,
-                                      String KEY, String STATUS_OPEN, String STATUS_CLOSED) {
+                                      String KEY, String STATUS_OPEN, String STATUS_CLOSED, String STATUS_UNKNOWN) {
 
         // Display restaurant name and Setup text scrolling
         tvTitle.setText(restaurant.getName());
@@ -59,7 +59,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         // Display selections count
         displaySelectionsCount(restaurant.getRid(), workmatesList);
         // Display restaurant opening info
-        displayRestaurantOpeningInfo(restaurant, STATUS_OPEN, STATUS_CLOSED);
+        displayRestaurantOpeningInfo(restaurant, STATUS_OPEN, STATUS_CLOSED, STATUS_UNKNOWN);
         // Display restaurant rating
         mRatingBar.setRating((float) (restaurant.getRating() * 3/5));
         // Display restaurant picture
@@ -99,9 +99,15 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void displayRestaurantOpeningInfo(RestaurantWithDistance restaurant,
-                                              String STATUS_OPEN, String STATUS_CLOSED) {
-        boolean openNow = Objects.requireNonNull(restaurant.getOpeningHours()).isOpenNow();
-        tvOpenTime.setText((openNow) ? STATUS_OPEN : STATUS_CLOSED);
+                                              String STATUS_OPEN, String STATUS_CLOSED, String STATUS_UNKNOWN) {
+        // boolean openNow = Objects.requireNonNull(restaurant.getOpeningHours()).isOpenNow();
+        // tvOpenTime.setText((openNow) ? STATUS_OPEN : STATUS_CLOSED);
+
+        if (restaurant.getOpeningHours() != null) {
+            tvOpenTime.setText((restaurant.getOpeningHours().isOpenNow()) ? STATUS_OPEN : STATUS_CLOSED);
+        } else {
+            tvOpenTime.setText(STATUS_UNKNOWN);
+        }
     }
 
 }

@@ -11,7 +11,7 @@ import com.squareup.picasso.Picasso;
 
 public class DetailRestaurantWorkmateViewHolder extends RecyclerView.ViewHolder {
 
-    WorkmateListItemBinding binding;
+    private final WorkmateListItemBinding binding;
 
     public DetailRestaurantWorkmateViewHolder(@NonNull View itemView) {
         super(itemView);

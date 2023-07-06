@@ -2,43 +2,28 @@ package com.example.go4lunch.view.fragment;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
 
+import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentSettingsBinding;
-import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.EventButtonClick;
 import com.example.go4lunch.viewmodel.SettingsViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
-import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
-    // Declare callback
-    private OnButtonClickedListener mCallback;
-    // Declare ViewBinding
     private FragmentSettingsBinding binding;
-    // Declare View items
-    private EditText mRadiusEditText;
-    private Button mSaveButton;
-    private SwitchMaterial mNotificationSwitch;
-    private String searchRadiusPrefs;
-    private String notificationsPrefs;
+    private OnButtonClickedListener mCallback;
     private SettingsViewModel settingsViewModel;
-    private User currentUser;
-
 
     // Constructor
     public SettingsFragment() {
@@ -50,50 +35,36 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentSettingsBinding.inflate(inflater, container, false);
-
-        // Initialize View items
-        mRadiusEditText = binding.etRadius;
-        mSaveButton = binding.buttonSave;
-        mNotificationSwitch = binding.switchNotification;
-
         // Initialize ViewModel
         settingsViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(SettingsViewModel.class);
-
-        // Initialize data
-        initData();
-
         // Initialize preferences
-
-        // Search Radius prefs
-        mRadiusEditText.setText(settingsViewModel.getSearchRadius(currentUser));
-        // Notifications prefs
-        mNotificationSwitch.setChecked(Boolean.parseBoolean(settingsViewModel.getNotificationsPrefs(currentUser)));
-
+        initPrefs();
         //Set listeners on buttons and switch
-        mSaveButton.setOnClickListener(this);
-        mNotificationSwitch.setOnClickListener(this);
+        setListeners();
 
         return binding.getRoot();
     }
 
     @Override
-    /* Spread the click to the parent activity
-    Binding added as an argument to make it available in the activity */
+    // Spread the click to the parent activity
     public void onClick(View v) {
+        String message = null;
         switch (EventButtonClick.from(v)) {
             case BTN_SAVE:
                 hideVirtualKeyboard(requireContext(), v);
-                searchRadiusPrefs = mRadiusEditText.getText().toString();
+                message = settingsViewModel.updateSearchRadiusPrefs(binding.etRadius.getText().toString());
+                // Display default radius if '0' or 'empty' saved as prefs
+                if (message == getString(R.string.search_radius_prefs_deleted))
+                    binding.etRadius.setText(settingsViewModel.getSearchRadius(settingsViewModel.getCurrentUser()));
                 break;
             case SW_NOTIFICATION:
-                notificationsPrefs = String.valueOf(mNotificationSwitch.isChecked());
+                message = settingsViewModel.updateNotificationsPrefs(String.valueOf(binding.switchNotification.isChecked()));
                 break;
         }
-        mCallback.onButtonClicked(v, binding, searchRadiusPrefs, notificationsPrefs);
+        mCallback.onButtonClicked(v, message);
     }
 
     @Override
@@ -103,10 +74,9 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         this.createCallbackToParentActivity();
     }
 
-    /* Declare an interface that will be implemented by any container activity for callback
-        Binding added as an argument to make it available in the activity */
+    // Declare an interface that will be implemented by any container activity for callback
     public interface OnButtonClickedListener {
-        void onButtonClicked(View view, FragmentSettingsBinding binding, String searchRadiusPrefs, String notificationsPrefs);
+        void onButtonClicked(View view, String message);
     }
 
     // Create callback to parent activity
@@ -119,12 +89,21 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void initData() {
-        currentUser = settingsViewModel.getCurrentUser();
+    private void initPrefs() {
+        // Search Radius prefs
+        binding.etRadius.setText(settingsViewModel.getSearchRadius(settingsViewModel.getCurrentUser()));
+        // Notifications prefs
+        binding.switchNotification.setChecked(Boolean.parseBoolean(settingsViewModel.getNotificationsPrefs(settingsViewModel.getCurrentUser())));
+    }
+
+    private void setListeners() {
+        binding.buttonSave.setOnClickListener(this);
+        binding.switchNotification.setOnClickListener(this);
     }
 
     public void hideVirtualKeyboard(Context context, View view) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
 }

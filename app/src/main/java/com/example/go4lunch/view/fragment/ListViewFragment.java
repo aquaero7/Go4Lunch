@@ -128,7 +128,7 @@ public class ListViewFragment extends Fragment {
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
         listViewAdapter = new ListViewAdapter(restaurantsListToDisplay, workmatesList, getString(R.string.MAPS_API_KEY),
-                getString(R.string.status_open), getString(R.string.status_closed));
+                getString(R.string.status_open), getString(R.string.status_closed), getString(R.string.status_unknown));
         // 3.3 - Attach the adapter to the recyclerview to populate items
         mRecyclerView.setAdapter(listViewAdapter);
         // 3.4 - Set layout manager to position the items
