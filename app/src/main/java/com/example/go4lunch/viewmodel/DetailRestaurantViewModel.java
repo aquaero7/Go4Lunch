@@ -146,6 +146,9 @@ public class DetailRestaurantViewModel extends ViewModel {
         return likedRestaurantRepository.isRestaurantLiked();
     }
 
+
+    // Getters
+
     public String getOpeningInformation(RestaurantWithDistance restaurant) {
         Application application = MainApplication.getInstance(); // To get access to 'getString()'
 
@@ -262,9 +265,6 @@ public class DetailRestaurantViewModel extends ViewModel {
 
         return openingInformation;
     }
-
-
-    // Getters
 
     public RestaurantWithDistance getRestaurant() {
         return restaurantRepository.getRestaurant();

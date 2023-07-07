@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,9 +21,7 @@ import android.view.ViewGroup;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentListViewBinding;
 import com.example.go4lunch.view.activity.DetailRestaurantActivity;
-import com.example.go4lunch.model.model.LikedRestaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
-import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.adapter.ListViewAdapter;
@@ -32,23 +29,12 @@ import com.example.go4lunch.viewmodel.ListViewViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 public class ListViewFragment extends Fragment {
 
     private FragmentListViewBinding binding;
-    private RecyclerView mRecyclerView;
-    private ListViewAdapter listViewAdapter;
-    private List<User> workmatesList = new ArrayList<>();
-    private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
-    private List<RestaurantWithDistance> filteredRestaurantsList = new ArrayList<>();
-    private List<RestaurantWithDistance> restaurantsListToDisplay = new ArrayList<>();
-    private boolean filterIsOn = false;
-    private ListViewViewModel listViewViewModel;
     private EventListener eventListener;
+    private ListViewAdapter listViewAdapter;
+    private ListViewViewModel listViewViewModel;
 
     // Constructor
     public ListViewFragment() {
@@ -59,7 +45,6 @@ public class ListViewFragment extends Fragment {
     public static ListViewFragment newInstance() {
         return (new ListViewFragment());
     }
-
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -75,10 +60,10 @@ public class ListViewFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         // Inflate the layout for this fragment
         binding = FragmentListViewBinding.inflate(inflater, container, false);
-        mRecyclerView = binding.rvListView;
+        // Initialize ViewModel
+        listViewViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(ListViewViewModel.class);
 
         /** To use if menu is handled in fragment
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
@@ -87,10 +72,6 @@ public class ListViewFragment extends Fragment {
         // Initialize RecyclerView
         configureRecyclerView();
         configureOnClickRecyclerView();
-
-        // Initialize ViewModel
-        listViewViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(ListViewViewModel.class);
-
         // Initialize data
         initData();
 
@@ -127,20 +108,20 @@ public class ListViewFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
-        listViewAdapter = new ListViewAdapter(restaurantsListToDisplay, workmatesList);
+        listViewAdapter = new ListViewAdapter(listViewViewModel.getRestaurantsToDisplay(), listViewViewModel.getWorkmates());
         // 3.3 - Attach the adapter to the recyclerview to populate items
-        mRecyclerView.setAdapter(listViewAdapter);
+        binding.rvListView.setAdapter(listViewAdapter);
         // 3.4 - Set layout manager to position the items
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvListView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     // Configure item click on RecyclerView
     private void configureOnClickRecyclerView(){
-        ItemClickSupport.addTo(mRecyclerView, R.layout.restaurant_list_item)
+        ItemClickSupport.addTo(binding.rvListView, R.layout.restaurant_list_item)
                 .setOnItemClickListener((recyclerView, position, v) -> {
-                    if (restaurantsListToDisplay.size() != 0) {
-                        RestaurantWithDistance mRestaurantWithDistance = restaurantsListToDisplay.get(position);
-                        launchDetailRestaurantActivity(mRestaurantWithDistance);
+                    if (listViewViewModel.getRestaurantsToDisplay().size() != 0) {
+                        RestaurantWithDistance restaurant = listViewViewModel.getRestaurantsToDisplay().get(position);
+                        launchDetailRestaurantActivity(restaurant);
                     }
                 });
     }
@@ -149,18 +130,11 @@ public class ListViewFragment extends Fragment {
     private void initData() {
         // Initialize workmates data
         listViewViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmates -> {
-            workmatesList.clear();
-            workmatesList.addAll(workmates);
             listViewAdapter.notifyDataSetChanged();
         });
         // Initialize restaurants data
         listViewViewModel.getRestaurantsMutableLiveData().observe(requireActivity(), restaurants -> {
-            restaurantsList.clear();
-            restaurantsList.addAll(restaurants);
-            if (!filterIsOn) {
-                restaurantsListToDisplay.clear();
-                restaurantsListToDisplay.addAll(restaurantsList);
-            }
+            listViewViewModel.setRestaurantsToDisplay(restaurants);
             listViewAdapter.notifyDataSetChanged();
         });
     }
@@ -176,29 +150,11 @@ public class ListViewFragment extends Fragment {
     // List filter launched from activity
     @SuppressLint("NotifyDataSetChanged")
     public void filterList(String query) {
-        restaurantsListToDisplay.clear();
-        filteredRestaurantsList.clear();
-        if (query.isEmpty()) {
-            // SearchView is cleared and closed
-            restaurantsListToDisplay.addAll(restaurantsList);
-            filterIsOn = false;
-        } else {
-            // A query is sent from searchView
-            for (RestaurantWithDistance restaurant : restaurantsList) {
-                // Switching both strings to lower case to make case insensitive comparison
-                if (restaurant.getName().toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT)))
-                    filteredRestaurantsList.add(restaurant);
-            }
-            restaurantsListToDisplay.addAll(filteredRestaurantsList);
-            filterIsOn = true;
-            if (filteredRestaurantsList.isEmpty()) showSnackBar(getString(R.string.info_restaurant_not_found));
-        }
+        // Apply filter and display message if nothing matches query
+        if (listViewViewModel.filterList(query) != null)
+            Snackbar.make(binding.getRoot(), listViewViewModel.filterList(query), Snackbar.LENGTH_LONG).show();
         // Update recyclerView
         listViewAdapter.notifyDataSetChanged();
-    }
-
-    private void showSnackBar(String message) {
-        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
 
 }

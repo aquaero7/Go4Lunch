@@ -1,9 +1,7 @@
 package com.example.go4lunch.view.fragment;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -20,15 +18,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.view.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
-import com.example.go4lunch.model.model.LikedRestaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
-import com.example.go4lunch.model.model.User;
-import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.utils.EventListener;
-import com.example.go4lunch.viewmodel.MainViewModel;
 import com.example.go4lunch.viewmodel.MapViewViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.google.android.gms.common.api.Status;
@@ -39,23 +32,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.OnMapsSdkInitializedCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-
 
 public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener,
@@ -63,20 +47,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         OnMapsSdkInitializedCallback {
 
     private FragmentMapViewBinding binding;
-    private SupportMapFragment mapFragment;
-    private CardView autocompleteCardView;
-    private AutocompleteSupportFragment autocompleteFragment;
-    private MapViewViewModel mapViewViewModel;
     private EventListener eventListener;
-    private boolean focusHome;
+    private MapViewViewModel mapViewViewModel;
     private GoogleMap mGoogleMap;
-    private PlacesClient placesClient;
-    private static final int DEFAULT_ZOOM = 17;
-    private static final int RESTAURANT_ZOOM = 19;
-    private LatLng home;
-    private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
-    private int selectionsCount;
-    private final String currentDate = DataProcessingUtils.getCurrentDate();
+    // private PlacesClient placesClient;  // TODO : Useless ?
 
     public MapViewFragment() {
     }
@@ -97,11 +71,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -109,25 +78,20 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
                              @Nullable Bundle savedInstanceState) {
         // Set the layout file as the content view.
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
-        // Require latest version of map renderer   // Not working : Legacy version is used anyway !
-        MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this);
-        // Initialize SDK Places for Autocomplete API
-        Places.initialize(requireContext(), getString(R.string.MAPS_API_KEY));
-        // Create a new PlacesClient instance or Autocomplete API
-        placesClient = Places.createClient(requireContext());
+        // Initialize ViewModel
+        mapViewViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(MapViewViewModel.class);
 
         /** To use if menu is handled in fragment
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
-        // Initialize ViewModel
-        mapViewViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(MapViewViewModel.class);
-        // Initialize CardView
-        autocompleteCardView = binding.includedCardViewAutocomplete.cardViewAutocomplete;
-        // Initialize AutocompleteSupportFragment
-        // autocompleteFragment = (AutocompleteSupportFragment) getParentFragmentManager().findFragmentById(R.id.fragment_autocomplete);
-        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.fragment_autocomplete);
-        mapViewViewModel.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment));
+        // Require latest version of map renderer   // Not working : Legacy version is used anyway !
+        MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this);
+        // Initialize SDK Places for Autocomplete API
+        Places.initialize(requireContext(), getString(R.string.MAPS_API_KEY));
+        // Create a new PlacesClient instance or Autocomplete API
+        // placesClient = Places.createClient(requireContext());   // TODO : Useless ?
+
         // return rootView;
         return binding.getRoot();
     }
@@ -136,7 +100,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Get a handle to the fragment and register the callback.
-        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         // Acquiring the map
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
@@ -177,17 +141,16 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public boolean onMyLocationButtonClick() {
         // Request for home focus and default zoom
-        focusHome = true;
+        mapViewViewModel.setFocusHome(true);
         // Reset the zoom
-        mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
+        mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(mapViewViewModel.getDefaultZoom()));
         return false;
     }
 
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
-        String refId = marker.getTag().toString();
-        for (RestaurantWithDistance restaurant : restaurantsList) {
-            if(restaurant.getRid().equals(refId)) {
+        for (RestaurantWithDistance restaurant : mapViewViewModel.getRestaurants()) {
+            if(restaurant.getRid().equals(marker.getTag())) {
                 launchDetailRestaurantActivity(restaurant);
                 break;
             }
@@ -220,27 +183,25 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         // Display MyLocation button if permissions are granted
         mGoogleMap.setMyLocationEnabled(mapViewViewModel.arePermissionsGranted());
         // Set camera default zoom
-        mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(DEFAULT_ZOOM));
+        mGoogleMap.moveCamera(CameraUpdateFactory.zoomTo(mapViewViewModel.getDefaultZoom()));
         // Other settings
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
         // Set listener to my location button in order to know if home focus is requested
         mGoogleMap.setOnMyLocationButtonClickListener(this);
-
         // Request for home focus at first display
-        focusHome = true;
+        mapViewViewModel.setFocusHome(true);
     }
 
     @SuppressLint("MissingPermission")  // Permissions already checked in AuthActivity
     private void setFocusToHome() {
         // Initialize or update location data
-        mapViewViewModel.getCurrentLocationMutableLiveData().observe(requireActivity(), latLng -> {
-            home = latLng;
+        mapViewViewModel.getCurrentLocationMutableLiveData().observe(requireActivity(), home -> {
             // Set camera position to home if requested
-            if (focusHome && home != null) {
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, DEFAULT_ZOOM));
+            if (home != null && mapViewViewModel.getFocusHome()) {
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, mapViewViewModel.getDefaultZoom()));
                 // No more home focus after first display (except if MyLocationButton is triggered)
-                focusHome = false;
+                mapViewViewModel.setFocusHome(false);
             }
         });
 
@@ -252,20 +213,15 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     private void displayRestaurantsOnMap() {
         // Initialize restaurants data
         mapViewViewModel.getRestaurantsMutableLiveData().observe(requireActivity(), restaurants -> {
-            restaurantsList.clear();
-            restaurantsList.addAll(restaurants);
             // Display restaurants on map
             if (!restaurants.isEmpty()) {
                 for (RestaurantWithDistance restaurant : restaurants) {
-                    double rLat = restaurant.getGeometry().getLocation().getLat();
-                    double rLng = restaurant.getGeometry().getLocation().getLng();
-                    String rId = restaurant.getRid();
                     // Add marker
                     Marker marker = mGoogleMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(rLat, rLng))
+                            .position(mapViewViewModel.getLatLng(restaurant))
                             .title(restaurant.getName()));
-                    marker.setTag(rId);
-                    getSelectionsCountAndUpdateMarkerIcon(rId, marker);
+                    Objects.requireNonNull(marker).setTag(restaurant.getRid());
+                    getSelectionsCountAndUpdateMarkerIcon(restaurant.getRid(), marker);
                 }
                 // Add listener on restaurants markers
                 mGoogleMap.setOnMarkerClickListener(this);
@@ -276,15 +232,9 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     private void getSelectionsCountAndUpdateMarkerIcon(String rId, Marker marker) {
         // Initialize or update restaurants data
         mapViewViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmatesList -> {
-            // Count selections
-            selectionsCount = 0;
-            for (User workmate : workmatesList) {
-                // For each workmate, check selected restaurant and increase selections count if matches with restaurant id
-                boolean isSelected = rId.equals(workmate.getSelectionId()) && currentDate.equals(workmate.getSelectionDate());
-                if (isSelected) selectionsCount += 1;
-            }
             // Update marker color
-            float markerColor = (selectionsCount > 0) ? BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_RED;
+            float markerColor = (mapViewViewModel.getSelectionsCount(rId, workmatesList) > 0) ?
+                    BitmapDescriptorFactory.HUE_GREEN : BitmapDescriptorFactory.HUE_RED;
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(markerColor));
         });
     }
@@ -298,35 +248,30 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     }
 
     // Autocomplete is launched from activity
-    public void launchAutocomplete(String text) {
+    public void launchAutocomplete(String query) {
         // Configure AutocompleteSupportFragment
-        mapViewViewModel.getCurrentUserMutableLiveData().observe(requireActivity(), currentUser -> configureAutocompleteSupportFragment(currentUser, text));
+        configureAutocompleteSupportFragment(query);
         // Launch Autocomplete
-        autocompleteCardView.setVisibility(View.VISIBLE);
+        binding.includedCardViewAutocomplete.cardViewAutocomplete.setVisibility(View.VISIBLE);
     }
 
-    private void configureAutocompleteSupportFragment(User currentUser, String text) {
-        // Specify the limitation to only show results within the defined region
-        LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(home, Integer.parseInt(mapViewViewModel.getSearchRadius(currentUser))*1000);
-        autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
-        autocompleteFragment.setActivityMode(AutocompleteActivityMode.valueOf("FULLSCREEN"));
-        autocompleteFragment.setText(text);
+    private void configureAutocompleteSupportFragment(String query) {
+        // Initialize AutocompleteSupportFragment
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.fragment_autocomplete);
+        mapViewViewModel.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment), query);
 
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                String placeId = place.getId();
-                Log.i("MapViewFragment", "Place: " + placeId);
-                for (RestaurantWithDistance restaurant : restaurantsList) {
-                    if (Objects.equals(restaurant.getRid(), placeId)) {
-                        double lat = restaurant.getGeometry().getLocation().getLat();
-                        double lng = restaurant.getGeometry().getLocation().getLng();
-                        Log.i("MapViewFragment", "Place: " + placeId + ", " + lat + ", " + lng);
+                Log.i("MapViewFragment", "Place: " + place.getId());
+                for (RestaurantWithDistance restaurant : mapViewViewModel.getRestaurants()) {
+                    if (Objects.equals(restaurant.getRid(), place.getId())) {
                         // Focus map on this restaurant
-                        if (mGoogleMap != null) mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lng), RESTAURANT_ZOOM));
+                        if (mGoogleMap != null) mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapViewViewModel.getLatLng(restaurant), mapViewViewModel.getRestaurantZoom()));
+                        Log.i("MapViewFragment", "Place: " + place.getId() + " Lat : " + mapViewViewModel.getLatLng(restaurant).latitude + " Lng : " + mapViewViewModel.getLatLng(restaurant).longitude);
                         autocompleteFragment.setText("");
-                        autocompleteCardView.setVisibility(View.GONE);
+                        binding.includedCardViewAutocomplete.cardViewAutocomplete.setVisibility(View.GONE);
                     }
                 }
             }
@@ -334,7 +279,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
             public void onError(@NonNull Status status) {
                 Log.i("MapViewFragment", "An error occurred: " + status);
                 autocompleteFragment.setText("");
-                autocompleteCardView.setVisibility(View.GONE);
+                binding.includedCardViewAutocomplete.cardViewAutocomplete.setVisibility(View.GONE);
             }
         });
     }

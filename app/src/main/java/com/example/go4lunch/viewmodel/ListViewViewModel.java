@@ -13,7 +13,9 @@ import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.DataProcessingUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ListViewViewModel extends ViewModel {
 
@@ -40,6 +42,10 @@ public class ListViewViewModel extends ViewModel {
     }
 
 
+    /***********
+     * Methods *
+     ***********/
+
     // Actions
 
     public int countSelections(String rId, List<User> workmates) {
@@ -52,6 +58,29 @@ public class ListViewViewModel extends ViewModel {
         }
         return selectionsCount;
     }
+
+    public String filterList(String query) {
+        List<RestaurantWithDistance> filteredRestaurantsList = new ArrayList<>();
+        if (query.isEmpty()) {
+            // SearchView is cleared and closed
+            restaurantRepository.setRestaurantsToDisplay(getRestaurants());
+            setFilterStatus(false);
+            return null;
+        } else {
+            // A query is sent from searchView
+            for (RestaurantWithDistance restaurant : getRestaurants()) {
+                // Switching both strings to lower case to make case insensitive comparison
+                if (restaurant.getName().toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT)))
+                    filteredRestaurantsList.add(restaurant);
+            }
+            restaurantRepository.setRestaurantsToDisplay(filteredRestaurantsList);
+            setFilterStatus(true);
+            return (filteredRestaurantsList.isEmpty()) ? MainApplication.getInstance().getString(R.string.info_restaurant_not_found) : null;
+        }
+    }
+
+
+    // Getters
 
     public String getDistance(long distance) {
         return (distance < 10000) ? distance + "m" : distance / 1000 + "km";
@@ -69,6 +98,29 @@ public class ListViewViewModel extends ViewModel {
 
     public String getPhotoUrl(List<Photo> photos) {
         return (photos != null) ? photos.get(0).getPhotoUrl(MainApplication.getInstance().getString(R.string.MAPS_API_KEY)) : null;
+    }
+
+    public List<RestaurantWithDistance> getRestaurantsToDisplay() {
+        return restaurantRepository.getRestaurantsToDisplay();
+    }
+
+    public List<RestaurantWithDistance> getRestaurants() {
+        return restaurantRepository.getRestaurants();
+    }
+
+    public List<User> getWorkmates() {
+        return userRepository.getWorkmates();
+    }
+
+
+    // Setters
+
+    public void setFilterStatus(boolean status) {
+        restaurantRepository.setFilterStatus(status);
+    }
+
+    public void setRestaurantsToDisplay(List<RestaurantWithDistance> restaurants) {
+        restaurantRepository.setRestaurantsToDisplay(restaurants);
     }
 
 }

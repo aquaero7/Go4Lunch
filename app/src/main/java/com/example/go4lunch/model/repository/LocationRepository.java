@@ -22,14 +22,19 @@ public class LocationRepository {
     /** DEFAULT VALUES **/
     private final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
     private final double DEF_LONGITUDE = 0;  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
+    private final int DEFAULT_ZOOM = 17;
+    private final int RESTAURANT_ZOOM = 19;
     /********************/
 
     private static volatile LocationRepository instance;
-    private MutableLiveData<LatLng> currentLocationMutableLiveData;
+    private final MutableLiveData<LatLng> currentLocationMutableLiveData;
     private LatLng home;
+    private boolean focusHome;
 
     public LocationRepository() {
         currentLocationMutableLiveData = new MutableLiveData<>();
+
+        focusHome = false;
     }
 
     public static LocationRepository getInstance() {
@@ -109,7 +114,25 @@ public class LocationRepository {
         return new LatLng(DEF_LATITUDE, DEF_LONGITUDE);
     }
 
+    public LatLng getCurrentLocation() {
+        return home;
+    }
 
+    public boolean getFocusHome() {
+        return focusHome;
+    }
+
+    public void setFocusHome(boolean focus) {
+        focusHome = focus;
+    }
+
+    public int getDefaultZoom() {
+        return DEFAULT_ZOOM;
+    }
+
+    public int getRestaurantZoom() {
+        return RESTAURANT_ZOOM;
+    }
 
 
 

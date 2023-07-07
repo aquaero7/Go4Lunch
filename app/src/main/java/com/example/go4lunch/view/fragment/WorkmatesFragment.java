@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,9 +21,7 @@ import android.view.ViewGroup;
 import com.example.go4lunch.R;
 import com.example.go4lunch.view.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
-import com.example.go4lunch.model.model.LikedRestaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
-import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.adapter.WorkmateAdapter;
@@ -32,20 +29,12 @@ import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.example.go4lunch.viewmodel.WorkmatesViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 public class WorkmatesFragment extends Fragment {
 
     private FragmentWorkmatesBinding binding;
-    private RecyclerView mRecyclerView;
-    private WorkmateAdapter workmateAdapter;
-    private List<User> workmatesList = new ArrayList<>();
-    private List<RestaurantWithDistance> restaurantsList = new ArrayList<>();
-    private WorkmatesViewModel workmatesViewModel;
     private EventListener eventListener;
-
+    private WorkmateAdapter workmateAdapter;
+    private WorkmatesViewModel workmatesViewModel;
 
     // Constructor
     public WorkmatesFragment() {
@@ -73,8 +62,8 @@ public class WorkmatesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentWorkmatesBinding.inflate(inflater, container, false);
-
-        mRecyclerView = binding.rvWorkmates;
+        // Initialize ViewModel
+        workmatesViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(WorkmatesViewModel.class);
 
         /** To use if menu is handled in fragment
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
@@ -83,10 +72,6 @@ public class WorkmatesFragment extends Fragment {
         // Initialize RecyclerView
         configureRecyclerView();
         configureOnClickRecyclerView();
-
-        // Initialize ViewModel
-        workmatesViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(WorkmatesViewModel.class);
-
         // Initialize data
         initData();
 
@@ -123,22 +108,20 @@ public class WorkmatesFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
-        workmateAdapter = new WorkmateAdapter(workmatesList, getString(R.string.text_choice));
+        workmateAdapter = new WorkmateAdapter(workmatesViewModel.getWorkmates(), getString(R.string.text_choice));
         // 3.3 - Attach the adapter to the recyclerview to populate items
-        mRecyclerView.setAdapter(workmateAdapter);
+        binding.rvWorkmates.setAdapter(workmateAdapter);
         // 3.4 - Set layout manager to position the items
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.rvWorkmates.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     // Configure item click on RecyclerView
     private void configureOnClickRecyclerView(){
-        ItemClickSupport.addTo(mRecyclerView, R.layout.workmate_list_item)
+        ItemClickSupport.addTo(binding.rvWorkmates, R.layout.workmate_list_item)
                 .setOnItemClickListener((recyclerView, position, v) -> {
-                    if (workmatesList.size() != 0) {
-                        // Get workmate
-                        User workmate = workmatesList.get(position);
+                    if (workmatesViewModel.getWorkmates().size() != 0) {
                         // Get workmate selection
-                        RestaurantWithDistance restaurant = workmatesViewModel.checkWorkmateSelection(workmate, restaurantsList);
+                        RestaurantWithDistance restaurant = workmatesViewModel.getWorkmateSelection(position);
                         // Launch DetailActivity or show message
                         if (restaurant != null) {
                             launchDetailRestaurantActivity(restaurant);
@@ -153,15 +136,7 @@ public class WorkmatesFragment extends Fragment {
     private void initData() {
         // Initialize workmates data
         workmatesViewModel.getWorkmatesMutableLiveData().observe(requireActivity(), workmates -> {
-            workmatesList.clear();
-            workmatesList.addAll(workmates);
             workmateAdapter.notifyDataSetChanged();
-        });
-        // Initialize restaurants data
-        workmatesViewModel.getRestaurantsMutableLiveData().observe(requireActivity(), restaurants -> {
-            restaurantsList.clear();
-            restaurantsList.addAll(restaurants);
-            restaurantsList = restaurants;
         });
     }
 

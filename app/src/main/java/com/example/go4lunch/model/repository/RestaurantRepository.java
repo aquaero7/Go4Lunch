@@ -30,16 +30,24 @@ public class RestaurantRepository {
     /********************/
 
     private static volatile RestaurantRepository instance;
-    private MutableLiveData<List<RestaurantWithDistance>> restaurantsMutableLiveData;
-    private MutableLiveData<RestaurantWithDistance> restaurantDetailsMutableLiveData;
-    private List<Restaurant> restaurantsList = new ArrayList<>();
-    private List<RestaurantWithDistance> restaurantsListWithDistance = new ArrayList<>();
+    private final MutableLiveData<List<RestaurantWithDistance>> restaurantsMutableLiveData;
+    private final MutableLiveData<RestaurantWithDistance> restaurantDetailsMutableLiveData;
+    private final List<Restaurant> restaurantsList;
+    private List<RestaurantWithDistance> restaurantsListWithDistance;
+    private List<RestaurantWithDistance> restaurantsToDisplay;
     private RestaurantWithDistance restaurant;
+    private boolean filterStatus;
     private boolean restaurantIsSelected;
 
     private RestaurantRepository() {
         restaurantsMutableLiveData = new MutableLiveData<>();
         restaurantDetailsMutableLiveData = new MutableLiveData<>();
+
+        restaurantsList = new ArrayList<>();
+        restaurantsListWithDistance = new ArrayList<>();
+        restaurantsToDisplay = new ArrayList<>();
+
+        filterStatus = false;
     }
 
     public static RestaurantRepository getInstance() {
@@ -165,6 +173,23 @@ public class RestaurantRepository {
 
     public boolean isRestaurantSelected() {
         return restaurantIsSelected;
+    }
+
+    public List<RestaurantWithDistance> getRestaurants() {
+        return restaurantsListWithDistance;
+    }
+
+    public void setFilterStatus(boolean status) {
+        filterStatus = status;
+    }
+
+    public List<RestaurantWithDistance> getRestaurantsToDisplay() {
+        return restaurantsToDisplay;
+    }
+
+    public void setRestaurantsToDisplay(List<RestaurantWithDistance> restaurants) {
+        restaurantsToDisplay.clear();
+        restaurantsToDisplay.addAll(restaurants);
     }
 
 

@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GmapsApiClient {
 
-    private static Retrofit retrofit /* = null */;
+    private static Retrofit retrofit;
 
     public static GmapsApiInterface getApiClient() {
 
