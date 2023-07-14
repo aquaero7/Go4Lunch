@@ -15,6 +15,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -70,10 +71,19 @@ public class MapViewViewModel extends ViewModel {
         // Specify the country of place data to return.
         autocompleteFragment.setCountries("FR");
         // Specify the limitation to only show results within the defined region
-        LatLngBounds latLngBounds = Utils.calculateBounds(getCurrentLocation(), Integer.parseInt(getSearchRadius())*1000);
+        LatLngBounds latLngBounds = calculateBounds(getCurrentLocation(), Integer.parseInt(getSearchRadius())*1000);
         autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
         autocompleteFragment.setActivityMode(AutocompleteActivityMode.valueOf("FULLSCREEN"));
         autocompleteFragment.setText(query);
+    }
+
+    public LatLngBounds calculateBounds(LatLng home, int radius) {
+        /** Distances in meters / Headings in degrees */
+        double distanceToCorner = radius * Math.sqrt(2);
+        LatLng sw = SphericalUtil.computeOffset(home, distanceToCorner, 225);   // 5*PI/4
+        LatLng ne = SphericalUtil.computeOffset(home, distanceToCorner, 45);    // PI/4
+
+        return new LatLngBounds(sw, ne);
     }
 
 

@@ -10,8 +10,10 @@ import com.example.go4lunch.model.api.model.Location;
 import com.example.go4lunch.model.api.model.OpenClose;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Period;
+import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.viewmodel.DetailRestaurantViewModel;
+import com.example.go4lunch.viewmodel.MapViewViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.maps.android.SphericalUtil;
@@ -50,10 +52,14 @@ public class UtilsTest {
     long currentDayOfWeek;
 
     DetailRestaurantViewModel detailRestaurantViewModel;
+    MapViewViewModel mapViewViewModel;
+    RestaurantRepository restaurantRepository;
 
 
     private void initializeData() {
         detailRestaurantViewModel = new DetailRestaurantViewModel();
+        mapViewViewModel = new MapViewViewModel();
+        restaurantRepository = RestaurantRepository.getInstance();
         // Reference LatLng for test restaurants
         refLatLng = new LatLng(0, 0);    // Equator - Greenwich meridian
         // LatLng for test restaurants
@@ -116,10 +122,10 @@ public class UtilsTest {
         testRestaurantsPerNull = Collections.singletonList(testRestaurantPerNull);
         testRestaurantsOpHoNull = Collections.singletonList(testRestaurantOpHoNull);
         // Test restaurants list with distance
-        testRestaurantsWithDistance = Utils.updateRestaurantsListWithDistances(testRestaurants, refLatLng);
-        testRestaurantsWithDistance0 = Utils.updateRestaurantsListWithDistances(testRestaurants0, refLatLng);
-        testRestaurantsWithDistancePerNull = Utils.updateRestaurantsListWithDistances(testRestaurantsPerNull, refLatLng);
-        testRestaurantsWithDistanceOpHoNull = Utils.updateRestaurantsListWithDistances(testRestaurantsOpHoNull, refLatLng);
+        testRestaurantsWithDistance = restaurantRepository.updateRestaurantsListWithDistances(testRestaurants, refLatLng);
+        testRestaurantsWithDistance0 = restaurantRepository.updateRestaurantsListWithDistances(testRestaurants0, refLatLng);
+        testRestaurantsWithDistancePerNull = restaurantRepository.updateRestaurantsListWithDistances(testRestaurantsPerNull, refLatLng);
+        testRestaurantsWithDistanceOpHoNull = restaurantRepository.updateRestaurantsListWithDistances(testRestaurantsOpHoNull, refLatLng);
         // Test periods list sort
         op1 = "1100"; cl1 = "1200"; op2 = "1101"; cl2 = "1201"; op3 = "1900"; cl3 = "2200"; op4 = "1901"; cl4 = "2201";
         period1 = new Period(new OpenClose(1, cl1), new OpenClose(1, op1));
@@ -160,10 +166,10 @@ public class UtilsTest {
         double refDistance3 = SphericalUtil.computeDistanceBetween(refLatLng, testLatLng3);  // 20015115 m = Half equatorial perimeter of the earth
         double refDistance4 = SphericalUtil.computeDistanceBetween(refLatLng, testLatLng4);  // 10007557 m = Quarter meridian perimeter of the earth
         // Test distances
-        double testDistance1 = Utils.calculateRestaurantDistance(testRestaurant1, refLatLng);
-        double testDistance2 = Utils.calculateRestaurantDistance(testRestaurant2, refLatLng);
-        double testDistance3 = Utils.calculateRestaurantDistance(testRestaurant3, refLatLng);
-        double testDistance4 = Utils.calculateRestaurantDistance(testRestaurant4, refLatLng);
+        double testDistance1 = restaurantRepository.calculateRestaurantDistance(testRestaurant1, refLatLng);
+        double testDistance2 = restaurantRepository.calculateRestaurantDistance(testRestaurant2, refLatLng);
+        double testDistance3 = restaurantRepository.calculateRestaurantDistance(testRestaurant3, refLatLng);
+        double testDistance4 = restaurantRepository.calculateRestaurantDistance(testRestaurant4, refLatLng);
         // Test verifications
         assertEquals("Wrong distance", refDistance1, testDistance1,1);
         assertEquals("Wrong distance", refDistance2, testDistance2,1);
@@ -187,7 +193,7 @@ public class UtilsTest {
         double testLng = 1;
         int refRadius = (int) (SphericalUtil.computeDistanceBetween(new LatLng(refLat,refLng), new LatLng(testLat, testLng)) / Math.sqrt(2));
         // Test bounds
-        LatLngBounds testBounds = Utils.calculateBounds(new LatLng(refLat,refLng), refRadius);
+        LatLngBounds testBounds = mapViewViewModel.calculateBounds(new LatLng(refLat,refLng), refRadius);
         double swLat = testBounds.southwest.latitude;
         double swLng = testBounds.southwest.longitude;
         double neLat = testBounds.northeast.latitude;
@@ -207,7 +213,7 @@ public class UtilsTest {
         double refDistance3 = SphericalUtil.computeDistanceBetween(refLatLng, testLatLng3);  // 20015115 m = Half equatorial perimeter of the earth
         double refDistance4 = SphericalUtil.computeDistanceBetween(refLatLng, testLatLng4);  // 10007557 m = Quarter meridian perimeter of the earth
         // Test update of restaurants list with distance
-        List<RestaurantWithDistance> restaurantsWithDistance = Utils.updateRestaurantsListWithDistances(testRestaurants, refLatLng);
+        List<RestaurantWithDistance> restaurantsWithDistance = restaurantRepository.updateRestaurantsListWithDistances(testRestaurants, refLatLng);
         // Test verifications
         assertEquals("Wrong distance1", refDistance1, restaurantsWithDistance.get(0).getDistance(), 1);
         assertEquals("Wrong distance2", refDistance2, restaurantsWithDistance.get(1).getDistance(), 1);
@@ -329,7 +335,7 @@ public class UtilsTest {
         assertEquals("Wrong order", 200, testRestaurants.get(3).getDistance());
         assertEquals("Wrong order", "restA", testRestaurants.get(3).getName());
         // Test sort
-        Utils.sortByDistanceAndName(testRestaurants);
+        restaurantRepository.sortByDistanceAndName(testRestaurants);
         // Test verifications
         // New list order expected : Restaurant names C-A-B-D with distances 100-200-300-300 (m)
         assertEquals("Wrong order", 100, testRestaurants.get(0).getDistance());
@@ -354,7 +360,7 @@ public class UtilsTest {
         assertEquals("Wrong order", "userC", testUsers.get(1).getUsername());
         assertEquals("Wrong order", "userA", testUsers.get(2).getUsername());
         // Test sort
-        Utils.sortByName(testUsers);
+        detailRestaurantViewModel.sortByName(testUsers);
         // Test verifications
         // New list order expected : User names A-B-C
         assertEquals("Wrong order", "userA", testUsers.get(0).getUsername());
@@ -372,7 +378,7 @@ public class UtilsTest {
         assertEquals("Wrong order", op4, testPeriods.get(2).getOpen().getTime());
         assertEquals("Wrong order", op2, testPeriods.get(3).getOpen().getTime());
         // Test ascending sort
-        Utils.sortByAscendingOpeningTime(testPeriods);
+        restaurantRepository.sortByAscendingOpeningTime(testPeriods);
         // Test verifications
         // New list order expected : Period opening time 1-2-3-4
         assertEquals("Wrong order", op1, testPeriods.get(0).getOpen().getTime());
@@ -391,7 +397,7 @@ public class UtilsTest {
         assertEquals("Wrong order", op4, testPeriods.get(2).getOpen().getTime());
         assertEquals("Wrong order", op2, testPeriods.get(3).getOpen().getTime());
         // Test ascending sort
-        Utils.sortByDescendingOpeningTime(testPeriods);
+        restaurantRepository.sortByDescendingOpeningTime(testPeriods);
         // Test verifications
         // New list order expected : Period opening time 1-2-3-4
         assertEquals("Wrong order", op4, testPeriods.get(0).getOpen().getTime());

@@ -146,6 +146,18 @@ public class DetailRestaurantViewModel extends ViewModel {
         return likedRestaurantRepository.isRestaurantLiked();
     }
 
+    public void sortByName(List<User> workmatesList) {
+        userRepository.sortByName(workmatesList);
+    }
+
+    public void sortByAscendingOpeningTime(List<Period> periods) {
+        restaurantRepository.sortByAscendingOpeningTime(periods);
+    }
+
+    public void sortByDescendingOpeningTime(List<Period> periods) {
+        restaurantRepository.sortByDescendingOpeningTime(periods);
+    }
+
 
     // Getters
 
@@ -194,7 +206,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                         // If there is at least one period for today : ...
 
                         // Sort today periods list by ascending opening time
-                        Utils.sortByAscendingOpeningTime(todayPeriods);
+                        sortByAscendingOpeningTime(todayPeriods);
                         // Calculate if the restaurant is currently open or closed
                         Period todayLastPeriod = todayPeriods.get(todayPeriods.size()-1);
                         openNow = false;
@@ -278,7 +290,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                     && Utils.getCurrentDate().equals(workmate.getSelectionDate()));
             if (isSelector) selectors.add(workmate);
         }
-        Utils.sortByName(selectors);
+        sortByName(selectors);
         userRepository.setSelectors(selectors);
         return selectors;
     }

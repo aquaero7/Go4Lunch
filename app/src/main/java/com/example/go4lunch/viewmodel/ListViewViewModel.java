@@ -65,7 +65,6 @@ public class ListViewViewModel extends ViewModel {
         if (query.isEmpty()) {
             // SearchView is cleared and closed
             restaurantRepository.setRestaurantsToDisplay(getRestaurants());
-            setFilterStatus(false);
             return null;
         } else {
             // A query is sent from searchView
@@ -75,7 +74,6 @@ public class ListViewViewModel extends ViewModel {
                     filteredRestaurantsList.add(restaurant);
             }
             restaurantRepository.setRestaurantsToDisplay(filteredRestaurantsList);
-            setFilterStatus(true);
             return (filteredRestaurantsList.isEmpty()) ? MainApplication.getInstance().getString(R.string.info_restaurant_not_found) : null;
         }
     }
@@ -115,10 +113,6 @@ public class ListViewViewModel extends ViewModel {
 
 
     // Setters
-
-    public void setFilterStatus(boolean status) {
-        restaurantRepository.setFilterStatus(status);
-    }
 
     public void setRestaurantsToDisplay(List<RestaurantWithDistance> restaurants) {
         restaurantRepository.setRestaurantsToDisplay(restaurants);

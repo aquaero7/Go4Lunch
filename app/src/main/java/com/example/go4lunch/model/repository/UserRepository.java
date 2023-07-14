@@ -208,7 +208,7 @@ public class UserRepository {
                                 selectionName, selectionAddress, searchRadiusPrefs, notificationsPrefs);
                         workmatesList.add(workmateToAdd);
                     }
-                    Utils.sortByName(workmatesList);
+                    sortByName(workmatesList);
                     // Populate the LiveData
                     workmatesMutableLiveData.setValue(workmatesList);
                 }
@@ -238,6 +238,10 @@ public class UserRepository {
                 });
     }
 
+    public void sortByName(List<User> workmatesList) {
+        workmatesList.sort(User.comparatorName);
+    }
+
     public MutableLiveData<Boolean> getUserCreationResponseMutableLiveData() {
         return userCreationResponseMutableLiveData;
     }
@@ -264,7 +268,7 @@ public class UserRepository {
                 // Add updated workmate to list
                 workmatesList.add(workmate);
                 // Sort list
-                Utils.sortByName(workmatesList);
+                sortByName(workmatesList);
                 // Populate the LiveData
                 workmatesMutableLiveData.setValue(workmatesList);
                 break;
@@ -291,7 +295,7 @@ public class UserRepository {
                 // Add updated workmate to list
                 workmatesList.add(workmate);
                 // Sort list
-                Utils.sortByName(workmatesList);
+                sortByName(workmatesList);
                 // Populate the LiveData
                 workmatesMutableLiveData.setValue(workmatesList);
                 break;

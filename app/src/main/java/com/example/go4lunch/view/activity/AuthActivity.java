@@ -89,8 +89,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
     // Method that handles response after sign in activity close
     private void handleResponseAfterSignIn(ActivityResult result){
-        // Show progressBar
-        binding.progressBarAuth.progressBar.setVisibility(View.VISIBLE);
         // Handle response
         IdpResponse response = IdpResponse.fromResultIntent(result.getData());
         // SUCCESS
@@ -109,8 +107,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                     showSnackBar(getString(R.string.error_unknown));
                 }
             }
-            // Hide progressBar
-            binding.progressBarAuth.progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -137,18 +133,18 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
     private void startApp(){
         // Show progressBar
-        binding.progressBarAuth.progressBar.setVisibility(View.VISIBLE);
+        binding.progressbarAuth.progressbar.setVisibility(View.VISIBLE);
         // Fetch data
         authViewModel.fetchDataExceptRestaurants();
         authViewModel.getCurrentLocationMutableLiveData().observe(this, home -> {
             // Fetch restaurants
             authViewModel.fetchRestaurants(home, getString(R.string.MAPS_API_KEY));
+            // Hide progressBar
+            binding.progressbarAuth.progressbar.setVisibility(View.INVISIBLE);
         });
         // Launch main activity
         Intent intent = new Intent(this,MainActivity.class);
         mainActivityResultLauncher.launch(intent);
-        // Hide progressBar
-        binding.progressBarAuth.progressBar.setVisibility(View.INVISIBLE);
     }
 
     // Show Snack Bar with a message

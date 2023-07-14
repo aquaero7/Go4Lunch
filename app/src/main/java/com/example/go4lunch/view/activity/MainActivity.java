@@ -80,8 +80,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         configureReAuthListener();
         // Initialize current user
         mainViewModel.getCurrentUserMutableLiveData();
-        // Hide ProgressBar
-        binding.activityMainProgressBar.progressBar.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -388,6 +386,5 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void showSnackBar(String message) {
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
-
 
 }

@@ -81,6 +81,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
         // Initialize ViewModel
         mapViewViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(MapViewViewModel.class);
+        // Show ProgressBar
+        binding.progressbarMap.progressbar.setVisibility(View.VISIBLE);
 
         /** To use if menu is handled in fragment
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
@@ -229,6 +231,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
                 }
                 // Add listener on restaurants markers
                 mGoogleMap.setOnMarkerClickListener(this);
+                // Hide ProgressBar
+                binding.progressbarMap.progressbar.setVisibility(View.INVISIBLE);
             }
         });
     }

@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.go4lunch.model.api.GmapsApiClient;
 import com.example.go4lunch.model.api.GmapsRestaurantDetailsPojo;
 import com.example.go4lunch.model.api.GmapsRestaurantPojo;
+import com.example.go4lunch.model.api.model.Period;
 import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.api.model.Geometry;
@@ -15,8 +16,11 @@ import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Photo;
 import com.example.go4lunch.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -34,9 +38,8 @@ public class RestaurantRepository {
     private final MutableLiveData<RestaurantWithDistance> restaurantDetailsMutableLiveData;
     private final List<Restaurant> restaurantsList;
     private List<RestaurantWithDistance> restaurantsListWithDistance;
-    private List<RestaurantWithDistance> restaurantsToDisplay;
+    private final List<RestaurantWithDistance> restaurantsToDisplay;
     private RestaurantWithDistance restaurant;
-    private boolean filterStatus;
     private boolean restaurantIsSelected;
 
     private RestaurantRepository() {
@@ -46,8 +49,6 @@ public class RestaurantRepository {
         restaurantsList = new ArrayList<>();
         restaurantsListWithDistance = new ArrayList<>();
         restaurantsToDisplay = new ArrayList<>();
-
-        filterStatus = false;
     }
 
     public static RestaurantRepository getInstance() {
@@ -99,8 +100,8 @@ public class RestaurantRepository {
                                 phoneNumber, website, geometry));
                     }
 
-                    restaurantsListWithDistance = Utils.updateRestaurantsListWithDistances(restaurantsList, home);
-                    Utils.sortByDistanceAndName(restaurantsListWithDistance);
+                    restaurantsListWithDistance = updateRestaurantsListWithDistances(restaurantsList, home);
+                    sortByDistanceAndName(restaurantsListWithDistance);
                     // Populate the LiveData
                     restaurantsMutableLiveData.setValue(restaurantsListWithDistance);
                 } else {
@@ -118,7 +119,7 @@ public class RestaurantRepository {
 
     public void fetchRestaurantDetails(RestaurantWithDistance nearbyRestaurant, String apiKey) {
 
-        // Call Place Details API //////////////////////////////////////////////////
+        // Call Place Details API //////////////////////////////////////////////////////////////////
         Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(
                 nearbyRestaurant.getRid(),
                 "formatted_address,formatted_phone_number,website,opening_hours",
@@ -145,6 +146,53 @@ public class RestaurantRepository {
                 Log.w("RestaurantRepository", t.getMessage(), t);
             }
         });
+    }
+
+    public List<RestaurantWithDistance> updateRestaurantsListWithDistances(List<Restaurant> restaurantsList, LatLng home) {
+        List<RestaurantWithDistance> restaurants = new ArrayList<>();
+        for (Restaurant restaurant : restaurantsList) {
+            int distance = calculateRestaurantDistance(restaurant, home);
+
+            RestaurantWithDistance restaurantWithDistance
+                    = new RestaurantWithDistance(restaurant.getRid(), restaurant.getName(),
+                    restaurant.getPhotos(), restaurant.getAddress(), restaurant.getRating(),
+                    restaurant.getOpeningHours(), restaurant.getPhoneNumber(),
+                    restaurant.getWebsite(), restaurant.getGeometry(), distance);
+
+            restaurants.add(restaurantWithDistance);
+        }
+        return restaurants;
+    }
+
+    public int calculateRestaurantDistance(Restaurant restaurant, LatLng currentLatLng) {
+        double restaurantLat = restaurant.getGeometry().getLocation().getLat();
+        double restaurantLng = restaurant.getGeometry().getLocation().getLng();
+        LatLng restaurantLatLng = new LatLng(restaurantLat, restaurantLng);
+        double distance = SphericalUtil.computeDistanceBetween(currentLatLng, restaurantLatLng);
+
+        return (int) distance;  /** Distance in meters */
+    }
+
+    public void sortByDistanceAndName (List<RestaurantWithDistance> restaurantsWithDistance) {
+        restaurantsWithDistance.sort(RestaurantWithDistance.comparatorName);
+        restaurantsWithDistance.sort(RestaurantWithDistance.comparatorDistance);
+    }
+
+    public void sortByAscendingOpeningTime(List<Period> periods) {
+        // Using Comparator
+        periods.sort(Comparator.comparing(o -> o.getOpen().getTime()));
+        // periods.sort(Comparator.comparing(o -> o.getOpen().getTime(), Comparator.naturalOrder()));
+
+        // Or without using Comparator
+        // periods.sort((o1, o2) -> o1.getOpen().getTime().compareTo(o2.getOpen().getTime()));
+    }
+
+    public void sortByDescendingOpeningTime(List<Period> periods) {
+        // Using Comparator
+        periods.sort(Comparator.comparing(o -> o.getOpen().getTime(), Comparator.reverseOrder()));
+
+        // Or without using Comparator
+        // periods.sort((o1, o2) -> o2.getOpen().getTime().compareTo(o1.getOpen().getTime()));
     }
 
     public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
@@ -179,10 +227,6 @@ public class RestaurantRepository {
         return restaurantsListWithDistance;
     }
 
-    public void setFilterStatus(boolean status) {
-        filterStatus = status;
-    }
-
     public List<RestaurantWithDistance> getRestaurantsToDisplay() {
         return restaurantsToDisplay;
     }
@@ -191,53 +235,5 @@ public class RestaurantRepository {
         restaurantsToDisplay.clear();
         restaurantsToDisplay.addAll(restaurants);
     }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-    public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData(LatLng home, String radius, String apiKey) {
-        restaurantsMutableLiveData = new MutableLiveData<>();
-
-        if (radius == null) radius = DEFAULT_RADIUS;
-
-        // Call Place Nearby Search API ////////////////////////////////////////////////////////////
-        Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient()
-                .getPlaces("restaurant", home.latitude + "," + home.longitude, Integer.parseInt(radius)*1000, apiKey);
-        call1.enqueue(new Callback<GmapsRestaurantPojo>() {
-            @Override
-            public void onResponse(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Response<GmapsRestaurantPojo> response1) {
-                GmapsRestaurantPojo nearPlaces = response1.body();
-                List<Restaurant> nearbyRestaurants = nearPlaces.getNearRestaurants();
-
-                // For each restaurant, get basic information ask for detailed information and add restaurant to the list
-                if (nearbyRestaurants != null) {
-                    Log.w("RestaurantRepository", "Nearby restaurants list not empty");
-                    restaurantsList.clear();
-                    for (Restaurant nearbyRestaurant : nearbyRestaurants) {
-                        getRestaurantDetailsFromApi(nearbyRestaurant, apiKey);
-                    }
-                } else {
-                    Log.w("RestaurantRepository", "Empty nearby restaurants list");
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Throwable t) {
-                // Toast.makeText(context, R.string.error, Toast.LENGTH_SHORT).show();
-                Log.w("RestaurantRepository", t.getMessage(), t);
-            }
-        });
-
-        //
-        restaurantsListWithDistance = Utils.updateRestaurantsListWithDistances(restaurantsList, home);
-        Utils.sortByDistanceAndName(restaurantsListWithDistance);
-        // Populate the LiveData
-        restaurantsMutableLiveData.setValue(restaurantsListWithDistance);
-        //
-
-        return restaurantsMutableLiveData;
-    }
-    */
 
 }

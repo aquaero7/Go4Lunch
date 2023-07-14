@@ -18,7 +18,7 @@
         android:contentDescription="@string/im_restaurant_auth"/>
 
     <include
-        android:id="@+id/progressBar_auth"
+        android:id="@+id/progressbar_auth"
         layout="@layout/progressbar"/>
 
     <include

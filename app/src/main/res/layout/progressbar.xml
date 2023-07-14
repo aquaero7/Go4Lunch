@@ -10,5 +10,5 @@
     style="@style/Widget.AppCompat.ProgressBar.Horizontal"
     android:indeterminate="true"
     android:visibility="invisible"
-    android:id="@+id/progressBar">
+    android:id="@+id/progressbar">
 </ProgressBar>
