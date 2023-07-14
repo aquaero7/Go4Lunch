@@ -1,7 +1,10 @@
 package com.example.go4lunch.utils;
 
 
-import android.util.Log;
+import android.app.Activity;
+import android.content.Context;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
@@ -20,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class DataProcessingUtils {
+public class Utils {
 
     public static int calculateRestaurantDistance(Restaurant restaurant, LatLng currentLatLng) {
         double restaurantLat = restaurant.getGeometry().getLocation().getLat();
@@ -80,6 +83,11 @@ public class DataProcessingUtils {
 
         // Or without using Comparator
         // periods.sort((o1, o2) -> o2.getOpen().getTime().compareTo(o1.getOpen().getTime()));
+    }
+
+    public static void hideVirtualKeyboard(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 

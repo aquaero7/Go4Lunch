@@ -26,7 +26,7 @@ public class NotificationService extends FirebaseMessagingService {
     private final int NOTIFICATION_ID = 4;
     // private final String NOTIFICATION_TAG = "GO4LUNCH";
 
-    private String currentDate = DataProcessingUtils.getCurrentDate();
+    private String currentDate = Utils.getCurrentDate();
     private User currentUser;
     private String currentUserId;
     private List<User> workmatesList;

@@ -38,6 +38,7 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Objects;
 
@@ -135,7 +136,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         initMap();
         setFocusToHome();
         displayRestaurantsOnMap();
-
+        // Show message if location permissions are denied
+        if (!mapViewViewModel.arePermissionsGranted()) Snackbar
+                .make(binding.getRoot(), getString(R.string.info_no_permission), Snackbar.LENGTH_LONG)
+                .show();
     }
 
     @Override

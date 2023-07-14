@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.model.helper.UserHelper;
-import com.example.go4lunch.utils.DataProcessingUtils;
+import com.example.go4lunch.utils.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,16 +25,18 @@ public class UserRepository {
     private final UserHelper userHelper;
     private final MutableLiveData<List<User>> workmatesMutableLiveData;
     private final MutableLiveData<User> currentUserMutableLiveData;
+    private final MutableLiveData<Boolean> userCreationResponseMutableLiveData;
     private final List<User> workmatesList;
     private final List<User> selectorsList;
     private User currentUser;
-    private boolean locationPermissionsGranted;
 
     private UserRepository() {
         userHelper = UserHelper.getInstance();
 
         workmatesMutableLiveData = new MutableLiveData<>();
         currentUserMutableLiveData = new MutableLiveData<>();
+
+        userCreationResponseMutableLiveData = new MutableLiveData<>();
 
         workmatesList = new ArrayList<>();
         selectorsList = new ArrayList<>();
@@ -63,7 +65,7 @@ public class UserRepository {
 
     public String getFbCurrentUserId() { return userHelper.getFbCurrentUserUID(); }
 
-    public Boolean isFbCurrentUserLogged(){
+    public Boolean isFbCurrentUserLogged() {
         return (this.getFbCurrentUser() != null);
     }
 
@@ -74,7 +76,58 @@ public class UserRepository {
 
     // Get the current user from Firestore and cast it to a User model Object
     public Task<User> getCurrentUserData() {
-        return userHelper.getCurrentUserData().continueWith(task -> task.getResult().toObject(User.class)) ;
+        return (userHelper.getCurrentUserData() != null) ?
+                userHelper.getCurrentUserData().continueWith(task -> task.getResult().toObject(User.class)) : null;
+    }
+
+    // Create user in Firebase
+    public void createUser() {
+        userCreationResponseMutableLiveData.setValue(false);
+        FirebaseUser cUser = getFbCurrentUser();
+        if(cUser != null){
+            // Data from FirebaseAuth
+            final String USER_ID = "uid";
+            String userUrlPicture = (cUser.getPhotoUrl() != null) ? cUser.getPhotoUrl().toString() : null;
+            final String USER_NAME = "username";
+            String username = cUser.getDisplayName();
+            final String USER_EMAIL = "userEmail";
+            String userEmail = cUser.getEmail();
+            final String USER_URL_PICTURE = "userUrlPicture";
+            String uid = cUser.getUid();
+
+            // If the current user already exist in Firestore, we get his data from Firestore
+            getCurrentUserData().addOnSuccessListener(user -> {
+                if (user != null) {
+                    // If the current user already exist in Firestore, we update his data
+                    Log.w("UserRepository", "User already exists and will be updated");
+                    getUsersCollection().document(uid)
+                            .update(USER_ID, uid, USER_NAME, username, USER_EMAIL, userEmail,
+                                    USER_URL_PICTURE, userUrlPicture)
+                            .addOnSuccessListener(command -> {
+                                Log.w("UserRepository","Update successful");
+                                userCreationResponseMutableLiveData.setValue(true);
+                                // Fetch current user
+                                // fetchCurrentUser();
+                            })
+                            .addOnFailureListener(e -> Log.w("UserRepository",
+                                    "Update failed. Message : " + e.getMessage()));
+                } else {
+                    // If the current user doesn't exist in Firestore, we create this user
+                    Log.w("UserRepository", "User doesn't exist and will be created");
+                    User userToCreate = new User(uid, username, userEmail, userUrlPicture);
+                    getUsersCollection().document(uid)
+                            .set(userToCreate)
+                            .addOnSuccessListener(command -> {
+                                Log.w("UserRepository","Creation successful");
+                                userCreationResponseMutableLiveData.setValue(true);
+                                // Fetch current user
+                                // fetchCurrentUser();
+                            })
+                            .addOnFailureListener(e -> Log.w("UserRepository",
+                                    "Creation failed. Message : " + e.getMessage()));
+                }
+            });
+        }
     }
 
     // Set ir update user selection restaurant id
@@ -155,7 +208,7 @@ public class UserRepository {
                                 selectionName, selectionAddress, searchRadiusPrefs, notificationsPrefs);
                         workmatesList.add(workmateToAdd);
                     }
-                    DataProcessingUtils.sortByName(workmatesList);
+                    Utils.sortByName(workmatesList);
                     // Populate the LiveData
                     workmatesMutableLiveData.setValue(workmatesList);
                 }
@@ -166,27 +219,34 @@ public class UserRepository {
     }
 
     public void fetchCurrentUser() {
+        // userCreationResponseMutableLiveData.setValue(false);
         getCurrentUserData()
                 .addOnSuccessListener(user -> {
-                    currentUser = user;
-                    // Populate the LiveData
-                    currentUserMutableLiveData.setValue(currentUser);
-                    Log.w("UserRepository", "breakPoint");
+                    if (user != null) {
+                        currentUser = user;
+                        // Populate the LiveData
+                        currentUserMutableLiveData.setValue(currentUser);
+                        // userCreationResponseMutableLiveData.setValue(true);
+                        Log.w("UserRepository", "breakPoint");
+                    } else {
+                        Log.w("UserRepository", "user is null");
+                    }
                 })
                 .addOnFailureListener(e -> {
+                    // userCreationResponseMutableLiveData.setValue(false);
                     Log.w("UserRepository", e.getMessage());
                 });
     }
 
+    public MutableLiveData<Boolean> getUserCreationResponseMutableLiveData() {
+        return userCreationResponseMutableLiveData;
+    }
+
     public MutableLiveData<List<User>> getWorkmatesMutableLiveData() {
-        // Populate the LiveData
-        // workmatesMutableLiveData.setValue(workmatesList);
         return workmatesMutableLiveData;
     }
 
     public MutableLiveData<User> getCurrentUserMutableLiveData() {
-        // Populate the LiveData
-        // currentUserMutableLiveData.setValue(currentUser);
         return currentUserMutableLiveData;
     }
 
@@ -204,7 +264,7 @@ public class UserRepository {
                 // Add updated workmate to list
                 workmatesList.add(workmate);
                 // Sort list
-                DataProcessingUtils.sortByName(workmatesList);
+                Utils.sortByName(workmatesList);
                 // Populate the LiveData
                 workmatesMutableLiveData.setValue(workmatesList);
                 break;
@@ -231,7 +291,7 @@ public class UserRepository {
                 // Add updated workmate to list
                 workmatesList.add(workmate);
                 // Sort list
-                DataProcessingUtils.sortByName(workmatesList);
+                Utils.sortByName(workmatesList);
                 // Populate the LiveData
                 workmatesMutableLiveData.setValue(workmatesList);
                 break;
@@ -264,16 +324,6 @@ public class UserRepository {
         currentUserMutableLiveData.setValue(currentUser);
     }
 
-    public void setPermissions(boolean granted) {
-        locationPermissionsGranted = granted;
-    }
-
-    public boolean arePermissionsGranted() {
-        return locationPermissionsGranted;
-    }
-
-
-    // For notification service
     public User getCurrentUser() {
         return currentUser;
     }
@@ -320,7 +370,7 @@ public class UserRepository {
                                 selectionName, selectionAddress, searchRadiusPrefs, notificationsPrefs);
                         workmatesList.add(workmateToAdd);
                     }
-                    DataProcessingUtils.sortByName(workmatesList);
+                    Utils.sortByName(workmatesList);
                     // Populate the LiveData
                     workmatesMutableLiveData.setValue(workmatesList);
                 }

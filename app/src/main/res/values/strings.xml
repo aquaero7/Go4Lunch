@@ -36,6 +36,7 @@
     <string name="website">BTN_WEBSITE</string>
     <string name="save">BTN_SAVE</string>
     <string name="notification">SW_NOTIFICATION</string>
+    <string name="pwd_send">PWD_SEND</string>
 
     <!-- ERROR AND INFO MSG -->
     <string name="error">An error has occurred.</string>
@@ -120,6 +121,12 @@
     <string name="dialog_info_ok">Deleting account and logging out…</string>
     <string name="dialog_info_cancel">Deletion canceled!</string>
     <string name="dialog_info_deletion_confirmation">Account deleted!</string>
+    <string name="reauth_message">Re-authentication requested!</string>
+    <string name="relog_message">Please logout then login.</string>
+    <string name="pwd_title">Password requested!</string>
+    <string name="pwd_error">Invalid password!</string>
+    <string name="pwd_hint">Password</string>
+    <string name="ok">OK</string>
 
 
     <!--******************-->

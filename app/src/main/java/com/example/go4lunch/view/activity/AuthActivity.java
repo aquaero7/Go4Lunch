@@ -3,41 +3,24 @@ package com.example.go4lunch.view.activity;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityAuthBinding;
-import com.example.go4lunch.model.repository.UserRepository;
-import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.viewmodel.AuthViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
-import com.firebase.ui.auth.AuthMethodPickerLayout;
-import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseUser;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
 
-    private final UserRepository userRepository = UserRepository.getInstance();
-    private ProgressBar progressBar;
-    private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-    private ActivityResultLauncher<String[]> requestPermissionsLauncher;
-    private boolean locationPermissionsGranted;
     private AuthViewModel authViewModel;
 
     @Override
@@ -48,8 +31,6 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Bind progress bar
-        progressBar = binding.progressBarAuth.progressBar;
         // Initialize ViewModel
         // authViewModel = new ViewModelProvider(this, new ViewModelFactory(getApplication())).get(AuthViewModel.class); // If VM extends AndroidViewModel
         authViewModel = new ViewModelProvider(this, new ViewModelFactory()).get(AuthViewModel.class); // If VM extends ViewModel
@@ -68,53 +49,30 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     private void checkPermissions() {
         // This is the result of the user answer to permissions request
         ActivityResultContracts.RequestMultiplePermissions permissionsContract = new ActivityResultContracts.RequestMultiplePermissions();
-        requestPermissionsLauncher = registerForActivityResult(permissionsContract, result -> {
-            Boolean fineLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
-            Boolean coarseLocationGranted = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION,false);
-            if (fineLocationGranted != null && fineLocationGranted) {
-                /** Fine location permission granted */
-                Log.w("ActivityResultLauncher", "Fine location permission was granted by user");
-                locationPermissionsGranted = true;
-            } else if (coarseLocationGranted != null && coarseLocationGranted) {
-                /** Coarse location permission granted */
-                Log.w("ActivityResultLauncher", "Only coarse location permission was granted by user");
-                locationPermissionsGranted = true;
-            } else {
-                /** No location permission granted */
-                Log.w("ActivityResultLauncher", "No location permission was granted by user");
-                locationPermissionsGranted = false;
-            }
-            /** Initialize permission object in MapsApisUtils to make it available for MapViewfragment */
-            userRepository.setPermissions(locationPermissionsGranted);
+        ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(permissionsContract, result -> {
+            authViewModel.manageUserAnswerForPermissions(result);
         });
 
         // Check and request permissions
-        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-            /** Permissions not granted
-             *  Request permissions to user.
-             *  The registered ActivityResultCallback gets the result of this(these) request(s). */
-            Log.w("checkPermissions", "Permissions not granted");
-            requestPermissionsLauncher.launch(PERMISSIONS);
-        } else {
-            /** Permissions granted */
-            Log.w("checkPermissions", "Permissions granted");
-            locationPermissionsGranted = true;
-            /** Initialize permissions in Utils to make them available for fragments */
-            userRepository.setPermissions(locationPermissionsGranted);
-        }
+        authViewModel.checkAndRequestPermissions(requestPermissionsLauncher);
     }
-
 
     private void setupListeners(){
         // Login Button
         binding.buttonLogin.setOnClickListener(view -> {
-            if(userRepository.isFbCurrentUserLogged()){
+            if(authViewModel.isFbCurrentUserLogged()){
+                // Start application
                 startApp();
             }else{
-                startSignInActivity();
+                // Start sign in activity
+                authActivityResultLauncher.launch(authViewModel.configureAuthIntent());
             }
         });
+    }
+
+    // Update Login Button when activity is resuming
+    private void updateLoginButton(){
+        binding.buttonLogin.setText(authViewModel.isFbCurrentUserLogged() ? getString(R.string.button_start) : getString(R.string.button_login));
     }
 
     // Receive and handle response of sign in activity (receiver)
@@ -123,58 +81,23 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
             this::handleResponseAfterSignIn
     );
 
-    // Receive and handle response of main activity
+    // Receive and handle response of main activity (receiver)
     ActivityResultLauncher<Intent> mainActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             this::handleSnackBarAfterLogout
     );
 
-    private void startSignInActivity() {
-
-        // Custom sign in layout instead of default one
-        AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
-                .Builder(R.layout.layout_sign_in)
-                .setGoogleButtonId(R.id.button_google)
-                .setFacebookButtonId(R.id.button_facebook)
-                .setTwitterButtonId(R.id.button_twitter)
-                .setEmailButtonId(R.id.button_email)
-                .build();
-
-        // Choose authentication providers
-        List<AuthUI.IdpConfig> providers =
-                Arrays.asList(
-                        new AuthUI.IdpConfig.GoogleBuilder().build(),
-                        new AuthUI.IdpConfig.FacebookBuilder().build(),
-                        new AuthUI.IdpConfig.TwitterBuilder().build(),
-                        new AuthUI.IdpConfig.EmailBuilder().build());
-
-        // Launch the activity
-        Intent data = AuthUI.getInstance()
-                .createSignInIntentBuilder()
-                .setTheme(R.style.AuthTheme)
-                .setAvailableProviders(providers)
-                .setIsSmartLockEnabled(false, true)
-                .setLogo(R.drawable.ic_go4lunch)
-                .setAuthMethodPickerLayout(customLayout)    // custom sign in layout
-                .build();
-        authActivityResultLauncher.launch(data);
-
-        // Show progressBar
-        progressBar.setVisibility(View.VISIBLE);
-
-    }
-
     // Method that handles response after sign in activity close
     private void handleResponseAfterSignIn(ActivityResult result){
         // Show progressBar
-        progressBar.setVisibility(View.VISIBLE);
-
+        binding.progressBarAuth.progressBar.setVisibility(View.VISIBLE);
+        // Handle response
         IdpResponse response = IdpResponse.fromResultIntent(result.getData());
         // SUCCESS
         if (result.getResultCode() == RESULT_OK) {
             showSnackBar(getString(R.string.info_connection_succeed));
             // Create user in Firestore
-            createUser();
+            createUserAndStartApplication();
         } else {
             // ERRORS
             if (response == null) {
@@ -187,7 +110,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
                 }
             }
             // Hide progressBar
-            progressBar.setVisibility(View.INVISIBLE);
+            binding.progressBarAuth.progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -198,76 +121,39 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         }
     }
 
-    // Show Snack Bar with a message
-    private void showSnackBar(String message){
-        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
-    }
-
-    // Update Login Button when activity is resuming
-    private void updateLoginButton(){
-        binding.buttonLogin.setText(userRepository.isFbCurrentUserLogged() ? getString(R.string.button_start) : getString(R.string.button_login));
-    }
-
-    private void createUser() {
-        FirebaseUser cUser = userRepository.getFbCurrentUser();
-        if(cUser != null){
-            // Data from FirebaseAuth
-            final String USER_ID = "uid";
-            String userUrlPicture = (cUser.getPhotoUrl() != null) ? cUser.getPhotoUrl().toString() : null;
-            final String USER_NAME = "username";
-            String username = cUser.getDisplayName();
-            final String USER_EMAIL = "userEmail";
-            String userEmail = cUser.getEmail();
-            final String USER_URL_PICTURE = "userUrlPicture";
-            String uid = cUser.getUid();
-
-            // If the current user already exist in Firestore, we get his data from Firestore
-            userRepository.getCurrentUserData().addOnSuccessListener(user -> {
-                if (user != null) {
-                    // If the current user already exist in Firestore, we update his data
-                    Log.w("AuthActivity", "User already exists and will be updated");
-                    userRepository.getUsersCollection().document(uid)
-                            .update(USER_ID, uid, USER_NAME, username, USER_EMAIL, userEmail,
-                                    USER_URL_PICTURE, userUrlPicture)
-                            .addOnSuccessListener(command -> {
-                                Log.w("AuthActivity","Update successful");
-                                startApp();
-                            })
-                            .addOnFailureListener(e -> Log.w("AuthActivity",
-                                    "Update failed. Message : " + e.getMessage()));
-                } else {
-                    // If the current user doesn't exist in Firestore, we create this user
-                    Log.w("AuthActivity", "User doesn't exist and will be created");
-                    User userToCreate = new User(uid, username, userEmail, userUrlPicture);
-                    userRepository.getUsersCollection().document(uid)
-                            .set(userToCreate)
-                            .addOnSuccessListener(command -> {
-                                Log.w("AuthActivity","Creation successful");
-                                startApp();
-                            })
-                            .addOnFailureListener(e -> Log.w("AuthActivity",
-                                    "Creation failed. Message : " + e.getMessage()));
+    private void createUserAndStartApplication() {
+        authViewModel.createUser();
+        authViewModel.getUserCreationResponseMutableLiveData().observe(this, new Observer<Boolean>() {
+            final Observer<Boolean> observer = this;
+            @Override
+            public void onChanged(Boolean response) {
+                if (response) {
+                    authViewModel.getUserCreationResponseMutableLiveData().removeObserver(observer);
+                    startApp();
                 }
-            });
-        }
+            }
+        });
     }
 
     private void startApp(){
-
+        // Show progressBar
+        binding.progressBarAuth.progressBar.setVisibility(View.VISIBLE);
         // Fetch data
-        authViewModel.fetchCurrentLocation();
-
+        authViewModel.fetchDataExceptRestaurants();
         authViewModel.getCurrentLocationMutableLiveData().observe(this, home -> {
+            // Fetch restaurants
             authViewModel.fetchRestaurants(home, getString(R.string.MAPS_API_KEY));
         });
-        authViewModel.fetchOtherData();
-        // Show progressBar
-        progressBar.setVisibility(View.VISIBLE);
         // Launch main activity
         Intent intent = new Intent(this,MainActivity.class);
         mainActivityResultLauncher.launch(intent);
         // Hide progressBar
-        progressBar.setVisibility(View.INVISIBLE);
+        binding.progressBarAuth.progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    // Show Snack Bar with a message
+    private void showSnackBar(String message){
+        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
 
 }

@@ -15,7 +15,7 @@ import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.model.model.LikedRestaurant;
 import com.example.go4lunch.model.model.User;
-import com.example.go4lunch.utils.DataProcessingUtils;
+import com.example.go4lunch.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +99,7 @@ public class DetailRestaurantViewModel extends ViewModel {
     }
 
     public void createSelection(String rId, String rName, String rAddress) {
-        final String currentDate = DataProcessingUtils.getCurrentDate();
+        final String currentDate = Utils.getCurrentDate();
         // Document in database
         userRepository.updateSelectionId(rId);
         userRepository.updateSelectionDate(currentDate);
@@ -158,8 +158,8 @@ public class DetailRestaurantViewModel extends ViewModel {
             // Possibility of several opening and closing periods in a day
             /** Information must be either 3 char (code) or 7 char (code+schedule) length */
             boolean openNow;
-            long currentDayOfWeek = DataProcessingUtils.getCurrentDayOfWeek();
-            String currentTime = DataProcessingUtils.getCurrentTime();
+            long currentDayOfWeek = Utils.getCurrentDayOfWeek();
+            String currentTime = Utils.getCurrentTime();
 
             // Get the list of opening periods
             List<Period> periods = restaurant.getOpeningHours().getPeriods();
@@ -194,7 +194,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                         // If there is at least one period for today : ...
 
                         // Sort today periods list by ascending opening time
-                        DataProcessingUtils.sortByAscendingOpeningTime(todayPeriods);
+                        Utils.sortByAscendingOpeningTime(todayPeriods);
                         // Calculate if the restaurant is currently open or closed
                         Period todayLastPeriod = todayPeriods.get(todayPeriods.size()-1);
                         openNow = false;
@@ -233,7 +233,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                                 } else {
                                     // Unexpected case... A problem occurs somewhere !
                                     openingInformation = application.getString(R.string.status_unknown); // Unknown opening hours
-                                    Log.w("DataProcessingUtils",
+                                    Log.w("Utils",
                                             "A problem has occurred when trying to retrieve opening information");
                                 }
                             }
@@ -275,10 +275,10 @@ public class DetailRestaurantViewModel extends ViewModel {
         // Check selected restaurant id and date
         for (User workmate : workmates) {
             boolean isSelector = (Objects.equals(rId, workmate.getSelectionId())
-                    && DataProcessingUtils.getCurrentDate().equals(workmate.getSelectionDate()));
+                    && Utils.getCurrentDate().equals(workmate.getSelectionDate()));
             if (isSelector) selectors.add(workmate);
         }
-        DataProcessingUtils.sortByName(selectors);
+        Utils.sortByName(selectors);
         userRepository.setSelectors(selectors);
         return selectors;
     }

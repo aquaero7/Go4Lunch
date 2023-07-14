@@ -3,14 +3,12 @@ package com.example.go4lunch.viewmodel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.model.model.LikedRestaurant;
-import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
-import com.example.go4lunch.utils.DataProcessingUtils;
+import com.example.go4lunch.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.libraries.places.api.model.Place;
@@ -23,15 +21,15 @@ import java.util.List;
 
 public class MapViewViewModel extends ViewModel {
 
-    private final UserRepository userRepository;
     private final LocationRepository locationRepository;
+    private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
 
 
     // Constructor
     public MapViewViewModel() {
-        userRepository = UserRepository.getInstance();
         locationRepository = LocationRepository.getInstance();
+        userRepository = UserRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
     }
 
@@ -72,7 +70,7 @@ public class MapViewViewModel extends ViewModel {
         // Specify the country of place data to return.
         autocompleteFragment.setCountries("FR");
         // Specify the limitation to only show results within the defined region
-        LatLngBounds latLngBounds = DataProcessingUtils.calculateBounds(getCurrentLocation(), Integer.parseInt(getSearchRadius())*1000);
+        LatLngBounds latLngBounds = Utils.calculateBounds(getCurrentLocation(), Integer.parseInt(getSearchRadius())*1000);
         autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
         autocompleteFragment.setActivityMode(AutocompleteActivityMode.valueOf("FULLSCREEN"));
         autocompleteFragment.setText(query);
@@ -82,7 +80,7 @@ public class MapViewViewModel extends ViewModel {
     // Getters
 
     public boolean arePermissionsGranted() {
-        return userRepository.arePermissionsGranted();
+        return locationRepository.arePermissionsGranted();
     }
 
     public String getSearchRadius() {
@@ -123,7 +121,7 @@ public class MapViewViewModel extends ViewModel {
         int selectionsCount = 0;
         for (User workmate : workmates) {
             // For each workmate, check selected restaurant and increase selections count if matches with restaurant id
-            boolean isSelected = rId.equals(workmate.getSelectionId()) && DataProcessingUtils.getCurrentDate().equals(workmate.getSelectionDate());
+            boolean isSelected = rId.equals(workmate.getSelectionId()) && Utils.getCurrentDate().equals(workmate.getSelectionDate());
             if (isSelected) selectionsCount += 1;
         }
         return selectionsCount;

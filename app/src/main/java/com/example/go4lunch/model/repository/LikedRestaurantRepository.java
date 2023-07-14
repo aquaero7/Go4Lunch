@@ -122,6 +122,10 @@ public class LikedRestaurantRepository {
         return restaurantIsLiked;
     }
 
+    public List<LikedRestaurant> getLikedRestaurants() {
+        return likedRestaurantsList;
+    }
+
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

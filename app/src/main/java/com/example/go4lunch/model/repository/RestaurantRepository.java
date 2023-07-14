@@ -13,7 +13,7 @@ import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.api.model.Geometry;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Photo;
-import com.example.go4lunch.utils.DataProcessingUtils;
+import com.example.go4lunch.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -99,8 +99,8 @@ public class RestaurantRepository {
                                 phoneNumber, website, geometry));
                     }
 
-                    restaurantsListWithDistance = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
-                    DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistance);
+                    restaurantsListWithDistance = Utils.updateRestaurantsListWithDistances(restaurantsList, home);
+                    Utils.sortByDistanceAndName(restaurantsListWithDistance);
                     // Populate the LiveData
                     restaurantsMutableLiveData.setValue(restaurantsListWithDistance);
                 } else {
@@ -230,8 +230,8 @@ public class RestaurantRepository {
         });
 
         //
-        restaurantsListWithDistance = DataProcessingUtils.updateRestaurantsListWithDistances(restaurantsList, home);
-        DataProcessingUtils.sortByDistanceAndName(restaurantsListWithDistance);
+        restaurantsListWithDistance = Utils.updateRestaurantsListWithDistances(restaurantsList, home);
+        Utils.sortByDistanceAndName(restaurantsListWithDistance);
         // Populate the LiveData
         restaurantsMutableLiveData.setValue(restaurantsListWithDistance);
         //

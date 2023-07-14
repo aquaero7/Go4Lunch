@@ -90,12 +90,72 @@
         app:headerLayout="@layout/activity_main_nav_header"
         app:menu="@menu/activity_main_menu_drawer">
 
-        <ImageView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_go4lunch"
-            android:layout_gravity="center|bottom"
-            android:contentDescription="@string/ic_app_logo"/>
+            android:layout_gravity="bottom"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_pwd"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_marginStart="20dp"
+                android:text="@string/pwd_title"
+                android:textColor="@color/yellow_ic"
+                android:textStyle="bold"
+                android:visibility="invisible"/>
+
+            <LinearLayout
+                android:id="@+id/lyt_pwd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="128dp"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tyl_pwd"
+                    android:layout_width="192dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    app:passwordToggleEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_pwd"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="4dp"
+                        android:lines="1"
+                        android:inputType="textPassword"
+                        android:hint="@string/pwd_hint"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Button
+                    android:id="@+id/bt_pwd_send"
+                    android:tag="@string/pwd_send"
+                    android:layout_width="36dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="bottom"
+                    android:text="@string/ok"
+                    android:background="@color/white"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_go4lunch"
+                android:contentDescription="@string/ic_app_logo"/>
+
+        </LinearLayout>
 
     </com.google.android.material.navigation.NavigationView>
 

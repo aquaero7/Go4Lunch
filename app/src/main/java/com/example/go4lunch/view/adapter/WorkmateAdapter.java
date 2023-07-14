@@ -9,12 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.model.User;
-import com.example.go4lunch.utils.DataProcessingUtils;
 import com.example.go4lunch.view.viewholder.WorkmateViewHolder;
 import com.example.go4lunch.viewmodel.WorkmatesViewModel;
 
 import java.util.List;
-import java.util.Objects;
 
 public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateViewHolder> {
 
@@ -44,7 +42,7 @@ public class WorkmateAdapter extends RecyclerView.Adapter<WorkmateViewHolder> {
 
         /*
         String textAndChoice = (workmate.getSelectionName() != null && workmate.getSelectionDate() != null
-                && Objects.equals(DataProcessingUtils.getCurrentDate(), workmate.getSelectionDate())) ?
+                && Objects.equals(Utils.getCurrentDate(), workmate.getSelectionDate())) ?
                 choiceText + workmate.getSelectionName() : "";
         */
         String textAndChoice = new WorkmatesViewModel().getTextAndChoice(choiceText, workmate);

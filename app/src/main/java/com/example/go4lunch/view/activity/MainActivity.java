@@ -3,65 +3,64 @@ package com.example.go4lunch.view.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager2.widget.ViewPager2;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.media.session.MediaSession;
+import android.net.wifi.hotspot2.pps.Credential;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-// import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.example.go4lunch.model.model.DialogTuple;
+import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.view.fragment.ListViewFragment;
 import com.example.go4lunch.view.fragment.MapViewFragment;
 import com.example.go4lunch.view.fragment.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
-import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
+import com.facebook.AccessToken;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.TwitterAuthCredential;
+import com.google.firebase.installations.remote.TokenResult;
 
-public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, EventListener {
+import java.security.AuthProvider;
+import java.util.Objects;
 
-    // For Navigation Drawer design
-    private Toolbar toolbar;
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
+public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, EventListener {
 
-    // For ViewPager and Tabs
-    private ViewPager2 pager;
-    private TabLayout tabs;
-    private String[] tabTitles;
-
-    private ImageView userPicture;
-    private TextView userName;
-    private TextView userEmail;
-    private AlertDialog.Builder builder;
-    private AlertDialog dialog;
-    String message;
-    private Fragment fmt;
-    private SearchView searchView;
     private MainViewModel mainViewModel;
-    private User currentUser;
+    private AlertDialog dialog;
+    private String signInProvider;
 
     @Override
     ActivityMainBinding getViewBinding() {
@@ -71,38 +70,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Initialize ViewModel
         // mainViewModel = new ViewModelProvider(this, new ViewModelFactory(getApplication())).get(MainViewModel.class); // If VM extends AndroidViewModel
         mainViewModel = new ViewModelProvider(this, new ViewModelFactory()).get(MainViewModel.class); // If VM extends ViewModel
-        // Get the toolbar view
-        this.configureToolbar();
-        // Configure ViewPager and tabs
-        this.configureViewPagerAndTabs();
-        // Configure Navigation Drawer views
-        this.configureDrawerLayout();
-        this.configureNavigationView();
-        // Configure progressBar
-        this.configureProgressBar();
-        // Initialize SearchView and setup listener
-        searchView = binding.includedToolbar.searchView;
-        this.configureSearchViewListener(searchView);
-        // Init data
-        this.initData();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void toggleSearchViewVisibility() {
-        SearchView view = binding.includedToolbar.searchView;
-        if (view.getVisibility() == View.VISIBLE) {
-            view.setVisibility(View.GONE);
-        } else {
-            view.setVisibility(View.VISIBLE);
-        }
+        configureToolbar();
+        configureViewPagerAndTabs();
+        configureDrawerLayout();
+        configureNavigationView();
+        configureSearchViewListener();
+        configureReAuthListener();
+        // Initialize current user
+        mainViewModel.getCurrentUserMutableLiveData();
+        // Hide ProgressBar
+        binding.activityMainProgressBar.progressBar.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -114,8 +93,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     @Override
     public void onBackPressed() {
         // Handle Navigation Drawer back click to close menu
-        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            this.drawerLayout.closeDrawer(GravityCompat.START);
+        if (binding.activityMainDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.activityMainDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -124,16 +103,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle Navigation Drawer Item Click
-        int id = item.getItemId();
-        switch (id){
+        switch (item.getItemId()){
             case R.id.activity_main_drawer_lunch:
                 launchDetailRestaurantActivity();
                 break;
             case R.id.activity_main_drawer_settings:
-                launchSettingActivity();
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                 break;
             case R.id.activity_main_drawer_logout:
-                logout();
+                logoutAndCloseActivity();
                 break;
             case R.id.activity_main_drawer_delete_account:
                 dialog.show();
@@ -141,8 +119,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             default:
                 break;
         }
-        this.drawerLayout.closeDrawer(GravityCompat.START);
+        binding.activityMainDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.bt_pwd_send && !Objects.requireNonNull(binding.etPwd.getText()).toString().isEmpty()) {
+            Utils.hideVirtualKeyboard(this, v);
+            launchReAuth(signInProvider);
+        }
     }
 
     /**
@@ -152,121 +138,100 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     */
 
     private void configureToolbar(){
-        // Get the toolbar view inside the activity layout
-        this.toolbar = binding.includedToolbar.toolbar;
         // Sets the Toolbar
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.includedToolbar.toolbar);
+    }
+
+    @Override
+    public void toggleSearchViewVisibility() {
+        SearchView view = binding.includedToolbar.searchView;
+        view.setVisibility((view.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
     }
 
     private void configureViewPagerAndTabs(){
-        // Get ViewPager from layout
-        pager = binding.activityMainViewpager;
-
         // Set Adapter PagerAdapter and glue it together
-        pager.setAdapter(new PagerAdapter(getSupportFragmentManager(), getLifecycle()));
-
-        // Get TabLayout from layout
-        tabs = binding.activityMainTabs;
-
-        // Initialize tab titles list
-        final String MAP_VIEW_TAB_TITLE = getString(R.string.tab_map_view);
-        final String LIST_VIEW_TAB_TITLE = getString(R.string.tab_list_view);
-        final String WORKMATES_TAB_TITLE = getString(R.string.tab_workmates);
-        tabTitles= new String[]{MAP_VIEW_TAB_TITLE, LIST_VIEW_TAB_TITLE, WORKMATES_TAB_TITLE};
-
-        // Initialize tab icons list
-        final int[] tabIcons = {
-                R.drawable.ic_baseline_map_black_24,
-                R.drawable.ic_baseline_view_list_black_24,
-                R.drawable.ic_baseline_group_black_24
-        };
+        binding.activityMainViewpager.setAdapter(new PagerAdapter(getSupportFragmentManager(), getLifecycle()));
 
         // Glue TabLayout and ViewPager together
-        new TabLayoutMediator(tabs, pager, (tab, position) -> {
+        new TabLayoutMediator(binding.activityMainTabs, binding.activityMainViewpager, (tab, position) -> {
             // Setup tab title
-            tab.setText(tabTitles[position]);
+            tab.setText(mainViewModel.getTabTitles()[position]);
             // Setup tab icon
-            tab.setIcon(tabIcons[position]);
+            tab.setIcon(mainViewModel.getTabIcons()[position]);
         }).attach();
 
         // Design purpose. Tabs have the same width
-        tabs.setTabMode(TabLayout.MODE_FIXED);
+        binding.activityMainTabs.setTabMode(TabLayout.MODE_FIXED);
 
         // Add a listener to detect tab selection change
-        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        binding.activityMainTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                // Show message if location permissions are denied
+                if (!mainViewModel.arePermissionsGranted()) showSnackBar(getString(R.string.info_no_permission));
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                searchView.setQuery("", false);
-                searchView.setVisibility(View.GONE);
+                binding.includedToolbar.searchView.setQuery("", false);
+                binding.includedToolbar.searchView.setVisibility(View.GONE);
             }
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
+                // Show message if location permissions are denied
+                if (!mainViewModel.arePermissionsGranted()) showSnackBar(getString(R.string.info_no_permission));
             }
         });
     }
 
     // Configure Drawer Layout
     private void configureDrawerLayout(){
-        this.drawerLayout = binding.activityMainDrawerLayout;
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.activityMainDrawerLayout,
+                binding.includedToolbar.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        binding.activityMainDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
 
     // Configure NavigationView
     private void configureNavigationView(){
-        this.navigationView = binding.activityMainNavView;
-        navigationView.setNavigationItemSelectedListener(this);
+        binding.activityMainNavView.setNavigationItemSelectedListener(this);
+        // Create confirmation dialog
         buildConfirmationDialog();
-
-        // Call user information update
-        userPicture = navigationView.getHeaderView(0).findViewById(R.id.user_picture);
-        userName = navigationView.getHeaderView(0).findViewById(R.id.user_name);
-        userEmail = navigationView.getHeaderView(0).findViewById(R.id.user_email);
+        // Update nav view with user information
         updateUIWithUserData();
     }
 
-    // Configure progressBar
-    private void configureProgressBar() {
-        ProgressBar progressBar = binding.activityMainProgressBar.progressBar;
-        progressBar.setVisibility(View.INVISIBLE);
-    }
-
-    private void configureSearchViewListener(SearchView searchView) {
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+    private void configureSearchViewListener() {
+        binding.includedToolbar.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // Get fragment's identification
-                fmt = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
-                switch (fmt.getTag()) {
+                Fragment fmt = getSupportFragmentManager().findFragmentByTag("f" + binding.activityMainViewpager.getCurrentItem());
+                switch (Objects.requireNonNull(Objects.requireNonNull(fmt).getTag())) {
                     case "f0":
                         ((MapViewFragment)fmt).launchAutocomplete(query);
-                        searchView.setQuery("", false);
+                        binding.includedToolbar.searchView.setQuery("", false);
                         break;
                     case "f1":
                         ((ListViewFragment)fmt).filterList(query);
                         break;
                     case "f2":
-                        showSnackBar(String.format(getString(R.string.error_search), tabTitles[pager.getCurrentItem()]));
-                        searchView.setQuery("", false);
+                        showSnackBar(String.format(getString(R.string.error_search), mainViewModel.getTabTitles()[binding.activityMainViewpager.getCurrentItem()]));
+                        binding.includedToolbar.searchView.setQuery("", false);
                         break;
                 }
-                searchView.setVisibility(View.GONE);
+                binding.includedToolbar.searchView.setVisibility(View.GONE);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Get fragment's identification
-                fmt = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
-                switch (fmt.getTag()) {
+                Fragment fmt = getSupportFragmentManager().findFragmentByTag("f" + binding.activityMainViewpager.getCurrentItem());
+                switch (Objects.requireNonNull(Objects.requireNonNull(fmt).getTag())) {
                     case "f0":
                         if (newText.length() == 3) {
-                            searchView.setQuery("", false);
-                            searchView.setVisibility(View.GONE);
+                            binding.includedToolbar.searchView.setQuery("", false);
+                            binding.includedToolbar.searchView.setVisibility(View.GONE);
                             ((MapViewFragment)fmt).launchAutocomplete(newText);
                         }
                         break;
@@ -280,10 +245,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             }
         });
 
-        searchView.setOnCloseListener(() -> {
+        binding.includedToolbar.searchView.setOnCloseListener(() -> {
             // Get fragment's identification
-            fmt = getSupportFragmentManager().findFragmentByTag("f" + pager.getCurrentItem());
-            switch (fmt.getTag()) {
+            Fragment fmt = getSupportFragmentManager().findFragmentByTag("f" + binding.activityMainViewpager.getCurrentItem());
+            switch (Objects.requireNonNull(Objects.requireNonNull(fmt).getTag())) {
                 case "f0":
                 case "f2":
                     break;
@@ -291,9 +256,14 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                     ((ListViewFragment)fmt).filterList("");
                     break;
             }
-            searchView.setVisibility(View.GONE);
+            binding.includedToolbar.searchView.setVisibility(View.GONE);
             return false;
         });
+    }
+
+    private void configureReAuthListener() {
+        // binding.btPwdVisibility.setOnClickListener(this);
+        binding.btPwdSend.setOnClickListener(this);
     }
 
     /**
@@ -302,132 +272,122 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
      * ---------------------
      */
 
-    private void initData() {
-        // Initialize current user
-        mainViewModel.getCurrentUserMutableLiveData().observe(this, user -> currentUser = user);
-    }
-
     private void launchDetailRestaurantActivity() {
-        mainViewModel.getRestaurantsMutableLiveData().observe(this, restaurantsList -> {
-            RestaurantWithDistance restaurant = mainViewModel.checkCurrentUserSelection(currentUser, restaurantsList);
-            // Launch DetailActivity or show message
-            if (restaurant != null) {
-                Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("RESTAURANT", restaurant);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            } else {
-                showSnackBar(getString(R.string.error_choice));
-            }
-        });
-    }
-
-    private void launchSettingActivity() {
-        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-        startActivity(intent);
+        RestaurantWithDistance restaurant = mainViewModel.getCurrentUserSelection();
+        // Launch DetailActivity or show message
+        if (restaurant != null) {
+            Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("RESTAURANT", restaurant);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        } else {
+            showSnackBar(getString(R.string.error_choice));
+        }
     }
 
     // Update Firebase user information
     private void updateUIWithUserData(){
         if(mainViewModel.isFbCurrentUserLogged()){
             FirebaseUser fbUser = mainViewModel.getFbCurrentUser();
+            // Set and display profile picture
             if(fbUser.getPhotoUrl() != null){
-                setProfilePicture(fbUser.getPhotoUrl());
+                ImageView userPicture = binding.activityMainNavView.getHeaderView(0).findViewById(R.id.user_picture);
+                userPicture.setImageTintList(null);
+                Glide.with(this)
+                        .load(fbUser.getPhotoUrl())
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(userPicture);
             }
-            setTextUserData(fbUser);
+            // Set and display name
+            String name = TextUtils.isEmpty(fbUser.getDisplayName()) ? getString(R.string.info_no_username_found) : fbUser.getDisplayName();
+            TextView userName = binding.activityMainNavView.getHeaderView(0).findViewById(R.id.user_name);
+            userName.setText(name);
+            // Set and display email
+            String email = TextUtils.isEmpty(fbUser.getEmail()) ? getString(R.string.info_no_email_found) : fbUser.getEmail();
+            TextView userEmail = binding.activityMainNavView.getHeaderView(0).findViewById(R.id.user_email);
+            userEmail.setText(email);
         }
-    }
-
-    // Update Firebase user picture
-    private void setProfilePicture(Uri profilePictureUrl){
-        userPicture.setImageTintList(null);
-        Glide.with(this)
-                .load(profilePictureUrl)
-                .apply(RequestOptions.circleCropTransform())
-                .into(userPicture);
-    }
-    // Update Firebase user name and email
-    private void setTextUserData(FirebaseUser fbUser){
-        //Get email & username from User
-        String email = TextUtils.isEmpty(fbUser.getEmail()) ? getString(R.string.info_no_email_found) : fbUser.getEmail();
-        String username = TextUtils.isEmpty(fbUser.getDisplayName()) ? getString(R.string.info_no_username_found) : fbUser.getDisplayName();
-        //Update views with data
-        userName.setText(username);
-        userEmail.setText(email);
     }
 
     private void buildConfirmationDialog() {
         // Create the builder with a specific theme setting (i.e. for all buttons text color)...
         // builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
         // ...or create the builder with no specific theme setting
-        builder = new AlertDialog.Builder(this);
-        // Add the buttons
-        builder .setPositiveButton(R.string.dialog_button_ok, (dialog, which) -> {
-                    message = getString(R.string.dialog_info_ok);
-                    showSnackBar(message);
-                    deleteAccountAndLogout();
-                })
-                .setNegativeButton(R.string.dialog_button_cancel, (dialog, which) -> {
-                    message = getString(R.string.dialog_info_cancel);
-                    showSnackBar(message);
-                })
-        // Chain together various setter methods to set the dialog characteristics
-                .setTitle(R.string.dialog_title)
-                .setMessage(R.string.dialog_message);
-        // Create the AlertDialog
-        dialog = builder.create();
-        // Set color for each button text (so, no need to set theme when building AlertDialog)
-        dialog.setOnShowListener(dialogInterface -> {
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.green_fab));
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(R.color.red));
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // Configure builder and create dialog
+        DialogTuple<AlertDialog, MutableLiveData<Boolean>> dialogTuple = mainViewModel.buildConfirmationDialog(builder);
+        // Get dialog
+        dialog = dialogTuple.getDialog();
+        // Manage response
+        dialogTuple.getResponse().observe(this, response -> {
+            if (response != null) {
+                if (response) {
+                    showSnackBar(getString(R.string.dialog_info_ok));
+                    deleteAccountLogoutAndCloseActivity();
+                } else {
+                    showSnackBar(getString(R.string.dialog_info_cancel));
+                }
+            }
         });
     }
 
-    private void logout(){
-        // Involves the use of the reference to a View inside ViewModel
-        // mainViewModel.signOut(this).addOnSuccessListener(aVoid -> closeActivity());
-        mainViewModel.signOut().addOnSuccessListener(aVoid -> closeActivity());
-
-        // Avoid the use of the reference to a View inside ViewModel
-        // mainViewModel.signOut();
-        // closeActivity();
+    private void logoutAndCloseActivity(){
+        mainViewModel.signOut()
+                .addOnSuccessListener(aVoid -> {
+                    Log.w("MainActivity", "Logout successful");
+                    setResult(RESULT_OK, new Intent());
+                    finish();
+                })
+                .addOnFailureListener(e -> Log.w("MainActivity", e.getMessage()));
     }
 
-    private void deleteAccountAndLogout() {
-        // Delete current user's likes from Firestore liked restaurants collection
-        mainViewModel.getLikedRestaurantsMutableLiveData()
-                .observe(this, likedRestaurantsList -> mainViewModel.deleteUserLikes(currentUser, likedRestaurantsList));
-        // Delete current user from Firestore users collection
-        mainViewModel.deleteUser(currentUser);
-        // Delete current user from Firebase and logout
-
-        /* Involves the use of the reference to a View inside ViewModel
-        mainViewModel.deleteFbUser(MainActivity.this)
-                .addOnSuccessListener(aVoid -> {
-                    message = getString(R.string.dialog_info_deletion_confirmation);
-                    showSnackBar(message);
-                    logout();
-                });
-        */
-        // Avoid the use of the reference to a View inside ViewModel
+    private void deleteAccountLogoutAndCloseActivity() {
+        mainViewModel.deleteUserLikesAndUser();
         mainViewModel.deleteFbUser()
                 .addOnSuccessListener(aVoid -> {
-                    message = getString(R.string.dialog_info_deletion_confirmation);
-                    showSnackBar(message);
-                    logout();
+                    showSnackBar(getString(R.string.dialog_info_deletion_confirmation));
+                    logoutAndCloseActivity();
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("MainActivity", e.getMessage());
+                    FirebaseAuth.getInstance().getAccessToken(false).addOnSuccessListener((OnSuccessListener<GetTokenResult>) getTokenResult -> {
+                                signInProvider = getTokenResult.getSignInProvider();
+                                if (Objects.equals("password", signInProvider)) {
+                                    showSnackBar(getString(R.string.reauth_message));
+                                    showReAutView();
+                                } else {
+                                    showSnackBar(getString(R.string.relog_message) +"\n"+ getString(R.string.relog_message));
+                                }
+                    });
                 });
-        //
     }
 
-    private void closeActivity() {
-        Intent intent = new Intent();
-        setResult(RESULT_OK, intent);
-        finish();
+    private void showReAutView() {
+        binding.activityMainDrawerLayout.openDrawer(GravityCompat.START);
+        binding.tvPwd.setVisibility(View.VISIBLE);
+        binding.lytPwd.setVisibility(View.VISIBLE);
+    }
+
+    private void launchReAuth(String signInProvider) {
+        String passWord = String.valueOf(binding.etPwd.getText());
+        mainViewModel.getFbCurrentUser().reauthenticate(Objects.requireNonNull(mainViewModel.getCredential(signInProvider, passWord)))
+                .addOnSuccessListener(unused -> {
+                    Objects.requireNonNull(binding.etPwd.getText()).clear();
+                    binding.tvPwd.setVisibility(View.INVISIBLE);
+                    binding.lytPwd.setVisibility(View.INVISIBLE);
+                    showSnackBar("Re-authentication succeed");
+                    deleteAccountLogoutAndCloseActivity();
+                })
+                .addOnFailureListener(e -> {
+                    binding.tvPwd.setText(getString(R.string.pwd_error));
+                    showSnackBar("Re-authentication failed");
+                });
     }
 
     private void showSnackBar(String message) {
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
+
 
 }

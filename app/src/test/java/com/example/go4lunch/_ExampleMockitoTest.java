@@ -3,7 +3,7 @@ package com.example.go4lunch;
 import static org.junit.Assert.assertEquals;
 
 import com.example.go4lunch.model.model.User;
-import com.example.go4lunch.utils.DataProcessingUtils;
+import com.example.go4lunch.utils.Utils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -112,42 +112,42 @@ public class _ExampleMockitoTest {
     @Test
     public void calendarUtilsTest() {
         System.out.println(currentDate);
-        System.out.println(DataProcessingUtils.getCurrentDate());
+        System.out.println(Utils.getCurrentDate());
 
-        assertEquals("Wrong date", currentDate, DataProcessingUtils.getCurrentDate());
+        assertEquals("Wrong date", currentDate, Utils.getCurrentDate());
     }
 
     @Test
     public void calendarUtilsMockitoTest() {
-        System.out.println(DataProcessingUtils.getCurrentDate());
-        assertEquals("Wrong date", currentDate, DataProcessingUtils.getCurrentDate());
+        System.out.println(Utils.getCurrentDate());
+        assertEquals("Wrong date", currentDate, Utils.getCurrentDate());
 
         /** Use a try with resources to limit the scope of the static method mocking to its test method.
          * So we only mock the static class in that test method */
-        try (MockedStatic<DataProcessingUtils> utilities = Mockito.mockStatic(DataProcessingUtils.class)) {
-            System.out.println(DataProcessingUtils.getCurrentDate());
-            assertNull("Wrong date", DataProcessingUtils.getCurrentDate());
-            utilities.when(DataProcessingUtils::getCurrentDate).thenReturn("myDate");
-            System.out.println(DataProcessingUtils.getCurrentDate());
-            assertEquals("Wrong date", "myDate", DataProcessingUtils.getCurrentDate());
+        try (MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class)) {
+            System.out.println(Utils.getCurrentDate());
+            assertNull("Wrong date", Utils.getCurrentDate());
+            utilities.when(Utils::getCurrentDate).thenReturn("myDate");
+            System.out.println(Utils.getCurrentDate());
+            assertEquals("Wrong date", "myDate", Utils.getCurrentDate());
         }
 
-        System.out.println(DataProcessingUtils.getCurrentDate());
-        assertEquals("Wrong date", currentDate, DataProcessingUtils.getCurrentDate());
+        System.out.println(Utils.getCurrentDate());
+        assertEquals("Wrong date", currentDate, Utils.getCurrentDate());
     }
 
     @Test
     public void calendarUtilsMockitoTest2() {
         // assertEquals("Wrong date", "myDate", CalendarUtils.getCurrentDate());
         // assertNull("Wrong date", CalendarUtils.getCurrentDate());
-        assertEquals("Wrong date", currentDate, DataProcessingUtils.getCurrentDate());
+        assertEquals("Wrong date", currentDate, Utils.getCurrentDate());
 
-        MockedStatic<DataProcessingUtils> utilities = Mockito.mockStatic(DataProcessingUtils.class);
-        assertNull("Wrong date", DataProcessingUtils.getCurrentDate());
-        utilities.when(DataProcessingUtils::getCurrentDate).thenReturn("myDate");
+        MockedStatic<Utils> utilities = Mockito.mockStatic(Utils.class);
+        assertNull("Wrong date", Utils.getCurrentDate());
+        utilities.when(Utils::getCurrentDate).thenReturn("myDate");
         // calendarUtilsMock.when(CalendarUtils::getCurrentDate).thenReturn("myDate");
 
-        assertEquals("Wrong date", "myDate", DataProcessingUtils.getCurrentDate());
+        assertEquals("Wrong date", "myDate", Utils.getCurrentDate());
     }
 
     @Test
@@ -221,15 +221,15 @@ public class _ExampleMockitoTest {
         assertEquals("Wrond name", "Toto", mock.getUsername());
 
         // Test on static method
-        try (MockedStatic<DataProcessingUtils> staticMock = mockStatic(DataProcessingUtils.class)) {
-            staticMock.when(DataProcessingUtils::getCurrentDate).thenReturn("20230101");
+        try (MockedStatic<Utils> staticMock = mockStatic(Utils.class)) {
+            staticMock.when(Utils::getCurrentDate).thenReturn("20230101");
 
-            DataProcessingUtils.getCurrentDate();                         // Method called once
-            String dateResult =  DataProcessingUtils.getCurrentDate();    // Method called twice
+            Utils.getCurrentDate();                         // Method called once
+            String dateResult =  Utils.getCurrentDate();    // Method called twice
 
             System.out.println(dateResult);
-            staticMock.verify(DataProcessingUtils::getCurrentDate, times(2));
-            assertEquals("Wrond date", "20230101", DataProcessingUtils.getCurrentDate());
+            staticMock.verify(Utils::getCurrentDate, times(2));
+            assertEquals("Wrond date", "20230101", Utils.getCurrentDate());
         }
         //
     }

@@ -7,11 +7,12 @@ import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Photo;
+import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
-import com.example.go4lunch.utils.DataProcessingUtils;
+import com.example.go4lunch.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class ListViewViewModel extends ViewModel {
         for (User workmate : workmates) {
             // Check selected restaurant id and date and increase selections count if matches with restaurant id
             boolean isSelected = rId.equals(workmate.getSelectionId())
-                    && DataProcessingUtils.getCurrentDate().equals(workmate.getSelectionDate());
+                    && Utils.getCurrentDate().equals(workmate.getSelectionDate());
             if (isSelected) selectionsCount += 1;
         }
         return selectionsCount;

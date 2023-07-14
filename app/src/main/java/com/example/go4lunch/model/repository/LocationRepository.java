@@ -28,6 +28,7 @@ public class LocationRepository {
 
     private static volatile LocationRepository instance;
     private final MutableLiveData<LatLng> currentLocationMutableLiveData;
+    private boolean locationPermissionsGranted;
     private LatLng home;
     private boolean focusHome;
 
@@ -108,6 +109,14 @@ public class LocationRepository {
         // Populate the LiveData
         // currentLocationMutableLiveData.setValue(home);
         return currentLocationMutableLiveData;
+    }
+
+    public void setPermissions(boolean granted) {
+        locationPermissionsGranted = granted;
+    }
+
+    public boolean arePermissionsGranted() {
+        return locationPermissionsGranted;
     }
 
     public LatLng getDefaultLocation() {

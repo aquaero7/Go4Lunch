@@ -36,6 +36,7 @@
     <string name="website">BTN_SITE_WEB</string>
     <string name="save">BTN_SAUVEGARDER</string>
     <string name="notification">SW_NOTIFICATION</string>
+    <string name="pwd_send">PWD_SEND</string>
 
     <!-- ERROR AND INFO MSG -->
     <string name="error">Une erreur s\'est produite.</string>
@@ -120,6 +121,12 @@
     <string name="dialog_info_ok">Suppression du compte et déconnexion…</string>
     <string name="dialog_info_cancel">Suppression abandonnée !</string>
     <string name="dialog_info_deletion_confirmation">Compte supprimé !</string>
+    <string name="reauth_message">Ré-authentification nécessaire !</string>
+    <string name="relog_message">Veuillez vous déconnecter puis vous reconnecter.</string>
+    <string name="pwd_title">Mot de passe demandé !</string>
+    <string name="pwd_error">Mot de passe invalide !</string>
+    <string name="pwd_hint">Mot de passe</string>
+    <string name="ok">OK</string>
 
 
     <!--******************-->

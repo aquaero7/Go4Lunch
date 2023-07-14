@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentSettingsBinding;
 import com.example.go4lunch.utils.EventButtonClick;
+import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.viewmodel.SettingsViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
 
@@ -54,7 +55,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         String message = null;
         switch (EventButtonClick.from(v)) {
             case BTN_SAVE:
-                hideVirtualKeyboard(requireContext(), v);
+                Utils.hideVirtualKeyboard(requireContext(), v);
                 message = settingsViewModel.updateSearchRadiusPrefs(binding.etRadius.getText().toString());
                 // Display default radius if '0' or 'empty' saved as prefs
                 if (message == getString(R.string.search_radius_prefs_deleted))
@@ -99,11 +100,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     private void setListeners() {
         binding.buttonSave.setOnClickListener(this);
         binding.switchNotification.setOnClickListener(this);
-    }
-
-    public void hideVirtualKeyboard(Context context, View view) {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 }
