@@ -1,11 +1,14 @@
 package com.example.go4lunch.view.fragment;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,14 +35,19 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.OnMapsSdkInitializedCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Collections;
 import java.util.Objects;
 
 public class MapViewFragment extends Fragment implements OnMapReadyCallback,
@@ -51,7 +59,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     private EventListener eventListener;
     private MapViewViewModel mapViewViewModel;
     private GoogleMap mGoogleMap;
-    // private PlacesClient placesClient;  // TODO : Useless ?
 
     public MapViewFragment() {
     }
@@ -83,6 +90,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         mapViewViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(MapViewViewModel.class);
         // Show ProgressBar
         binding.progressbarMap.progressbar.setVisibility(View.VISIBLE);
+        // Register autocomplete activity result
+        createAutocompleteResultLauncher();
 
         /** To use if menu is handled in fragment
          * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
@@ -92,8 +101,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this);
         // Initialize SDK Places for Autocomplete API
         Places.initialize(requireContext(), getString(R.string.MAPS_API_KEY));
-        // Create a new PlacesClient instance or Autocomplete API
-        // placesClient = Places.createClient(requireContext());   // TODO : Useless ?
 
         // return rootView;
         return binding.getRoot();
@@ -255,41 +262,37 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         startActivity(intent);
     }
 
-    // Autocomplete is launched from activity
-    public void launchAutocomplete(String query) {
-        // Configure AutocompleteSupportFragment
-        configureAutocompleteSupportFragment(query);
-        // Launch Autocomplete
-        binding.includedCardViewAutocomplete.cardViewAutocomplete.setVisibility(View.VISIBLE);
+    private void createAutocompleteResultLauncher() {
+        // Manage predictions user selection
+        ActivityResultLauncher<Intent> startAutocomplete = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent intent = result.getData();
+                        if (intent != null) {
+                            Place place = Autocomplete.getPlaceFromIntent(intent);
+                            Log.w("MapViewFragment", "Place: ${place.getId()}");
+                            for (RestaurantWithDistance restaurant : mapViewViewModel.getRestaurants()) {
+                                if (Objects.equals(restaurant.getRid(), place.getId())) {
+                                    // Focus map on this restaurant
+                                    if (mGoogleMap != null) mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                            mapViewViewModel.getLatLng(restaurant),
+                                            mapViewViewModel.getRestaurantZoom()));
+                                    Log.w("MapViewFragment", "Place: " + place.getId()
+                                            + " Lat : " + mapViewViewModel.getLatLng(restaurant).latitude
+                                            + " Lng : " + mapViewViewModel.getLatLng(restaurant).longitude);
+                                }
+                            }
+                        }
+                    } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
+                        Log.w("MapViewFragment", "User canceled autocomplete");
+                    }
+                });
+        mapViewViewModel.setStartAutocomplete(startAutocomplete);
     }
 
-    private void configureAutocompleteSupportFragment(String query) {
-        // Initialize AutocompleteSupportFragment
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.fragment_autocomplete);
-        mapViewViewModel.initializeAutocompleteSupportFragment(Objects.requireNonNull(autocompleteFragment), query);
-
-        // Set up a PlaceSelectionListener to handle the response.
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(@NonNull Place place) {
-                Log.i("MapViewFragment", "Place: " + place.getId());
-                for (RestaurantWithDistance restaurant : mapViewViewModel.getRestaurants()) {
-                    if (Objects.equals(restaurant.getRid(), place.getId())) {
-                        // Focus map on this restaurant
-                        if (mGoogleMap != null) mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapViewViewModel.getLatLng(restaurant), mapViewViewModel.getRestaurantZoom()));
-                        Log.i("MapViewFragment", "Place: " + place.getId() + " Lat : " + mapViewViewModel.getLatLng(restaurant).latitude + " Lng : " + mapViewViewModel.getLatLng(restaurant).longitude);
-                        autocompleteFragment.setText("");
-                        binding.includedCardViewAutocomplete.cardViewAutocomplete.setVisibility(View.GONE);
-                    }
-                }
-            }
-            @Override
-            public void onError(@NonNull Status status) {
-                Log.i("MapViewFragment", "An error occurred: " + status);
-                autocompleteFragment.setText("");
-                binding.includedCardViewAutocomplete.cardViewAutocomplete.setVisibility(View.GONE);
-            }
-        });
+    public void launchAutocomplete(String query) {
+        mapViewViewModel.launchAutocomplete(query);
     }
 
 }

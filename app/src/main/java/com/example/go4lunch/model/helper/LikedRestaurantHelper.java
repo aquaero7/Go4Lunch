@@ -45,34 +45,9 @@ public class LikedRestaurantHelper {
         getLikedRestaurantsCollection().get().addOnCompleteListener(listener);
     }
 
-    /* Get liked restaurant data from Firestore
-    public Task<DocumentSnapshot> getLikedRestaurantData(String id) {
-        if(id != null) {
-            return getLikedRestaurantsCollection().document(id).get();
-        } else {
-            return null;
-        }
-    }
-    */
-
     // Delete liked restaurant in Firestore
     public void deleteLikedRestaurant(String id) {
         getLikedRestaurantsCollection().document(id).delete();
     }
-
-    /* Clear the liked restaurants collection
-    public void clearLikedRestaurantsCollection() {
-        getLikedRestaurantsList(task -> {
-            if (task.isSuccessful()) {
-                // Get and delete each document in liked restaurants collection
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    getLikedRestaurantsCollection().document(document.getId()).delete();
-                }
-            } else {
-                Log.d("LikedRestaurantHelper", "Error getting documents: ", task.getException());
-            }
-        });
-    }
-    */
 
 }

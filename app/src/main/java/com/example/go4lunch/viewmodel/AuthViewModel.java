@@ -85,7 +85,6 @@ public class AuthViewModel extends ViewModel {
     }
 
     public void fetchRestaurants(LatLng home, String apiKey) {
-        //
         if (userRepository.getCurrentUserData() != null) {
             userRepository.getCurrentUserData()
                     .addOnSuccessListener(user -> {

@@ -8,18 +8,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.media.session.MediaSession;
-import android.net.wifi.hotspot2.pps.Credential;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,24 +31,15 @@ import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
-import com.facebook.AccessToken;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.TwitterAuthCredential;
-import com.google.firebase.installations.remote.TokenResult;
 
-import java.security.AuthProvider;
 import java.util.Objects;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, EventListener {
@@ -123,10 +109,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     @Override
     public void onClick(View v) {
+        // Manage click on button to valid password for reAuth
         if (v.getId() == R.id.bt_pwd_send && !Objects.requireNonNull(binding.etPwd.getText()).toString().isEmpty()) {
-            Utils.hideVirtualKeyboard(this, v);
+            Utils.getInstance().hideVirtualKeyboard(this, v);
             launchReAuth(signInProvider);
         }
+    }
+
+    @Override
+    public void toggleSearchViewVisibility() {
+        SearchView view = binding.includedToolbar.searchView;
+        view.setVisibility((view.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
     }
 
     /**
@@ -138,12 +131,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void configureToolbar(){
         // Sets the Toolbar
         setSupportActionBar(binding.includedToolbar.toolbar);
-    }
-
-    @Override
-    public void toggleSearchViewVisibility() {
-        SearchView view = binding.includedToolbar.searchView;
-        view.setVisibility((view.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
     }
 
     private void configureViewPagerAndTabs(){
@@ -227,6 +214,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 Fragment fmt = getSupportFragmentManager().findFragmentByTag("f" + binding.activityMainViewpager.getCurrentItem());
                 switch (Objects.requireNonNull(Objects.requireNonNull(fmt).getTag())) {
                     case "f0":
+                        // Don't trigger predictions before 3 chars input
                         if (newText.length() == 3) {
                             binding.includedToolbar.searchView.setQuery("", false);
                             binding.includedToolbar.searchView.setVisibility(View.GONE);
@@ -241,6 +229,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                 }
                 return false;
             }
+
+
         });
 
         binding.includedToolbar.searchView.setOnCloseListener(() -> {
@@ -308,6 +298,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         }
     }
 
+    // Build dialog for account deletion
     private void buildConfirmationDialog() {
         // Create the builder with a specific theme setting (i.e. for all buttons text color)...
         // builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);

@@ -130,7 +130,7 @@ public class UserRepository {
         }
     }
 
-    // Set ir update user selection restaurant id
+    // Set or update user selection restaurant id
     public Task<Void> updateSelectionId(String selectionId) {
         return userHelper.updateSelectionId(selectionId);
     }
@@ -343,64 +343,5 @@ public class UserRepository {
     public List<User> getSelectors() {
         return selectorsList;
     }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-    public MutableLiveData<List<User>> getWorkmatesMutableLiveData() {
-        workmatesMutableLiveData = new MutableLiveData<>();
-
-        // Get workmates list from database document
-        getUsersList(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult() != null) {
-                    // Get users list
-                    if (workmatesList != null) workmatesList.clear();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        // Map<String, Object> userData = document.getData(); // Map data for debug.
-                        String uId = Objects.requireNonNull(document.getData().get("uid")).toString();
-                        String uName = Objects.requireNonNull(document.getData().get("username")).toString();
-                        String uEmail = ((document.getData().get("userEmail")) != null) ? document.getData().get("userEmail").toString() : null;
-                        String uUrlPicture = ((document.getData().get("userUrlPicture")) != null) ? document.getData().get("userUrlPicture").toString() : null;
-                        String selectionId = ((document.getData().get("selectionId")) != null) ? document.getData().get("selectionId").toString() : null;
-                        String selectionDate = ((document.getData().get("selectionDate")) != null) ? document.getData().get("selectionDate").toString() : null;
-                        String selectionName = ((document.getData().get("selectionName")) != null) ? document.getData().get("selectionName").toString() : null;
-                        String selectionAddress = ((document.getData().get("selectionAddress")) != null) ? document.getData().get("selectionAddress").toString() : null;
-                        String searchRadiusPrefs = ((document.getData().get("searchRadiusPrefs")) != null) ? document.getData().get("searchRadiusPrefs").toString() : null;
-                        String notificationsPrefs = ((document.getData().get("notificationsPrefs")) != null) ? document.getData().get("notificationsPrefs").toString() : null;
-
-                        User workmateToAdd = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate,
-                                selectionName, selectionAddress, searchRadiusPrefs, notificationsPrefs);
-                        workmatesList.add(workmateToAdd);
-                    }
-                    Utils.sortByName(workmatesList);
-                    // Populate the LiveData
-                    workmatesMutableLiveData.setValue(workmatesList);
-                }
-            } else {
-                Log.w("UserRepository", "Error getting documents: ", task.getException());
-            }
-        });
-        return workmatesMutableLiveData;
-    }
-    */
-
-    /*
-    public MutableLiveData<User> getCurrentUserMutableLiveData() {
-        currentUserMutableLiveData = new MutableLiveData<>();
-
-        // Get current user from Firebase
-        getCurrentUserData()
-                .addOnSuccessListener(user -> {
-                    // Populate the LiveData
-                    currentUserMutableLiveData.setValue(user);
-                })
-                .addOnFailureListener(e -> {
-                    Log.w("UserRepository", e.getMessage());
-                });
-        return currentUserMutableLiveData;
-    }
-    */
 
 }

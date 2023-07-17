@@ -24,6 +24,7 @@ import java.util.List;
 public class NotificationService extends FirebaseMessagingService {
 
     private final UserRepository userRepository = UserRepository.getInstance();
+    private final Utils utils = Utils.getInstance();
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -35,7 +36,7 @@ public class NotificationService extends FirebaseMessagingService {
             // Get current user
             User currentUser = userRepository.getCurrentUser();
             // Check if current user has selected a restaurant
-            boolean aRestaurantIsSelected = currentUser.getSelectionId() != null && Utils.getCurrentDate().equals(currentUser.getSelectionDate());
+            boolean aRestaurantIsSelected = currentUser.getSelectionId() != null && utils.getCurrentDate().equals(currentUser.getSelectionDate());
             /* Send notification with message only if current user has selected a restaurant
                and if his notifications preferences parameter is set true */
             if (aRestaurantIsSelected && Boolean.parseBoolean(currentUser.getNotificationsPrefs())) {
@@ -53,7 +54,7 @@ public class NotificationService extends FirebaseMessagingService {
                         String wSelDate = (workmate.getSelectionDate() != null) ? workmate.getSelectionDate() : "";
 
                         /* If the workmate selection matches that of the current user, add his/her name to the selectors list */
-                        if (currentUser.getSelectionId().equals(wSelId) && Utils.getCurrentDate().equals(wSelDate)) selectorsNameList.add(wName);
+                        if (currentUser.getSelectionId().equals(wSelId) && utils.getCurrentDate().equals(wSelDate)) selectorsNameList.add(wName);
                     }
                 }
                 // Create notification body text

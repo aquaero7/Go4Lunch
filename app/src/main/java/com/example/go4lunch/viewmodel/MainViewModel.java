@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.model.DialogTuple;
+import com.example.go4lunch.model.repository.AutocompleteRepository;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
@@ -17,26 +18,24 @@ import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.Utils;
 import com.facebook.AccessToken;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FacebookAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainViewModel extends ViewModel {
 
+    private final MainApplication application;
     private final LocationRepository locationRepository;
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
     // private final Application application; // Only if MainViewModel extends AndroidViewModel
+    private final Utils utils;
 
 
     // Constructor
@@ -44,10 +43,12 @@ public class MainViewModel extends ViewModel {
         // super(application); // Only if MainViewModel extends AndroidViewModel
         // this.application = application; // Only if MainViewModel extends AndroidViewModel
 
+        application = MainApplication.getInstance();
         locationRepository = LocationRepository.getInstance();
         userRepository = UserRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
         likedRestaurantRepository = LikedRestaurantRepository.getInstance();
+        utils = Utils.getInstance();
     }
 
 
@@ -63,13 +64,6 @@ public class MainViewModel extends ViewModel {
     /***********
      * Methods *
      ***********/
-
-    // Fetchers (using Maps and Firebase APIs)
-
-    public void fetchCurrentUser() {
-        userRepository.fetchCurrentUser();
-    }
-
 
     // Actions
 
@@ -128,8 +122,8 @@ public class MainViewModel extends ViewModel {
         AlertDialog dialog = builder.create();
         // Set color for each button text (so, no need to set theme when building AlertDialog)
         dialog.setOnShowListener(dialogInterface -> {
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(MainApplication.getInstance().getColor(R.color.green_fab));
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(MainApplication.getInstance().getColor(R.color.red));
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(application.getColor(R.color.green_fab));
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(application.getColor(R.color.red));
         });
         return new DialogTuple<>(dialog, dialogResponseMutableLiveData);
     }
@@ -170,7 +164,7 @@ public class MainViewModel extends ViewModel {
         String selectionDate = userRepository.getCurrentUser().getSelectionDate();
         RestaurantWithDistance selectedRestaurant = null;
         // If a restaurant is selected, check if selected restaurant is nearby
-        if ((selectionId != null) && (Utils.getCurrentDate().equals(selectionDate))) {
+        if ((selectionId != null) && (utils.getCurrentDate().equals(selectionDate))) {
             for (RestaurantWithDistance restaurant : restaurantRepository.getRestaurants()) {
                 if (Objects.equals(selectionId, restaurant.getRid())) {
                     selectedRestaurant = restaurant;

@@ -55,16 +55,7 @@ public class RestaurantRepository {
         RestaurantRepository result = instance;
         if (result != null) {
             return result;
-        }
-        /*
-        synchronized(RestaurantHelperUnused.class) {
-            if (instance == null) {
-                instance = new RestaurantRepository();
-            }
-            return instance;
-        }
-        */
-        else {
+        } else {
             instance = new RestaurantRepository();
             return instance;
         }

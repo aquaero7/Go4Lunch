@@ -55,7 +55,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         String message = null;
         switch (EventButtonClick.from(v)) {
             case BTN_SAVE:
-                Utils.hideVirtualKeyboard(requireContext(), v);
+                Utils.getInstance().hideVirtualKeyboard(requireContext(), v);
                 message = settingsViewModel.updateSearchRadiusPrefs(binding.etRadius.getText().toString());
                 // Display default radius if '0' or 'empty' saved as prefs
                 if (message == getString(R.string.search_radius_prefs_deleted))

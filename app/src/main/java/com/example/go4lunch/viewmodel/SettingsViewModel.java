@@ -12,8 +12,8 @@ import java.util.Objects;
 
 public class SettingsViewModel extends ViewModel {
 
-    private UserRepository userRepository;
-    private RestaurantRepository restaurantRepository;
+    private final UserRepository userRepository;
+    private final RestaurantRepository restaurantRepository;
 
 
     // Constructor

@@ -91,7 +91,6 @@ public class LocationRepository {
                                 }
                             }
                         };
-
                         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
                     }
                 }
@@ -106,8 +105,6 @@ public class LocationRepository {
     }
 
     public MutableLiveData<LatLng> getCurrentLocationMutableLiveData() {
-        // Populate the LiveData
-        // currentLocationMutableLiveData.setValue(home);
         return currentLocationMutableLiveData;
     }
 
@@ -142,72 +139,5 @@ public class LocationRepository {
     public int getRestaurantZoom() {
         return RESTAURANT_ZOOM;
     }
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-    public MutableLiveData<LatLng> getCurrentLocationMutableLiveData(Activity activity) {
-        currentLocationMutableLiveData = new MutableLiveData<>();
-
-        // Get current location from API
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
-        try {
-            Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-            // Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);
-            locationResult.addOnCompleteListener(activity, task -> {
-                if (task.isSuccessful()) {
-                    Location lastKnownLocation = task.getResult();
-                    if (lastKnownLocation != null) {
-                        // Get the last known location...
-                        double latitude = lastKnownLocation.getLatitude();
-                        double longitude = lastKnownLocation.getLongitude();
-                        // Initialize home
-                        home = new LatLng(latitude, longitude);
-                        // Populate the LiveData
-                        currentLocationMutableLiveData.setValue(home);
-                    } else {
-                        // Get the updated current location...
-                        // Setup parameters of location request
-                        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 500).build();
-                        // Create callback to handle location result
-                        LocationCallback locationCallback = new LocationCallback() {
-                            @Override
-                            public void onLocationResult(@NonNull LocationResult locationResult) {
-                                super.onLocationResult(locationResult);
-                                for (Location location : locationResult.getLocations()) {
-                                    if (location != null) {
-                                        // Get the current location...
-                                        double latitude = location.getLatitude();
-                                        double longitude = location.getLongitude();
-                                        // ...and stop location updates as soon of current location is got
-                                        fusedLocationProviderClient.removeLocationUpdates(this);
-                                        // Initialize home
-                                        home = new LatLng(latitude, longitude);
-                                        // Populate the LiveData
-                                        currentLocationMutableLiveData.setValue(home);
-                                    }
-                                }
-                            }
-                        };
-
-                        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-                    }
-                }
-                else {
-                    Log.w("RestaurantRepository", "Exception: %s", task.getException());
-                }
-            });
-
-        } catch (SecurityException e) {
-            Log.w("Exception: %s", e.getMessage(), e);
-        }
-        return currentLocationMutableLiveData;
-    }
-    */
-
-
-
 
 }

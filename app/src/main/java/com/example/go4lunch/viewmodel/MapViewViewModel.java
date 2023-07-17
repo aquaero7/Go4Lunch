@@ -1,8 +1,14 @@
 package com.example.go4lunch.viewmodel;
 
+import android.content.Intent;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.MainApplication;
+import com.example.go4lunch.model.repository.AutocompleteRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
@@ -13,6 +19,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.maps.android.SphericalUtil;
@@ -25,6 +32,8 @@ public class MapViewViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
+    private final AutocompleteRepository autocompleteRepository;
+    private final Utils utils;
 
 
     // Constructor
@@ -32,16 +41,14 @@ public class MapViewViewModel extends ViewModel {
         locationRepository = LocationRepository.getInstance();
         userRepository = UserRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
+        autocompleteRepository = AutocompleteRepository.getInstance();
+        utils = Utils.getInstance();
     }
 
 
     /************
      * LiveData *
      ************/
-
-    public MutableLiveData<User> getCurrentUserMutableLiveData() {
-        return userRepository.getCurrentUserMutableLiveData();
-    }
 
     public MutableLiveData<List<User>> getWorkmatesMutableLiveData() {
         return userRepository.getWorkmatesMutableLiveData();
@@ -62,28 +69,29 @@ public class MapViewViewModel extends ViewModel {
 
     // Actions
 
-    public void initializeAutocompleteSupportFragment(AutocompleteSupportFragment autocompleteFragment, String query) {
-        // Specify the types of place data to return.
-        // autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
-        autocompleteFragment.setPlaceFields(Collections.singletonList(Place.Field.ID));
-        // Specify the type values of place data to return.
-        autocompleteFragment.setTypesFilter(Collections.singletonList("restaurant"));
-        // Specify the country of place data to return.
-        autocompleteFragment.setCountries("FR");
-        // Specify the limitation to only show results within the defined region
-        LatLngBounds latLngBounds = calculateBounds(getCurrentLocation(), Integer.parseInt(getSearchRadius())*1000);
-        autocompleteFragment.setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast));
-        autocompleteFragment.setActivityMode(AutocompleteActivityMode.valueOf("FULLSCREEN"));
-        autocompleteFragment.setText(query);
-    }
-
-    public LatLngBounds calculateBounds(LatLng home, int radius) {
+    public LatLngBounds calculateBounds() {
+        LatLng home = getCurrentLocation();
+        int radius = Integer.parseInt(getSearchRadius()) * 1000;
         /** Distances in meters / Headings in degrees */
         double distanceToCorner = radius * Math.sqrt(2);
         LatLng sw = SphericalUtil.computeOffset(home, distanceToCorner, 225);   // 5*PI/4
         LatLng ne = SphericalUtil.computeOffset(home, distanceToCorner, 45);    // PI/4
 
         return new LatLngBounds(sw, ne);
+    }
+
+    public void launchAutocomplete(String query) {
+        // Calculate bounds
+        LatLngBounds latLngBounds = calculateBounds();
+        // Launch autocomplete
+        Intent intent = new Autocomplete
+                .IntentBuilder(AutocompleteActivityMode.FULLSCREEN, Collections.singletonList(Place.Field.ID))
+                .setTypesFilter(Collections.singletonList("restaurant"))
+                .setCountries(Collections.singletonList("FR"))
+                .setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast))
+                .setInitialQuery(query)
+                .build(MainApplication.getContext());
+        autocompleteRepository.getStartAutocomplete().launch(intent);
     }
 
 
@@ -131,10 +139,14 @@ public class MapViewViewModel extends ViewModel {
         int selectionsCount = 0;
         for (User workmate : workmates) {
             // For each workmate, check selected restaurant and increase selections count if matches with restaurant id
-            boolean isSelected = rId.equals(workmate.getSelectionId()) && Utils.getCurrentDate().equals(workmate.getSelectionDate());
+            boolean isSelected = rId.equals(workmate.getSelectionId()) && utils.getCurrentDate().equals(workmate.getSelectionDate());
             if (isSelected) selectionsCount += 1;
         }
         return selectionsCount;
+    }
+
+    public ActivityResultLauncher<Intent> getStartAutocomplete() {
+        return autocompleteRepository.getStartAutocomplete();
     }
 
 
@@ -142,6 +154,10 @@ public class MapViewViewModel extends ViewModel {
 
     public void setFocusHome(boolean focusHome) {
         locationRepository.setFocusHome(focusHome);
+    }
+
+    public void setStartAutocomplete(ActivityResultLauncher<Intent> startAutocomplete) {
+        autocompleteRepository.setStartAutocomplete(startAutocomplete);
     }
 
 }

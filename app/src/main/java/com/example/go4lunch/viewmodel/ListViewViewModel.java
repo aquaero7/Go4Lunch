@@ -22,11 +22,13 @@ public class ListViewViewModel extends ViewModel {
 
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
+    private final Utils utils;
 
     // Constructor
     public ListViewViewModel() {
         userRepository = UserRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
+        utils = Utils.getInstance();
     }
 
 
@@ -54,7 +56,7 @@ public class ListViewViewModel extends ViewModel {
         for (User workmate : workmates) {
             // Check selected restaurant id and date and increase selections count if matches with restaurant id
             boolean isSelected = rId.equals(workmate.getSelectionId())
-                    && Utils.getCurrentDate().equals(workmate.getSelectionDate());
+                    && utils.getCurrentDate().equals(workmate.getSelectionDate());
             if (isSelected) selectionsCount += 1;
         }
         return selectionsCount;

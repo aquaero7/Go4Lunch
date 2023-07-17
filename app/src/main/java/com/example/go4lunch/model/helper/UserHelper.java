@@ -22,10 +22,12 @@ public class UserHelper {
 
     // Firestore
     private static final String COLLECTION_USERS = "users";
+    /*
     private static final String USER_ID = "uid";
     private static final String USER_NAME = "username";
     private static final String USER_EMAIL = "userEmail";
     private static final String USER_URL_PICTURE = "userUrlPicture";
+    */
     private static final String SELECTION_ID_FIELD = "selectionId";
     private static final String SELECTION_DATE_FIELD = "selectionDate";
     private static final String SELECTION_NAME_FIELD = "selectionName";

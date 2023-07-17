@@ -19,8 +19,8 @@ public class LikedRestaurantRepository {
     private static volatile LikedRestaurantRepository instance;
     private final LikedRestaurantHelper likedRestaurantHelper;
 
-    private MutableLiveData<List<LikedRestaurant>> likedRestaurantsMutableLiveData;
-    private List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
+    private final MutableLiveData<List<LikedRestaurant>> likedRestaurantsMutableLiveData;
+    private final List<LikedRestaurant> likedRestaurantsList = new ArrayList<>();
     private boolean restaurantIsLiked;
 
 
@@ -52,13 +52,6 @@ public class LikedRestaurantRepository {
         likedRestaurantHelper.getLikedRestaurantsList(listener);
     }
 
-    /* Get the liked restaurant data from Firestore and cast it to a LikedRestaurant model Object
-    public Task<LikedRestaurant> getLikedRestaurantData(String id) {
-        return likedRestaurantHelper.getLikedRestaurantData(id)
-                .continueWith(task -> task.getResult().toObject(LikedRestaurant.class));
-    }
-    */
-
     // Delete liked restaurant in Firestore
     public void deleteLikedRestaurant(String id) {
         likedRestaurantHelper.deleteLikedRestaurant(id);
@@ -70,7 +63,7 @@ public class LikedRestaurantRepository {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
                     // Get liked restaurants list
-                    if (likedRestaurantsList != null) likedRestaurantsList.clear();
+                    if (!likedRestaurantsList.isEmpty()) likedRestaurantsList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         // Map<String, Object> likedRestaurantData = document.getData(); // Map data for debug.
                         String id = Objects.requireNonNull(document.getId());
@@ -90,8 +83,6 @@ public class LikedRestaurantRepository {
     }
 
     public MutableLiveData<List<LikedRestaurant>> getLikedRestaurantsMutableLiveData() {
-        // Populate the LiveData
-        // likedRestaurantsMutableLiveData.setValue(likedRestaurantsList);
         return likedRestaurantsMutableLiveData;
     }
 
@@ -125,39 +116,5 @@ public class LikedRestaurantRepository {
     public List<LikedRestaurant> getLikedRestaurants() {
         return likedRestaurantsList;
     }
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-    public MutableLiveData<List<LikedRestaurant>> getLikedRestaurantsMutableLiveData() {
-        likedRestaurantsMutableLiveData = new MutableLiveData<>();
-
-        // Get liked restaurants list from database document
-        getLikedRestaurantsList(task -> {
-            if (task.isSuccessful()) {
-                if (task.getResult() != null) {
-                    // Get liked restaurants list
-                    if (likedRestaurantsList != null) likedRestaurantsList.clear();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        // Map<String, Object> likedRestaurantData = document.getData(); // Map data for debug.
-                        String id = Objects.requireNonNull(document.getId());
-                        String rId = Objects.requireNonNull(document.getData().get("rid")).toString();
-                        String uId = Objects.requireNonNull(document.getData().get("uid")).toString();
-
-                        LikedRestaurant likedRestaurantToAdd = new LikedRestaurant(id, rId, uId);
-                        likedRestaurantsList.add(likedRestaurantToAdd);
-                    }
-                    // Populate the LiveData
-                    likedRestaurantsMutableLiveData.setValue(likedRestaurantsList);
-                }
-            } else {
-                Log.d("LikedRestaurantRepository", "Error getting documents: ", task.getException());
-            }
-        });
-        return likedRestaurantsMutableLiveData;
-    }
-    */
 
 }

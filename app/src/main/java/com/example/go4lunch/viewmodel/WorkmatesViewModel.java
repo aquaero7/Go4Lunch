@@ -17,11 +17,13 @@ public class WorkmatesViewModel extends ViewModel {
 
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
+    private final Utils utils;
 
     // Constructor
     public WorkmatesViewModel() {
         userRepository = UserRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
+        utils = Utils.getInstance();
     }
 
 
@@ -31,10 +33,6 @@ public class WorkmatesViewModel extends ViewModel {
 
     public MutableLiveData<List<User>> getWorkmatesMutableLiveData() {
         return userRepository.getWorkmatesMutableLiveData();
-    }
-
-    public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
-        return restaurantRepository.getRestaurantsMutableLiveData();
     }
 
 
@@ -50,7 +48,7 @@ public class WorkmatesViewModel extends ViewModel {
         String selectionDate = getWorkmates().get(position).getSelectionDate();
         RestaurantWithDistance selectedRestaurant = null;
         // If a restaurant is selected, get it from restaurants list and launch detail activity
-        if ((selectionId != null) && (Utils.getCurrentDate().equals(selectionDate))) {
+        if ((selectionId != null) && (utils.getCurrentDate().equals(selectionDate))) {
             for (RestaurantWithDistance restaurant : getRestaurants()) {
                 if (Objects.equals(selectionId, restaurant.getRid())) {
                     selectedRestaurant = restaurant;
@@ -64,7 +62,7 @@ public class WorkmatesViewModel extends ViewModel {
     public String getTextAndChoice(String choiceText, User workmate) {
         return (workmate.getSelectionName() != null
                 && workmate.getSelectionDate() != null
-                && Objects.equals(Utils.getCurrentDate(), workmate.getSelectionDate())) ?
+                && Objects.equals(utils.getCurrentDate(), workmate.getSelectionDate())) ?
                 choiceText + workmate.getSelectionName() : "";
     }
 

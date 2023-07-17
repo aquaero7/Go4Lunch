@@ -26,6 +26,7 @@ public class DetailRestaurantViewModel extends ViewModel {
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
+    private final Utils utils;
 
 
     // Constructor
@@ -33,6 +34,7 @@ public class DetailRestaurantViewModel extends ViewModel {
         userRepository = UserRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
         likedRestaurantRepository = LikedRestaurantRepository.getInstance();
+        utils = Utils.getInstance();
     }
 
 
@@ -99,7 +101,7 @@ public class DetailRestaurantViewModel extends ViewModel {
     }
 
     public void createSelection(String rId, String rName, String rAddress) {
-        final String currentDate = Utils.getCurrentDate();
+        final String currentDate = utils.getCurrentDate();
         // Document in database
         userRepository.updateSelectionId(rId);
         userRepository.updateSelectionDate(currentDate);
@@ -170,8 +172,8 @@ public class DetailRestaurantViewModel extends ViewModel {
             // Possibility of several opening and closing periods in a day
             /** Information must be either 3 char (code) or 7 char (code+schedule) length */
             boolean openNow;
-            long currentDayOfWeek = Utils.getCurrentDayOfWeek();
-            String currentTime = Utils.getCurrentTime();
+            long currentDayOfWeek = Utils.getInstance().getCurrentDayOfWeek();
+            String currentTime = Utils.getInstance().getCurrentTime();
 
             // Get the list of opening periods
             List<Period> periods = restaurant.getOpeningHours().getPeriods();
@@ -287,7 +289,7 @@ public class DetailRestaurantViewModel extends ViewModel {
         // Check selected restaurant id and date
         for (User workmate : workmates) {
             boolean isSelector = (Objects.equals(rId, workmate.getSelectionId())
-                    && Utils.getCurrentDate().equals(workmate.getSelectionDate()));
+                    && utils.getCurrentDate().equals(workmate.getSelectionDate()));
             if (isSelector) selectors.add(workmate);
         }
         sortByName(selectors);
