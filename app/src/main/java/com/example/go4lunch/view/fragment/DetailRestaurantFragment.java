@@ -21,7 +21,7 @@ import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.model.api.model.Photo;
-import com.example.go4lunch.utils.EventButtonClick;
+import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.adapter.DetailRestaurantWorkmateAdapter;
 import com.example.go4lunch.viewmodel.DetailRestaurantViewModel;
@@ -74,7 +74,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     public void onClick(View v) {
         RestaurantWithDistance restaurant = detailRestaurantViewModel.getRestaurant();
         String message = null;
-        switch (EventButtonClick.from(v)) {
+        switch (EventObjectClick.fromView(v)) {
             case BTN_CALL:
             case BTN_WEBSITE:
                 break;

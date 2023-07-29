@@ -7,9 +7,9 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.go4lunch.databinding.ActivityDetailRestaurantBinding;
+import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.view.fragment.DetailRestaurantFragment;
 import com.example.go4lunch.R;
-import com.example.go4lunch.utils.EventButtonClick;
 import com.google.android.material.snackbar.Snackbar;
 
 public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaurantBinding>
@@ -32,7 +32,7 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
     @Override
     public void onButtonClicked(View view, String message, String rPhoneNumber, String rWebsite) {
         // Handle the button click event
-        switch (EventButtonClick.from(view)) {
+        switch (EventObjectClick.fromView(view)) {
             case BTN_CALL:
                 if (rPhoneNumber != null)
                     startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + rPhoneNumber)));

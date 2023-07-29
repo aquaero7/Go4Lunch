@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentListViewBinding;
+import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.view.activity.DetailRestaurantActivity;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.utils.EventListener;
@@ -96,8 +97,8 @@ public class ListViewFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // Handle actions on menu items
-        switch (item.getItemId()) {
-            case R.id.menu_activity_main_search:
+        switch (EventObjectClick.fromMenuItem(item)) {
+            case MENU_ITEM_SEARCH:
                 eventListener.toggleSearchViewVisibility();
                 return true;
             default:

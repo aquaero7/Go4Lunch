@@ -1,6 +1,5 @@
 package com.example.go4lunch.view.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -11,11 +10,10 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentSettingsBinding;
-import com.example.go4lunch.utils.EventButtonClick;
+import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.viewmodel.SettingsViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
@@ -53,7 +51,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     // Spread the click to the parent activity
     public void onClick(View v) {
         String message = null;
-        switch (EventButtonClick.from(v)) {
+        switch (EventObjectClick.fromView(v)) {
             case BTN_SAVE:
                 Utils.getInstance().hideVirtualKeyboard(requireContext(), v);
                 message = settingsViewModel.updateSearchRadiusPrefs(binding.etRadius.getText().toString());

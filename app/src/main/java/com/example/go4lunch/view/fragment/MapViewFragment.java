@@ -21,13 +21,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.view.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.viewmodel.MapViewViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
@@ -35,19 +35,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.OnMapsSdkInitializedCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.Collections;
 import java.util.Objects;
 
 public class MapViewFragment extends Fragment implements OnMapReadyCallback,
@@ -182,8 +176,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // Handle actions on menu items
-        switch (item.getItemId()) {
-            case R.id.menu_activity_main_search:
+        switch (EventObjectClick.fromMenuItem(item)) {
+            case MENU_ITEM_SEARCH:
                 eventListener.toggleSearchViewVisibility();
                 return true;
             default:

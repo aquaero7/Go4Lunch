@@ -4,9 +4,9 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.go4lunch.databinding.ActivitySettingsBinding;
+import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.view.fragment.SettingsFragment;
 import com.example.go4lunch.R;
-import com.example.go4lunch.utils.EventButtonClick;
 import com.google.android.material.snackbar.Snackbar;
 
 public class SettingsActivity extends BaseActivity<ActivitySettingsBinding>
@@ -30,7 +30,7 @@ public class SettingsActivity extends BaseActivity<ActivitySettingsBinding>
     // Binding added as an argument to make it available here
     public void onButtonClicked(View view, String message) {
         // Handle the button click event
-        switch (EventButtonClick.from(view)) {
+        switch (EventObjectClick.fromView(view)) {
             case BTN_SAVE:
             case SW_NOTIFICATION:
                 if (message != null) Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();

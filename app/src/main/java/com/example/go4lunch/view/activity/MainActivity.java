@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.model.model.DialogTuple;
+import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.view.fragment.ListViewFragment;
 import com.example.go4lunch.view.fragment.MapViewFragment;
@@ -87,17 +88,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle Navigation Drawer Item Click
-        switch (item.getItemId()){
-            case R.id.activity_main_drawer_lunch:
+        switch (EventObjectClick.fromMenuItem(item)){
+            case MENU_ITEM_LUNCH:
                 launchDetailRestaurantActivity();
                 break;
-            case R.id.activity_main_drawer_settings:
+            case MENU_ITEM_SETTINGS:
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                 break;
-            case R.id.activity_main_drawer_logout:
+            case MENU_ITEM_LOGOUT:
                 logoutAndCloseActivity();
                 break;
-            case R.id.activity_main_drawer_delete_account:
+            case MENU_ITEM_DELETE_ACCOUNT:
                 dialog.show();
                 break;
             default:
