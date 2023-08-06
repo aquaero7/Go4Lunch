@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -29,6 +30,9 @@ import com.example.go4lunch.view.adapter.WorkmateAdapter;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.example.go4lunch.viewmodel.WorkmatesViewModel;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 public class WorkmatesFragment extends Fragment {
 

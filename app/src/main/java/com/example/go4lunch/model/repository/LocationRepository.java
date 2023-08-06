@@ -20,10 +20,10 @@ import com.google.android.gms.tasks.Task;
 public class LocationRepository {
 
     /** DEFAULT VALUES **/
-    private final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
-    private final double DEF_LONGITUDE = 0;  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
-    private final int DEFAULT_ZOOM = 17;
-    private final int RESTAURANT_ZOOM = 19;
+    public static final double DEF_LATITUDE = 0;   // 48.8566;//Paris 48.7258;//VLB 43.0931;//SFLP 48.5959;//SLT
+    public static final double DEF_LONGITUDE = 0;  //  2.3522;//Paris  2.1252;//VLB  5.8392;//SFLP  2.5810;//SLT
+    public static final int DEFAULT_ZOOM = 17;
+    public static final int RESTAURANT_ZOOM = 19;
     /********************/
 
     private static volatile LocationRepository instance;

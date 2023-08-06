@@ -79,10 +79,12 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
             case BTN_WEBSITE:
                 break;
             case BTN_LIKE:
-                message = detailRestaurantViewModel.updateLikedRestaurant(restaurant.getRid());
+                message = (detailRestaurantViewModel.updateLikedRestaurant(restaurant.getRid())) ?
+                        getString(R.string.btn_like_checked) : getString(R.string.btn_like_unchecked);
                 break;
             case FAB_SELECT:
-                message = detailRestaurantViewModel.updateSelection(restaurant.getRid(), restaurant.getName(), restaurant.getAddress());
+                message = (detailRestaurantViewModel.updateSelection(restaurant.getRid(), restaurant.getName(), restaurant.getAddress())) ?
+                        getString(R.string.fab_checked) : getString(R.string.fab_unchecked);
                 break;
         }
         mCallback.onButtonClicked(v, message, restaurant.getPhoneNumber(), restaurant.getWebsite());

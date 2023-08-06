@@ -2,8 +2,6 @@ package com.example.go4lunch.viewmodel;
 
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.MainApplication;
-import com.example.go4lunch.R;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.model.model.User;
@@ -15,11 +13,12 @@ public class SettingsViewModel extends ViewModel {
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
 
-
     // Constructor
-    public SettingsViewModel() {
-        userRepository = UserRepository.getInstance();
-        restaurantRepository = RestaurantRepository.getInstance();
+    public SettingsViewModel(
+            UserRepository userRepository, RestaurantRepository restaurantRepository) {
+
+        this.userRepository = userRepository;
+        this.restaurantRepository = restaurantRepository;
     }
 
 
@@ -36,12 +35,12 @@ public class SettingsViewModel extends ViewModel {
 
     // Actions
 
-    public String updateSearchRadiusPrefs(String searchRadiusPrefs) {
+    public boolean updateSearchRadiusPrefs(String searchRadiusPrefs) {
         String prefsValue = null;
-        String message = MainApplication.getInstance().getString(R.string.search_radius_prefs_deleted);;
+        boolean searchRadiusStatus = false;
         if (!searchRadiusPrefs.isEmpty() && !Objects.equals(searchRadiusPrefs,"0")) {
             prefsValue = searchRadiusPrefs;
-            message = MainApplication.getInstance().getString(R.string.search_radius_prefs_saved);
+            searchRadiusStatus = true;
         }
         // Update search radius preference to user document in database
         userRepository.updateSearchRadiusPrefs(prefsValue);
@@ -49,15 +48,15 @@ public class SettingsViewModel extends ViewModel {
         userRepository.updateCurrentUser("RAD", prefsValue);
         userRepository.updateWorkmates("RAD", prefsValue);
 
-        return message;
+        return searchRadiusStatus;
     }
 
-    public String updateNotificationsPrefs(String notificationsPrefs) {
+    public boolean updateNotificationsPrefs(String notificationsPrefs) {
         String prefsValue = null;
-        String message = MainApplication.getInstance().getString(R.string.switch_unchecked);
+        boolean notificationStatus = false;
         if (notificationsPrefs != null && Boolean.parseBoolean(notificationsPrefs)) {
             prefsValue = notificationsPrefs;
-            message = MainApplication.getInstance().getString(R.string.switch_checked);
+            notificationStatus = true;
         }
         // Update notifications preference to user document in database
         userRepository.updateNotificationsPrefs(prefsValue);
@@ -65,7 +64,7 @@ public class SettingsViewModel extends ViewModel {
         userRepository.updateCurrentUser("NOT", prefsValue);
         userRepository.updateWorkmates("NOT", prefsValue);
 
-        return message;
+        return notificationStatus;
     }
 
 

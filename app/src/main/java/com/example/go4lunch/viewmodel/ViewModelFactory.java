@@ -8,6 +8,12 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.go4lunch.MainApplication;
+import com.example.go4lunch.model.repository.LikedRestaurantRepository;
+import com.example.go4lunch.model.repository.RestaurantRepository;
+import com.example.go4lunch.model.repository.UserRepository;
+import com.example.go4lunch.utils.Utils;
+
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
     Application application; // For AuthViewModel and MainViewModel only if extending AndroidViewModel
@@ -30,9 +36,12 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         } else if(modelClass.isAssignableFrom(WorkmatesViewModel.class)) {
             return (T) new WorkmatesViewModel();
         } else if(modelClass.isAssignableFrom(DetailRestaurantViewModel.class)) {
-            return (T) new DetailRestaurantViewModel();
+            return (T) new DetailRestaurantViewModel(
+                    UserRepository.getInstance(), RestaurantRepository.getInstance(),
+                    LikedRestaurantRepository.getInstance(), Utils.getInstance(), MainApplication.getContext());
         } else if(modelClass.isAssignableFrom(SettingsViewModel.class)) {
-            return (T) new SettingsViewModel();
+            return (T) new SettingsViewModel(
+                    UserRepository.getInstance(), RestaurantRepository.getInstance());
         } else if(modelClass.isAssignableFrom(AuthViewModel.class)) {
             // return (T) new AuthViewModel(application); // If extending AndroidViewModel
             return (T) new AuthViewModel(); // If extending ViewModel

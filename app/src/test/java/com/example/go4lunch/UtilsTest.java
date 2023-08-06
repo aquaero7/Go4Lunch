@@ -17,11 +17,11 @@ import java.util.Date;
 import java.util.Locale;
 
 public class UtilsTest {
-    MockitoSession mockito;
-    String currentDate;
-    String currentTime;
-    long currentDayOfWeek;
-    Utils utils;
+    private MockitoSession mockito;
+    private String currentDate;
+    private String currentTime;
+    private long currentDayOfWeek;
+    private Utils utils;
 
     private void initializeData() {
         // Set and start Mockito strictness
@@ -79,8 +79,5 @@ public class UtilsTest {
     public void getCurrentDateWithSuccess() {
         assertEquals("Wrong date", currentDate, utils.getCurrentDate());
     }
-
-
-
 
 }

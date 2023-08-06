@@ -30,7 +30,7 @@ import retrofit2.Response;
 public class RestaurantRepository {
 
     /** DEFAULT VALUES **/
-    private final String DEFAULT_RADIUS = "1"; // Distance in km
+    public static final String DEFAULT_RADIUS = "1"; // Distance in km
     /********************/
 
     private static volatile RestaurantRepository instance;

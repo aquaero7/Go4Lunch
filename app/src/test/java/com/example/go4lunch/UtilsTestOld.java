@@ -1,6 +1,9 @@
 package com.example.go4lunch;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+
+import android.content.Context;
 
 import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
@@ -10,7 +13,9 @@ import com.example.go4lunch.model.api.model.Location;
 import com.example.go4lunch.model.api.model.OpenClose;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Period;
+import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
+import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.viewmodel.DetailRestaurantViewModel;
 import com.example.go4lunch.viewmodel.MapViewViewModel;
@@ -53,14 +58,28 @@ public class UtilsTestOld {
     DetailRestaurantViewModel detailRestaurantViewModel;
     MapViewViewModel mapViewViewModel;
     RestaurantRepository restaurantRepository;
+    RestaurantRepository restaurantRepositoryMock;
+    UserRepository userRepository;
+    UserRepository userRepositoryMock;
+    LikedRestaurantRepository likedRestaurantRepository;
+    LikedRestaurantRepository likedRestaurantRepositoryMock;
     Utils utils;
+    Utils utilsMock;
+    Context context;
 
 
     private void initializeData() {
-        detailRestaurantViewModel = new DetailRestaurantViewModel();
+        userRepositoryMock = mock(UserRepository.class);
+        restaurantRepositoryMock = mock(RestaurantRepository.class);
+        likedRestaurantRepositoryMock = mock(LikedRestaurantRepository.class);
+        utilsMock = mock(Utils.class);
         mapViewViewModel = new MapViewViewModel();
         restaurantRepository = RestaurantRepository.getInstance();
+        userRepository = UserRepository.getInstance();
+        likedRestaurantRepository = LikedRestaurantRepository.getInstance();
         utils = Utils.getInstance();
+        context = MainApplication.getContext();
+        detailRestaurantViewModel = new DetailRestaurantViewModel(userRepository, restaurantRepository, likedRestaurantRepository, utilsMock, context);
         // Reference LatLng for test restaurants
         refLatLng = new LatLng(0, 0);    // Equator - Greenwich meridian
         // LatLng for test restaurants

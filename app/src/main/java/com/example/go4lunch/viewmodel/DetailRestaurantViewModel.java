@@ -1,12 +1,12 @@
 package com.example.go4lunch.viewmodel;
 
-import android.app.Application;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.api.model.Period;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
@@ -21,20 +21,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressLint("StaticFieldLeak")
 public class DetailRestaurantViewModel extends ViewModel {
 
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
     private final Utils utils;
+    private final  Context context;
 
 
     // Constructor
-    public DetailRestaurantViewModel() {
-        userRepository = UserRepository.getInstance();
-        restaurantRepository = RestaurantRepository.getInstance();
-        likedRestaurantRepository = LikedRestaurantRepository.getInstance();
-        utils = Utils.getInstance();
+    public DetailRestaurantViewModel(
+            UserRepository userRepository, RestaurantRepository restaurantRepository,
+            LikedRestaurantRepository likedRestaurantRepository, Utils utils, Context context) {
+
+        this.userRepository = userRepository;
+        this.restaurantRepository = restaurantRepository;
+        this.likedRestaurantRepository = likedRestaurantRepository;
+        this.utils = utils;
+        this.context = context;
     }
 
 
@@ -68,13 +74,13 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     // Actions
 
-    public String updateLikedRestaurant(String rId) {
+    public boolean updateLikedRestaurant(String rId) {
         if (!likedRestaurantRepository.isRestaurantLiked()) {
             createLikedRestaurant(userRepository.getFbCurrentUserId(), rId);
-            return MainApplication.getInstance().getString(R.string.btn_like_checked);
+            return true;
         } else {
             deleteLikedRestaurant(userRepository.getFbCurrentUserId(), rId);
-            return MainApplication.getInstance().getString(R.string.btn_like_unchecked);
+            return false;
         }
     }
 
@@ -88,15 +94,15 @@ public class DetailRestaurantViewModel extends ViewModel {
         likedRestaurantRepository.updateLikedRestaurants(rId+uId);  // Local list
     }
 
-    public String updateSelection(String rId, String rName, String rAddress) {
+    public boolean updateSelection(String rId, String rName, String rAddress) {
         if (!restaurantRepository.isRestaurantSelected()) {
             // Add selected restaurant ID to current user
             createSelection(rId, rName, rAddress);
-            return MainApplication.getInstance().getString(R.string.fab_checked);
+            return true;
         } else {
             // Remove selected restaurant ID from current user
             deleteSelection();
-            return MainApplication.getInstance().getString(R.string.fab_unchecked);
+            return false;
         }
     }
 
@@ -164,16 +170,14 @@ public class DetailRestaurantViewModel extends ViewModel {
     // Getters
 
     public String getOpeningInformation(RestaurantWithDistance restaurant) {
-        Application application = MainApplication.getInstance(); // To get access to 'getString()'
-
         // Built restaurant opening hours information to display
         String openingInformation = "";
         if (restaurant.getOpeningHours() != null) {
             // Possibility of several opening and closing periods in a day
             /** Information must be either 3 char (code) or 7 char (code+schedule) length */
             boolean openNow;
-            long currentDayOfWeek = Utils.getInstance().getCurrentDayOfWeek();
-            String currentTime = Utils.getInstance().getCurrentTime();
+            long currentDayOfWeek = utils.getCurrentDayOfWeek();
+            String currentTime = utils.getCurrentTime();
 
             // Get the list of opening periods
             List<Period> periods = restaurant.getOpeningHours().getPeriods();
@@ -184,7 +188,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                         && periods.get(0).getClose() == null
                         && periods.get(0).getOpen().getTime().equals("0000")) {
                     // If there is only one period, and it is open all week
-                    openingInformation = application.getString(R.string.status_open247); // Open 24/7
+                    openingInformation = context.getString(R.string.status_open247); // Open 24/7
                 } else {
                     /* There is at least one period, so, we get details for each period...
                        ...and we get today's periods */
@@ -196,14 +200,14 @@ public class DetailRestaurantViewModel extends ViewModel {
                     // Analyze today's periods
                     if (todayPeriods.size() == 0) {
                         // There is no period for today, so it is closed
-                        openingInformation = application.getString(R.string.status_closed); // Closed
+                        openingInformation = context.getString(R.string.status_closed); // Closed
                     } else if (todayPeriods.size() == 1
                             && todayPeriods.get(0).getOpen().getTime().equals("0000")
                             && todayPeriods.get(0).getClose() != null
                             && todayPeriods.get(0).getClose().getTime().equals("0000")
                             && todayPeriods.get(0).getClose().getDay() == currentDayOfWeek + 1) {
                         // If there is only one period for today, so it is open all day
-                        openingInformation = application.getString(R.string.status_open24); // Open H24 today
+                        openingInformation = context.getString(R.string.status_open24); // Open H24 today
                     } else {
                         // If there is at least one period for today : ...
 
@@ -232,7 +236,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                                 schedule = schedule.substring(0,2) + "h" + schedule.substring(2);
                                 if (currentTime.compareTo(schedule) < 0 ) {
                                     // Closing today at...
-                                    openingInformation = application.getString(R.string.status_open_until) + schedule; // Open until...
+                                    openingInformation = context.getString(R.string.status_open_until) + schedule; // Open until...
                                     break;
                                 }
                             }
@@ -243,12 +247,11 @@ public class DetailRestaurantViewModel extends ViewModel {
                                     // Closing after midnight (last period schedule)
                                     String schedule = todayLastPeriod.getClose().getTime();
                                     schedule = schedule.substring(0,2) + "h" + schedule.substring(2);
-                                    openingInformation = application.getString(R.string.status_open_until) + schedule; // Open until...
+                                    openingInformation = context.getString(R.string.status_open_until) + schedule; // Open until...
                                 } else {
-                                    // Unexpected case... A problem occurs somewhere !
-                                    openingInformation = application.getString(R.string.status_unknown); // Unknown opening hours
-                                    Log.w("Utils",
-                                            "A problem has occurred when trying to retrieve opening information");
+                                    // Unexpected case... A problem occurs somewhere !  // As a precaution cause this case seems to be unreachable !
+                                    openingInformation = context.getString(R.string.status_unknown); // Unknown opening hours
+                                    Log.w("Utils","A problem has occurred when trying to retrieve opening information");
                                 }
                             }
                         } else {
@@ -258,23 +261,23 @@ public class DetailRestaurantViewModel extends ViewModel {
                                 schedule = schedule.substring(0,2) + "h" + schedule.substring(2);
                                 if (currentTime.compareTo(schedule) < 0 ) {
                                     // Opening today at...
-                                    openingInformation = application.getString(R.string.status_open_at) + schedule; // Open at...
+                                    openingInformation = context.getString(R.string.status_open_at) + schedule; // Open at...
                                     break;
                                 }
                             }
                             if (openingInformation.isEmpty()) {
-                                openingInformation = application.getString(R.string.status_closed); // Closed
+                                openingInformation = context.getString(R.string.status_closed); // Closed
                             }
                         }
                     }
                 }
             } else {
                 // No information about opening hours (periods is null)
-                openingInformation = application.getString(R.string.status_unknown); // Unknown opening hours
+                openingInformation = context.getString(R.string.status_unknown); // Unknown opening hours
             }
         } else {
             // No information about opening hours (openingHours is null)
-            openingInformation = application.getString(R.string.status_unknown); // Unknown opening hours
+            openingInformation = context.getString(R.string.status_unknown); // Unknown opening hours
         }
 
         return openingInformation;

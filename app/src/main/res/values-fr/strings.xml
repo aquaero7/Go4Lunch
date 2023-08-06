@@ -48,7 +48,7 @@
     <string name="error_choice">Aucun restaurant sélectionné.\nSélectionnez d\'abord un restaurant !</string>
     <string name="error_search">Recherche non implémentée pour la vue %s.</string>
     <string name="info_restaurant_not_found">Aucun restaurant correspondant à la recherche n\'a été trouvé.</string>
-    <string name="error_no_selection">Aucun restaurant n\'a été sélectionné par ce collègue.</string>
+    <string name="error_no_selection">Aucun restaurant sélectionné par ce collègue\nou sélection hors du rayon de recherche défini.</string>
     <string name="info_location_provided">Position détectée</string>
     <string name="info_location_updated">Position mise à jour</string>
 
