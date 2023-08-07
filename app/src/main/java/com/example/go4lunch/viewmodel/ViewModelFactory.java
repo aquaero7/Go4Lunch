@@ -38,7 +38,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         } else if(modelClass.isAssignableFrom(DetailRestaurantViewModel.class)) {
             return (T) new DetailRestaurantViewModel(
                     UserRepository.getInstance(), RestaurantRepository.getInstance(),
-                    LikedRestaurantRepository.getInstance(), Utils.getInstance(), MainApplication.getContext());
+                    LikedRestaurantRepository.getInstance(), Utils.getInstance());
         } else if(modelClass.isAssignableFrom(SettingsViewModel.class)) {
             return (T) new SettingsViewModel(
                     UserRepository.getInstance(), RestaurantRepository.getInstance());

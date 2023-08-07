@@ -68,7 +68,7 @@ public class DetailRestaurantViewModelTest {
         contextMock = mock(Context.class);
         utils = Utils.getInstance();
 
-        detailRestaurantViewModel = new DetailRestaurantViewModel(userRepositoryMock, restaurantRepositoryMock, likedRestaurantRepositoryMock, utilsMock, contextMock);
+        detailRestaurantViewModel = new DetailRestaurantViewModel(userRepositoryMock, restaurantRepositoryMock, likedRestaurantRepositoryMock, utilsMock);
 
         uId1 = "uId1"; uName1 = "uName1"; uEmail1 = "uEmail1"; uUrl1 = "uUrl1";
         selId1 = "rId1"; selDate1 = "selDate1"; selName1 = "rName1"; selAddress1 = "rAddress1";
@@ -168,10 +168,6 @@ public class DetailRestaurantViewModelTest {
 
     @Test
     public void fetchRestaurantDetailsWithSuccess() {
-        RestaurantWithDistance restaurant = new RestaurantWithDistance(
-                "", "", new ArrayList<>(), "", 0, new OpeningHours(),
-                "", "", new Geometry(), 0);
-
         detailRestaurantViewModel.fetchRestaurantDetails(restaurant, "");
         verify(restaurantRepositoryMock, times(1)).fetchRestaurantDetails(restaurant, "");
     }
@@ -310,81 +306,67 @@ public class DetailRestaurantViewModelTest {
 
         // Scenario 1 : openingHours = null
         restaurant.setOpeningHours(null);
-        detailRestaurantViewModel.getOpeningInformation(restaurant);
-        assertEquals(unknown, detailRestaurantViewModel.getOpeningInformation(restaurant));
+        assertEquals(unknown, detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
         // Scenario 2 : openingHours.periods = null
         restaurant.setOpeningHours(oh2);
-        detailRestaurantViewModel.getOpeningInformation(restaurant);
-        assertEquals(unknown, detailRestaurantViewModel.getOpeningInformation(restaurant));
+        assertEquals(unknown, detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
         // Scenario 3 : periods.size = 1 (only 1 period)
         restaurant.setOpeningHours(oh3);
-        detailRestaurantViewModel.getOpeningInformation(restaurant);
-        assertEquals(open247, detailRestaurantViewModel.getOpeningInformation(restaurant));
+        assertEquals(open247, detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
         // Scenario 4 : todayPeriods.size = 0 (no today period)
         restaurant.setOpeningHours(oh4);
-        detailRestaurantViewModel.getOpeningInformation(restaurant);
-        assertEquals(closed, detailRestaurantViewModel.getOpeningInformation(restaurant));
+        assertEquals(closed, detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
         // Scenario 5 : todayPeriods.size = 1 (1 today period, all day long)
         restaurant.setOpeningHours(oh5);
-        detailRestaurantViewModel.getOpeningInformation(restaurant);
-        assertEquals(open24, detailRestaurantViewModel.getOpeningInformation(restaurant));
+        assertEquals(open24, detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
         // Scenario 6 : todayPeriods.size = 1 (1 today period, part of the day)
         restaurant.setOpeningHours(oh6);
 
             // Case 6.1 : Current time is before the period opening time
             when(utilsMock.getCurrentTime()).thenReturn("0900");
-            detailRestaurantViewModel.getOpeningInformation(restaurant);
-            assertEquals(openAt + "10h00", detailRestaurantViewModel.getOpeningInformation(restaurant));
+            assertEquals(openAt + "10h00", detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
             // Case 6.2 : Current time is inside the period
             when(utilsMock.getCurrentTime()).thenReturn("1500");
-            detailRestaurantViewModel.getOpeningInformation(restaurant);
-            assertEquals(openUntil + "22h00", detailRestaurantViewModel.getOpeningInformation(restaurant));
+            assertEquals(openUntil + "22h00", detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
             // Case 6.3 : Current time is after the period closing time
             when(utilsMock.getCurrentTime()).thenReturn("2300");
-            detailRestaurantViewModel.getOpeningInformation(restaurant);
-            assertEquals(closed, detailRestaurantViewModel.getOpeningInformation(restaurant));
+            assertEquals(closed, detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
         // Scenario 7 : todayPeriods.size = 2 (2 today periods. Last period closing today)
         restaurant.setOpeningHours(oh7);
 
             // Case 7.1 : Current time is before the first period opening time
             when(utilsMock.getCurrentTime()).thenReturn("0900");
-            detailRestaurantViewModel.getOpeningInformation(restaurant);
-            assertEquals(openAt + "11h00", detailRestaurantViewModel.getOpeningInformation(restaurant));
+            assertEquals(openAt + "11h00", detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
             // Case 7.2 : Current time is inside the first period
             when(utilsMock.getCurrentTime()).thenReturn("1300");
-            detailRestaurantViewModel.getOpeningInformation(restaurant);
-            assertEquals(openUntil + "14h00", detailRestaurantViewModel.getOpeningInformation(restaurant));
+            assertEquals(openUntil + "14h00", detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
             // Case 7.3 : Current time is after the first period closing time (and before the last period opening time)
             when(utilsMock.getCurrentTime()).thenReturn("1600");
-            detailRestaurantViewModel.getOpeningInformation(restaurant);
-            assertEquals(openAt + "19h00", detailRestaurantViewModel.getOpeningInformation(restaurant));
+            assertEquals(openAt + "19h00", detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
             // Case 7.4 : Current time is inside the last period
             when(utilsMock.getCurrentTime()).thenReturn("2000");
-            detailRestaurantViewModel.getOpeningInformation(restaurant);
-            assertEquals(openUntil + "23h00", detailRestaurantViewModel.getOpeningInformation(restaurant));
+            assertEquals(openUntil + "23h00", detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
             // Case 7.5 : Current time is after the last period closing time
             when(utilsMock.getCurrentTime()).thenReturn("2330");
-            detailRestaurantViewModel.getOpeningInformation(restaurant);
-            assertEquals(closed, detailRestaurantViewModel.getOpeningInformation(restaurant));
+            assertEquals(closed, detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
 
         // Scenario 8 : todayPeriods.size = 2 (2 today periods. Last period closing tomorrow)
         restaurant.setOpeningHours(oh8);
         // Current time is inside the last period (other cases are already tested in scenarii 7)
         when(utilsMock.getCurrentTime()).thenReturn("2330");
-        detailRestaurantViewModel.getOpeningInformation(restaurant);
-        assertEquals(openUntil + "01h00", detailRestaurantViewModel.getOpeningInformation(restaurant));
+        assertEquals(openUntil + "01h00", detailRestaurantViewModel.getOpeningInformation(restaurant, contextMock));
     }
 
     @Test
@@ -418,13 +400,6 @@ public class DetailRestaurantViewModelTest {
 
     @Test
     public void setRestaurantWithSuccess() {
-        // RestaurantWithDistance restaurant = null;
-        /*
-        RestaurantWithDistance restaurant = new RestaurantWithDistance(
-                "rId", "rName", new ArrayList<>(), "rAddress",
-                1, new OpeningHours(),"phoneNumber",
-                "website", new Geometry(), 1);
-        */
         detailRestaurantViewModel.setRestaurant(restaurant);
         verify(restaurantRepositoryMock, times(1)).setRestaurant(restaurant);
     }

@@ -1,10 +1,11 @@
-package com.example.go4lunch;
+package com.example.go4lunch.tobedeleted;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 import android.content.Context;
 
+import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
@@ -66,6 +67,7 @@ public class UtilsTestOld {
     Utils utils;
     Utils utilsMock;
     Context context;
+    Context contextMock;
 
 
     private void initializeData() {
@@ -73,13 +75,14 @@ public class UtilsTestOld {
         restaurantRepositoryMock = mock(RestaurantRepository.class);
         likedRestaurantRepositoryMock = mock(LikedRestaurantRepository.class);
         utilsMock = mock(Utils.class);
+        contextMock = mock(Context.class);
         mapViewViewModel = new MapViewViewModel();
         restaurantRepository = RestaurantRepository.getInstance();
         userRepository = UserRepository.getInstance();
         likedRestaurantRepository = LikedRestaurantRepository.getInstance();
         utils = Utils.getInstance();
         context = MainApplication.getContext();
-        detailRestaurantViewModel = new DetailRestaurantViewModel(userRepository, restaurantRepository, likedRestaurantRepository, utilsMock, context);
+        detailRestaurantViewModel = new DetailRestaurantViewModel(userRepository, restaurantRepository, likedRestaurantRepository, utilsMock);
         // Reference LatLng for test restaurants
         refLatLng = new LatLng(0, 0);    // Equator - Greenwich meridian
         // LatLng for test restaurants
@@ -257,7 +260,7 @@ public class UtilsTestOld {
 
         /** Test openingInformation (if at least one period exists today) */
         for (RestaurantWithDistance restaurantWithDistance : testRestaurantsWithDistance) {
-            String openingInformation = detailRestaurantViewModel.getOpeningInformation(restaurantWithDistance);
+            String openingInformation = detailRestaurantViewModel.getOpeningInformation(restaurantWithDistance, contextMock);
             String rId = restaurantWithDistance.getRid();
             // Test verifications
             switch (rId) {
@@ -305,18 +308,18 @@ public class UtilsTestOld {
         }
 
         /** Test opening information (if no period exists today) */
-        String openingInformation0 = detailRestaurantViewModel.getOpeningInformation(testRestaurantsWithDistance0.get(0));
+        String openingInformation0 = detailRestaurantViewModel.getOpeningInformation(testRestaurantsWithDistance0.get(0), contextMock);
         // Test verification
         assertEquals("Wrong information 0", CLO, openingInformation0);
 
         /** Test opening information (if periods list is null) */
-        String openingInformationPerNull = detailRestaurantViewModel.getOpeningInformation(testRestaurantsWithDistancePerNull.get(0));
+        String openingInformationPerNull = detailRestaurantViewModel.getOpeningInformation(testRestaurantsWithDistancePerNull.get(0), contextMock);
         // Test verification
         assertEquals("Wrong information 00", UNK, openingInformationPerNull);
 
 
         /** Test opening information (openingInformation object is null) */
-        String openingInformationOpHoNull = detailRestaurantViewModel.getOpeningInformation(testRestaurantsWithDistanceOpHoNull.get(0));
+        String openingInformationOpHoNull = detailRestaurantViewModel.getOpeningInformation(testRestaurantsWithDistanceOpHoNull.get(0), contextMock);
         // Test verification
         assertEquals("Wrong information 000", UNK, openingInformationOpHoNull);
     }

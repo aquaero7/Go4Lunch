@@ -21,26 +21,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@SuppressLint("StaticFieldLeak")
 public class DetailRestaurantViewModel extends ViewModel {
 
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
     private final Utils utils;
-    private final  Context context;
-
 
     // Constructor
     public DetailRestaurantViewModel(
             UserRepository userRepository, RestaurantRepository restaurantRepository,
-            LikedRestaurantRepository likedRestaurantRepository, Utils utils, Context context) {
+            LikedRestaurantRepository likedRestaurantRepository, Utils utils) {
 
         this.userRepository = userRepository;
         this.restaurantRepository = restaurantRepository;
         this.likedRestaurantRepository = likedRestaurantRepository;
         this.utils = utils;
-        this.context = context;
     }
 
 
@@ -169,7 +165,7 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     // Getters
 
-    public String getOpeningInformation(RestaurantWithDistance restaurant) {
+    public String getOpeningInformation(RestaurantWithDistance restaurant, Context context) {
         // Built restaurant opening hours information to display
         String openingInformation = "";
         if (restaurant.getOpeningHours() != null) {

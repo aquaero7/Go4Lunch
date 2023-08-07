@@ -198,7 +198,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         binding.ratingBarRestaurant.setRating((float) (restaurantWithDetails.getRating() * 3/5));
         // Place Details API data
         binding.tv2Restaurant.setText(restaurantWithDetails.getAddress());
-        binding.tv3Restaurant.setText(detailRestaurantViewModel.getOpeningInformation(restaurantWithDetails));
+        binding.tv3Restaurant.setText(detailRestaurantViewModel.getOpeningInformation(restaurantWithDetails, requireContext()));
     }
 
     @SuppressLint("UseCompatTextViewDrawableApis")  // For the use of setCompoundDrawableTintList()
