@@ -200,9 +200,11 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
             Picasso.get().load(R.drawable.im_restaurant).into(binding.ivRestaurant);
         }
         binding.tv1Restaurant.setText(restaurantWithDetails.getName());
+        binding.tv1Restaurant.setSelected(true);    // To active text scrolling if longer than field
         binding.ratingBarRestaurant.setRating((float) (restaurantWithDetails.getRating() * 3/5));
         // Place Details API data
         binding.tv2Restaurant.setText(restaurantWithDetails.getAddress());
+        binding.tv2Restaurant.setSelected(true);    // To active text scrolling if longer than field
         binding.tv3Restaurant.setText(detailRestaurantViewModel.getOpeningInformation(restaurantWithDetails, requireContext()));
     }
 

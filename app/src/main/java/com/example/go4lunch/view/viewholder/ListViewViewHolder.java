@@ -23,7 +23,7 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
 
         // Display restaurant name and Setup text scrolling
         binding.restaurantItemTitle.setText(name);
-        binding.restaurantItemTitle.setSelected(true);
+        binding.restaurantItemTitle.setSelected(true);  // To active text scrolling if longer than field
         // Display restaurant distance
         binding.restaurantItemDistance.setText(distance);
         // Display workmate logo
