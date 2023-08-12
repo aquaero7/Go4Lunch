@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import android.content.Context;
 
 import com.example.go4lunch.MainApplication;
+import com.example.go4lunch.model.api.GmapsApiClient;
 import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
@@ -14,7 +15,9 @@ import com.example.go4lunch.model.api.model.Location;
 import com.example.go4lunch.model.api.model.OpenClose;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Period;
+import com.example.go4lunch.model.repository.AutocompleteRepository;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
+import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.utils.Utils;
@@ -68,6 +71,8 @@ public class UtilsTestOld {
     Utils utilsMock;
     Context context;
     Context contextMock;
+    LocationRepository locationRepositoryMock;
+    AutocompleteRepository autocompleteRepositoryMock;
 
 
     private void initializeData() {
@@ -76,8 +81,10 @@ public class UtilsTestOld {
         likedRestaurantRepositoryMock = mock(LikedRestaurantRepository.class);
         utilsMock = mock(Utils.class);
         contextMock = mock(Context.class);
-        mapViewViewModel = new MapViewViewModel();
-        restaurantRepository = RestaurantRepository.getInstance();
+        locationRepositoryMock = mock(LocationRepository.class);
+        autocompleteRepositoryMock = mock(AutocompleteRepository.class);
+        mapViewViewModel = new MapViewViewModel(userRepositoryMock, locationRepositoryMock, restaurantRepositoryMock, autocompleteRepositoryMock, utilsMock);
+        restaurantRepository = RestaurantRepository.getNewInstance(GmapsApiClient.getApiClient());
         userRepository = UserRepository.getInstance();
         likedRestaurantRepository = LikedRestaurantRepository.getInstance();
         utils = Utils.getInstance();

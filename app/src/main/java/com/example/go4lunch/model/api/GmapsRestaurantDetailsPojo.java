@@ -17,6 +17,12 @@ public class GmapsRestaurantDetailsPojo implements Serializable {
     @Expose
     private String status;
 
+    public GmapsRestaurantDetailsPojo(Restaurant restaurantDetails, String status) {
+        this.restaurantDetails = restaurantDetails;
+        this.status = status;
+    }
+
+
     // GETTERS
 
     public Restaurant getRestaurantDetails() {

@@ -141,7 +141,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // Glue TabLayout and ViewPager together
         new TabLayoutMediator(binding.activityMainTabs, binding.activityMainViewpager, (tab, position) -> {
             // Setup tab title
-            tab.setText(mainViewModel.getTabTitles()[position]);
+            tab.setText(mainViewModel.getTabTitles(getApplicationContext())[position]);
             // Setup tab icon
             tab.setIcon(mainViewModel.getTabIcons()[position]);
         }).attach();
@@ -201,7 +201,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                         ((ListViewFragment)fmt).filterList(query);
                         break;
                     case "f2":
-                        showSnackBar(String.format(getString(R.string.error_search), mainViewModel.getTabTitles()[binding.activityMainViewpager.getCurrentItem()]));
+                        showSnackBar(String.format(getString(R.string.error_search), mainViewModel.getTabTitles(getApplicationContext())[binding.activityMainViewpager.getCurrentItem()]));
                         binding.includedToolbar.searchView.setQuery("", false);
                         break;
                 }
@@ -306,7 +306,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         // ...or create the builder with no specific theme setting
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // Configure builder and create dialog
-        DialogTuple<AlertDialog, MutableLiveData<Boolean>> dialogTuple = mainViewModel.buildConfirmationDialog(builder);
+        DialogTuple<AlertDialog, MutableLiveData<Boolean>> dialogTuple = mainViewModel.buildConfirmationDialog(builder, getApplicationContext());
         // Get dialog
         dialog = dialogTuple.getDialog();
         // Manage response
@@ -323,7 +323,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
 
     private void logoutAndCloseActivity(){
-        mainViewModel.signOut()
+        mainViewModel.signOut(getApplicationContext())
                 .addOnSuccessListener(aVoid -> {
                     Log.w("MainActivity", "Logout successful");
                     setResult(RESULT_OK, new Intent());
@@ -334,7 +334,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
 
     private void deleteAccountLogoutAndCloseActivity() {
         mainViewModel.deleteUserLikesAndUser();
-        mainViewModel.deleteFbUser()
+        mainViewModel.deleteFbUser(getApplicationContext())
                 .addOnSuccessListener(aVoid -> {
                     showSnackBar(getString(R.string.dialog_info_deletion_confirmation));
                     logoutAndCloseActivity();

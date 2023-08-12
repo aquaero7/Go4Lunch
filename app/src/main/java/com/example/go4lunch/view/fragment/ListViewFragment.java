@@ -109,7 +109,7 @@ public class ListViewFragment extends Fragment {
     // Configure RecyclerView, Adapter, LayoutManager & glue it together
     private void configureRecyclerView() {
         // 3.2 - Declare and create adapter
-        listViewAdapter = new ListViewAdapter(listViewViewModel.getRestaurantsToDisplay(), listViewViewModel.getWorkmates());
+        listViewAdapter = new ListViewAdapter(listViewViewModel.getRestaurantsToDisplay(), listViewViewModel.getWorkmates(), requireContext());
         // 3.3 - Attach the adapter to the recyclerview to populate items
         binding.rvListView.setAdapter(listViewAdapter);
         // 3.4 - Set layout manager to position the items
@@ -152,8 +152,8 @@ public class ListViewFragment extends Fragment {
     @SuppressLint("NotifyDataSetChanged")
     public void filterList(String query) {
         // Apply filter and display message if nothing matches query
-        if (listViewViewModel.filterList(query) != null)
-            Snackbar.make(binding.getRoot(), listViewViewModel.filterList(query), Snackbar.LENGTH_LONG).show();
+        if (listViewViewModel.filterList(query, requireContext()) != null)
+            Snackbar.make(binding.getRoot(), listViewViewModel.filterList(query, requireContext()), Snackbar.LENGTH_LONG).show();
         // Update recyclerView
         listViewAdapter.notifyDataSetChanged();
     }

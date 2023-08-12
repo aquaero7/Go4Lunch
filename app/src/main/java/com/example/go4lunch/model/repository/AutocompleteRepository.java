@@ -22,6 +22,14 @@ public class AutocompleteRepository {
         }
     }
 
+    /** For test use only : New instance factory */
+    public static AutocompleteRepository getNewInstance() {
+        instance = new AutocompleteRepository();
+        return  instance;
+    }
+    /*********************************************/
+
+
     public ActivityResultLauncher<Intent> getStartAutocomplete() {
         return startAutocomplete;
     }

@@ -27,6 +27,14 @@ public class GmapsRestaurantPojo implements Serializable {
     private String nextPageToken;
 
 
+    public GmapsRestaurantPojo(List<Restaurant> nearRestaurants, String status, String errorMsg, String nextPageToken) {
+        this.nearRestaurants = nearRestaurants;
+        this.status = status;
+        this.errorMsg = errorMsg;
+        this.nextPageToken = nextPageToken;
+    }
+
+
     // GETTERS
 
     public List<Restaurant> getNearRestaurants() {

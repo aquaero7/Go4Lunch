@@ -1,12 +1,15 @@
 package com.example.go4lunch.viewmodel;
 
 import android.app.AlertDialog;
+import android.content.Context;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
+import com.example.go4lunch.model.api.GmapsApiClient;
+import com.example.go4lunch.model.api.GmapsApiInterface;
 import com.example.go4lunch.model.model.DialogTuple;
 import com.example.go4lunch.model.repository.AutocompleteRepository;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
@@ -29,9 +32,8 @@ import java.util.Objects;
 
 public class MainViewModel extends ViewModel {
 
-    private final MainApplication application;
-    private final LocationRepository locationRepository;
     private final UserRepository userRepository;
+    private final LocationRepository locationRepository;
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
     // private final Application application; // Only if MainViewModel extends AndroidViewModel
@@ -39,16 +41,25 @@ public class MainViewModel extends ViewModel {
 
 
     // Constructor
-    public MainViewModel(/*@NonNull Application application*/) { // Only if MainViewModel extends AndroidViewModel
+    // public MainViewModel(@NonNull Application application) { // Only if MainViewModel extends AndroidViewModel
         // super(application); // Only if MainViewModel extends AndroidViewModel
         // this.application = application; // Only if MainViewModel extends AndroidViewModel
-
-        application = MainApplication.getInstance();
-        locationRepository = LocationRepository.getInstance();
+    public MainViewModel(
+            UserRepository userRepository, LocationRepository locationRepository,
+            RestaurantRepository restaurantRepository, LikedRestaurantRepository likedRestaurantRepository,
+            Utils utils) {
+        /*
         userRepository = UserRepository.getInstance();
+        locationRepository = LocationRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
         likedRestaurantRepository = LikedRestaurantRepository.getInstance();
         utils = Utils.getInstance();
+        */
+        this.userRepository = userRepository;
+        this.locationRepository = locationRepository;
+        this.restaurantRepository = restaurantRepository;
+        this.likedRestaurantRepository = likedRestaurantRepository;
+        this.utils = utils;
     }
 
 
@@ -86,18 +97,18 @@ public class MainViewModel extends ViewModel {
         userRepository.deleteUser(getFbCurrentUser().getUid());
     }
 
-    public Task<Void> deleteFbUser() {
+    public Task<Void> deleteFbUser(Context context) {
         // Method using AuthUI
         // return userRepository.deleteFbUser(application.getApplicationContext()); // Only if MainViewModel extends AndroidViewModel
-        return userRepository.deleteFbUser(MainApplication.getContext());
+        return userRepository.deleteFbUser(context);
         // Method using FirebaseAuth
         // return userRepository.deleteFbUser();
     }
 
     // Method using AuthUI
-    public Task<Void> signOut() {
+    public Task<Void> signOut(Context context) {
         // return userRepository.signOut(application.getApplicationContext()); // Only if MainViewModel extends AndroidViewModel
-        return userRepository.signOut(MainApplication.getContext());
+        return userRepository.signOut(context);
     }
     //
     /* Method using FirebaseAuth
@@ -106,7 +117,7 @@ public class MainViewModel extends ViewModel {
     }
     */
 
-    public DialogTuple<AlertDialog, MutableLiveData<Boolean>> buildConfirmationDialog(AlertDialog.Builder builder) {
+    public DialogTuple<AlertDialog, MutableLiveData<Boolean>> buildConfirmationDialog(AlertDialog.Builder builder, Context context) {
         MutableLiveData<Boolean> dialogResponseMutableLiveData = new MutableLiveData<>(null);
         // Add the buttons to builder
         builder.setPositiveButton(R.string.dialog_button_ok, (dialog, which) -> {
@@ -122,8 +133,8 @@ public class MainViewModel extends ViewModel {
         AlertDialog dialog = builder.create();
         // Set color for each button text (so, no need to set theme when building AlertDialog)
         dialog.setOnShowListener(dialogInterface -> {
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(application.getColor(R.color.green_fab));
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(application.getColor(R.color.red));
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(context.getColor(R.color.green_fab));
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(context.getColor(R.color.red));
         });
         return new DialogTuple<>(dialog, dialogResponseMutableLiveData);
     }
@@ -143,10 +154,10 @@ public class MainViewModel extends ViewModel {
         return userRepository.getFbCurrentUser();
     }
 
-    public final String[] getTabTitles() {
-        final String MAP_VIEW_TAB_TITLE = MainApplication.getInstance().getString(R.string.tab_map_view);
-        final String LIST_VIEW_TAB_TITLE = MainApplication.getInstance().getString(R.string.tab_list_view);
-        final String WORKMATES_TAB_TITLE = MainApplication.getInstance().getString(R.string.tab_workmates);
+    public final String[] getTabTitles(Context context) {
+        final String MAP_VIEW_TAB_TITLE = context.getString(R.string.tab_map_view);
+        final String LIST_VIEW_TAB_TITLE = context.getString(R.string.tab_list_view);
+        final String WORKMATES_TAB_TITLE = context.getString(R.string.tab_workmates);
         return new String[] {MAP_VIEW_TAB_TITLE, LIST_VIEW_TAB_TITLE, WORKMATES_TAB_TITLE};
     }
 

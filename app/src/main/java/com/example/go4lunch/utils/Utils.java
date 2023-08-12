@@ -26,6 +26,15 @@ public class Utils {
         }
     }
 
+    /** For test use only : New instance factory */
+    public static Utils getNewInstance() {
+        instance = new Utils();
+        return instance;
+    }
+
+    /*********************************************/
+
+
     /****************
      * Device Utils *
      ****************/

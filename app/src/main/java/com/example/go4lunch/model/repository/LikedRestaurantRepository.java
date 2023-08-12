@@ -26,6 +26,7 @@ public class LikedRestaurantRepository {
 
     private LikedRestaurantRepository() {
         likedRestaurantHelper = LikedRestaurantHelper.getInstance();
+
         likedRestaurantsMutableLiveData = new MutableLiveData<>();
     }
 
@@ -41,6 +42,20 @@ public class LikedRestaurantRepository {
             return instance;
         }
     }
+
+    /** For test use only : LikedRestaurantHelper dependency injection and new instance factory */
+    private LikedRestaurantRepository(LikedRestaurantHelper likedRestaurantHelper) {
+        this.likedRestaurantHelper = likedRestaurantHelper;
+
+        likedRestaurantsMutableLiveData = new MutableLiveData<>();
+    }
+
+    public static LikedRestaurantRepository getNewInstance(LikedRestaurantHelper likedRestaurantHelper) {
+        instance = new LikedRestaurantRepository(likedRestaurantHelper);
+        return instance;
+    }
+    /********************************************************************************************/
+
 
     // Create liked restaurant in Firestore
     public void createLikedRestaurant(String id, String rid, String uid) {

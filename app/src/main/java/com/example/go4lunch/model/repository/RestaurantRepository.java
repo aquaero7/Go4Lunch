@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.model.api.GmapsApiClient;
+import com.example.go4lunch.model.api.GmapsApiInterface;
 import com.example.go4lunch.model.api.GmapsRestaurantDetailsPojo;
 import com.example.go4lunch.model.api.GmapsRestaurantPojo;
 import com.example.go4lunch.model.api.model.Period;
@@ -14,14 +15,13 @@ import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.api.model.Geometry;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Photo;
-import com.example.go4lunch.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,8 +41,11 @@ public class RestaurantRepository {
     private final List<RestaurantWithDistance> restaurantsToDisplay;
     private RestaurantWithDistance restaurant;
     private boolean restaurantIsSelected;
+    private GmapsApiInterface apiClient;
 
     private RestaurantRepository() {
+        apiClient = GmapsApiClient.getApiClient();
+
         restaurantsMutableLiveData = new MutableLiveData<>();
         restaurantDetailsMutableLiveData = new MutableLiveData<>();
 
@@ -61,15 +64,34 @@ public class RestaurantRepository {
         }
     }
 
+    /** For test use only : GmapsApiInterface dependency injection and new instance factory */
+    private RestaurantRepository(GmapsApiInterface apiClient) {
+        this.apiClient = apiClient;
+
+        restaurantsMutableLiveData = new MutableLiveData<>();
+        restaurantDetailsMutableLiveData = new MutableLiveData<>();
+
+        restaurantsList = new ArrayList<>();
+        restaurantsListWithDistance = new ArrayList<>();
+        restaurantsToDisplay = new ArrayList<>();
+    }
+
+    public static RestaurantRepository getNewInstance(GmapsApiInterface apiClient) {
+        instance = new RestaurantRepository(apiClient);
+        return instance;
+    }
+    /**************************************************************************************/
+
+
     public void fetchRestaurants(LatLng home, String radius, String apiKey) {
         // Call Place Nearby Search API ////////////////////////////////////////////////////////////
-        Call<GmapsRestaurantPojo> call1 = GmapsApiClient.getApiClient()
-                .getPlaces("restaurant", home.latitude + "," + home.longitude, Integer.parseInt(radius)*1000, apiKey);
+        Call<GmapsRestaurantPojo> call1 = apiClient.getPlaces(
+                "restaurant", home.latitude + "," + home.longitude, Integer.parseInt(radius)*1000, apiKey);
         call1.enqueue(new Callback<GmapsRestaurantPojo>() {
             @Override
             public void onResponse(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Response<GmapsRestaurantPojo> response1) {
                 GmapsRestaurantPojo nearPlaces = response1.body();
-                List<Restaurant> nearbyRestaurants = nearPlaces.getNearRestaurants();
+                List<Restaurant> nearbyRestaurants = Objects.requireNonNull(nearPlaces).getNearRestaurants();
 
                 // For each restaurant, get basic information ask for detailed information and add restaurant to the list
                 if (nearbyRestaurants != null) {
@@ -102,7 +124,6 @@ public class RestaurantRepository {
 
             @Override
             public void onFailure(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Throwable t) {
-                // Toast.makeText(context, R.string.error, Toast.LENGTH_SHORT).show();
                 Log.w("RestaurantRepository", t.getMessage(), t);
             }
         });
@@ -111,11 +132,10 @@ public class RestaurantRepository {
     public void fetchRestaurantDetails(RestaurantWithDistance nearbyRestaurant, String apiKey) {
 
         // Call Place Details API //////////////////////////////////////////////////////////////////
-        Call<GmapsRestaurantDetailsPojo> call2 = GmapsApiClient.getApiClient().getPlaceDetails(
+        Call<GmapsRestaurantDetailsPojo> call2 = apiClient.getPlaceDetails(
                 nearbyRestaurant.getRid(),
                 "formatted_address,formatted_phone_number,website,opening_hours",
-                apiKey
-        );
+                apiKey);
         call2.enqueue(new Callback<GmapsRestaurantDetailsPojo>() {
             @Override
             public void onResponse(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Response<GmapsRestaurantDetailsPojo> response2) {

@@ -55,6 +55,26 @@ public class UserRepository {
         }
     }
 
+    /** For test use only : UserHelper dependency injection and new instance factory */
+    private UserRepository(UserHelper userHelper) {
+        this.userHelper = userHelper;
+
+        workmatesMutableLiveData = new MutableLiveData<>();
+        currentUserMutableLiveData = new MutableLiveData<>();
+
+        userCreationResponseMutableLiveData = new MutableLiveData<>();
+
+        workmatesList = new ArrayList<>();
+        selectorsList = new ArrayList<>();
+    }
+
+    public static UserRepository getNewInstance(UserHelper userHelper) {
+        instance = new UserRepository(userHelper);
+        return instance;
+    }
+    /********************************************************************************/
+
+
     public CollectionReference getUsersCollection() {
         return userHelper.getUsersCollection();
     }

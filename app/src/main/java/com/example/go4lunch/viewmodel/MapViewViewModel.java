@@ -1,5 +1,6 @@
 package com.example.go4lunch.viewmodel;
 
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.activity.result.ActivityResult;
@@ -8,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.MainApplication;
+import com.example.go4lunch.model.api.GmapsApiClient;
 import com.example.go4lunch.model.repository.AutocompleteRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
@@ -29,20 +31,30 @@ import java.util.List;
 
 public class MapViewViewModel extends ViewModel {
 
-    private final LocationRepository locationRepository;
     private final UserRepository userRepository;
+    private final LocationRepository locationRepository;
     private final RestaurantRepository restaurantRepository;
     private final AutocompleteRepository autocompleteRepository;
     private final Utils utils;
 
 
     // Constructor
-    public MapViewViewModel() {
-        locationRepository = LocationRepository.getInstance();
+    public MapViewViewModel(
+            UserRepository userRepository, LocationRepository locationRepository,
+            RestaurantRepository restaurantRepository, AutocompleteRepository autocompleteRepository,
+            Utils utils) {
+        /*
         userRepository = UserRepository.getInstance();
+        locationRepository = LocationRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
         autocompleteRepository = AutocompleteRepository.getInstance();
         utils = Utils.getInstance();
+        */
+        this.userRepository = userRepository;
+        this.locationRepository = locationRepository;
+        this.restaurantRepository = restaurantRepository;
+        this.autocompleteRepository = autocompleteRepository;
+        this.utils = utils;
     }
 
 
@@ -80,7 +92,7 @@ public class MapViewViewModel extends ViewModel {
         return new LatLngBounds(sw, ne);
     }
 
-    public void launchAutocomplete(String query) {
+    public void launchAutocomplete(String query, Context context) {
         // Calculate bounds
         LatLngBounds latLngBounds = calculateBounds();
         // Launch autocomplete
@@ -90,7 +102,7 @@ public class MapViewViewModel extends ViewModel {
                 .setCountries(Collections.singletonList("FR"))
                 .setLocationRestriction(RectangularBounds.newInstance(latLngBounds.southwest, latLngBounds.northeast))
                 .setInitialQuery(query)
-                .build(MainApplication.getContext());
+                .build(context);
         autocompleteRepository.getStartAutocomplete().launch(intent);
     }
 

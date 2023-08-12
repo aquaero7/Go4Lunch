@@ -1,5 +1,6 @@
 package com.example.go4lunch.view.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +20,13 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
 
     private final List<RestaurantWithDistance> restaurantsList;
     private final List<User> workmatesList;
+    private final Context context;
 
     // Constructor
-    public ListViewAdapter(List<RestaurantWithDistance> restaurantsList, List<User> workmatesList) {
+    public ListViewAdapter(List<RestaurantWithDistance> restaurantsList, List<User> workmatesList, Context context) {
         this.restaurantsList = restaurantsList;
         this.workmatesList = workmatesList;
+        this.context = context;
 
     }
 
@@ -48,8 +51,8 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
         viewHolder.updateWithRestaurants(restaurant.getName(), restaurant.getRating(),
                 listViewViewModel.getDistance(restaurant.getDistance()),
                 listViewViewModel.countSelections(restaurant.getRid(), workmatesList),
-                listViewViewModel.getOpeningInfo(restaurant.getOpeningHours()),
-                listViewViewModel.getPhotoUrl(restaurant.getPhotos()));
+                listViewViewModel.getOpeningInfo(restaurant.getOpeningHours(), context),
+                listViewViewModel.getPhotoUrl(restaurant.getPhotos(), context));
     }
 
     // Return the total count of restaurants

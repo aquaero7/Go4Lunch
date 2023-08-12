@@ -1,6 +1,7 @@
 package com.example.go4lunch.viewmodel;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.util.Log;
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
+import com.example.go4lunch.model.api.GmapsApiClient;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
@@ -19,6 +21,8 @@ import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Arrays;
@@ -34,14 +38,22 @@ public class AuthViewModel extends ViewModel {
     // private final Application application; // Only if AuthViewModel extends AndroidViewModel
 
     // Constructor
-    public AuthViewModel(/*@NonNull Application application*/) { // Only if AuthViewModel extends AndroidViewModel
+    // public AuthViewModel(@NonNull Application application) { // Only if AuthViewModel extends AndroidViewModel
         // super(application); // Only if AuthViewModel extends AndroidViewModel
         // this.application = application; // Only if AuthViewModel extends AndroidViewModel
-
+    public AuthViewModel(
+            UserRepository userRepository, LocationRepository locationRepository,
+            RestaurantRepository restaurantRepository, LikedRestaurantRepository likedRestaurantRepository) {
+        /*
         userRepository = UserRepository.getInstance();
         locationRepository = LocationRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
         likedRestaurantRepository = LikedRestaurantRepository.getInstance();
+        */
+        this.userRepository = userRepository;
+        this.locationRepository = locationRepository;
+        this.restaurantRepository = restaurantRepository;
+        this.likedRestaurantRepository = likedRestaurantRepository;
     }
 
 
@@ -64,9 +76,9 @@ public class AuthViewModel extends ViewModel {
 
     // Fetchers (using Maps and Firebase APIs)
 
-    public void fetchDataExceptRestaurants() {
+    public void fetchDataExceptRestaurants(Context context) {
         fetchCurrentUser();   // Fetch current user
-        fetchCurrentLocation(); // Fetch current location
+        fetchCurrentLocation(context); // Fetch current location
         fetchWorkmates();     // Fetch workmates list
         fetchLikedRestaurants();  // Fetch liked restaurants list
     }
@@ -79,9 +91,10 @@ public class AuthViewModel extends ViewModel {
         userRepository.fetchWorkmates();
     }
 
-    public void fetchCurrentLocation() {
-        // locationRepository.fetchCurrentLocation(application.getApplicationContext()); // Only if AuthViewModel extends AndroidViewModel
-        locationRepository.fetchCurrentLocation(MainApplication.getContext());
+    public void fetchCurrentLocation(Context context) {
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
+        // locationRepository.fetchCurrentLocation(fusedLocationProviderClient, application.getApplicationContext()); // Only if AuthViewModel extends AndroidViewModel
+        locationRepository.fetchCurrentLocation(fusedLocationProviderClient, context);
     }
 
     public void fetchRestaurants(LatLng home, String apiKey) {
@@ -134,9 +147,9 @@ public class AuthViewModel extends ViewModel {
         }
     }
 
-    public void checkAndRequestPermissions(ActivityResultLauncher<String[]> requestPermissionsLauncher) {
-        if ((ContextCompat.checkSelfPermission(MainApplication.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(MainApplication.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+    public void checkAndRequestPermissions(ActivityResultLauncher<String[]> requestPermissionsLauncher, Context context) {
+        if ((ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             /** Permissions not granted
              *  Request permissions to user.
              *  The registered ActivityResultCallback gets the result of this(these) request(s). */

@@ -68,6 +68,7 @@ public class DetailRestaurantViewModelTest {
         contextMock = mock(Context.class);
         utils = Utils.getInstance();
 
+        // Class under test
         detailRestaurantViewModel = new DetailRestaurantViewModel(userRepositoryMock, restaurantRepositoryMock, likedRestaurantRepositoryMock, utilsMock);
 
         uId1 = "uId1"; uName1 = "uName1"; uEmail1 = "uEmail1"; uUrl1 = "uUrl1";

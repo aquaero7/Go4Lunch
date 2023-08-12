@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.model.User;
+import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.view.viewholder.WorkmateViewHolder;
 import com.example.go4lunch.viewmodel.WorkmatesViewModel;
 

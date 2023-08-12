@@ -286,7 +286,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     }
 
     public void launchAutocomplete(String query) {
-        mapViewViewModel.launchAutocomplete(query);
+        mapViewViewModel.launchAutocomplete(query, requireContext());
     }
 
 }

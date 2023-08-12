@@ -32,6 +32,7 @@ public class LocationRepository {
     private LatLng home;
     private boolean focusHome;
 
+
     public LocationRepository() {
         currentLocationMutableLiveData = new MutableLiveData<>();
 
@@ -48,11 +49,17 @@ public class LocationRepository {
         }
     }
 
+    /** For test use only : New instance factory */
+    public static LocationRepository getNewInstance() {
+        instance = new LocationRepository();
+        return instance;
+    }
+    /*********************************************/
+
 
     @SuppressWarnings("MissingPermission")  // Permissions already checked in AuthActivity
-    public void fetchCurrentLocation(Context context) {
+    public void fetchCurrentLocation(FusedLocationProviderClient fusedLocationProviderClient, Context context) {
         // Get current location from API
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
         try {
             Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
             // Task<Location> locationResult = fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null);

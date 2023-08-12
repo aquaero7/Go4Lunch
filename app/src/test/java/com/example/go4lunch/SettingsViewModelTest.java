@@ -35,6 +35,7 @@ public class SettingsViewModelTest {
         userRepositoryMock = mock(UserRepository.class);
         restaurantRepositoryMock = mock(RestaurantRepository.class);
 
+        // Class under test
         settingsViewModel = new SettingsViewModel(userRepositoryMock, restaurantRepositoryMock);
 
         id1 = "id1"; name1 = "name1"; email1 = "email1"; url1 = "url1";

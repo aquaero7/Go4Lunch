@@ -29,7 +29,8 @@ public class UtilsTest {
                 .strictness(Strictness.STRICT_STUBS)
                 .startMocking();
 
-        utils = Utils.getInstance();
+        // Class under test
+        utils = Utils.getNewInstance();
     }
 
     private void initializeCalendar() {

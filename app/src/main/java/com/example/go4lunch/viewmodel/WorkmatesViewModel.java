@@ -3,6 +3,7 @@ package com.example.go4lunch.viewmodel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.model.api.GmapsApiClient;
 import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
@@ -15,15 +16,27 @@ import java.util.Objects;
 
 public class WorkmatesViewModel extends ViewModel {
 
-    private final UserRepository userRepository;
-    private final RestaurantRepository restaurantRepository;
+    private UserRepository userRepository;
+    private RestaurantRepository restaurantRepository;
     private final Utils utils;
 
-    // Constructor
+
+    // Constructor for WorkmatesAdapter
     public WorkmatesViewModel() {
+        utils = Utils.getInstance();
+    }
+
+    // Constructor
+    public WorkmatesViewModel(
+            UserRepository userRepository, RestaurantRepository restaurantRepository, Utils utils) {
+        /*
         userRepository = UserRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
         utils = Utils.getInstance();
+        */
+        this.userRepository = userRepository;
+        this.restaurantRepository = restaurantRepository;
+        this.utils = utils;
     }
 
 

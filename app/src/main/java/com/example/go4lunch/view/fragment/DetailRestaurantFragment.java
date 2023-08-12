@@ -3,6 +3,7 @@ package com.example.go4lunch.view.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -193,7 +194,11 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     private void displayRestaurantData(RestaurantWithDistance restaurantWithDetails) {
         // Nearby API data
         List<Photo> rPhotos = restaurantWithDetails.getPhotos();
-        if (rPhotos != null) Picasso.get().load(rPhotos.get(0).getPhotoUrl(getString(R.string.MAPS_API_KEY))).into(binding.ivRestaurant);
+        if (rPhotos != null) {
+            Picasso.get().load(rPhotos.get(0).getPhotoUrl(getString(R.string.MAPS_API_KEY))).into(binding.ivRestaurant);
+        } else {
+            Picasso.get().load(R.drawable.im_restaurant).into(binding.ivRestaurant);
+        }
         binding.tv1Restaurant.setText(restaurantWithDetails.getName());
         binding.ratingBarRestaurant.setRating((float) (restaurantWithDetails.getRating() * 3/5));
         // Place Details API data

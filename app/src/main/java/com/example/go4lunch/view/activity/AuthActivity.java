@@ -54,7 +54,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         });
 
         // Check and request permissions
-        authViewModel.checkAndRequestPermissions(requestPermissionsLauncher);
+        authViewModel.checkAndRequestPermissions(requestPermissionsLauncher, getApplicationContext());
     }
 
     private void setupListeners(){
@@ -135,7 +135,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
         // Show progressBar
         binding.progressbarAuth.progressbar.setVisibility(View.VISIBLE);
         // Fetch data
-        authViewModel.fetchDataExceptRestaurants();
+        authViewModel.fetchDataExceptRestaurants(getApplicationContext());
         authViewModel.getCurrentLocationMutableLiveData().observe(this, home -> {
             // Fetch restaurants
             authViewModel.fetchRestaurants(home, getString(R.string.MAPS_API_KEY));

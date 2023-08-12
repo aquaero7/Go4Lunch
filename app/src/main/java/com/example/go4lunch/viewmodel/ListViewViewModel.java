@@ -1,10 +1,13 @@
 package com.example.go4lunch.viewmodel;
 
+import android.content.Context;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
+import com.example.go4lunch.model.api.GmapsApiClient;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Photo;
 import com.example.go4lunch.model.repository.LocationRepository;
@@ -20,15 +23,28 @@ import java.util.Locale;
 
 public class ListViewViewModel extends ViewModel {
 
-    private final UserRepository userRepository;
-    private final RestaurantRepository restaurantRepository;
+    private UserRepository userRepository;
+    private RestaurantRepository restaurantRepository;
     private final Utils utils;
 
-    // Constructor
+
+    // Constructor for ListViewAdapter
     public ListViewViewModel() {
+        utils = Utils.getInstance();
+    }
+
+
+    // Constructor
+    public ListViewViewModel(
+            UserRepository userRepository, RestaurantRepository restaurantRepository, Utils utils) {
+        /*
         userRepository = UserRepository.getInstance();
         restaurantRepository = RestaurantRepository.getInstance();
         utils = Utils.getInstance();
+        */
+        this.userRepository = userRepository;
+        this.restaurantRepository = restaurantRepository;
+        this.utils = utils;
     }
 
 
@@ -62,7 +78,7 @@ public class ListViewViewModel extends ViewModel {
         return selectionsCount;
     }
 
-    public String filterList(String query) {
+    public String filterList(String query, Context context) {
         List<RestaurantWithDistance> filteredRestaurantsList = new ArrayList<>();
         if (query.isEmpty()) {
             // SearchView is cleared and closed
@@ -76,7 +92,7 @@ public class ListViewViewModel extends ViewModel {
                     filteredRestaurantsList.add(restaurant);
             }
             restaurantRepository.setRestaurantsToDisplay(filteredRestaurantsList);
-            return (filteredRestaurantsList.isEmpty()) ? MainApplication.getInstance().getString(R.string.info_restaurant_not_found) : null;
+            return (filteredRestaurantsList.isEmpty()) ? context.getString(R.string.info_restaurant_not_found) : null;
         }
     }
 
@@ -87,18 +103,18 @@ public class ListViewViewModel extends ViewModel {
         return (distance < 10000) ? distance + "m" : distance / 1000 + "km";
     }
 
-    public String getOpeningInfo(OpeningHours openingHours) {
+    public String getOpeningInfo(OpeningHours openingHours, Context context) {
         if (openingHours != null) {
             return (openingHours.isOpenNow()) ?
-                    MainApplication.getInstance().getString(R.string.status_open) :
-                    MainApplication.getInstance().getString(R.string.status_closed);
+                    context.getString(R.string.status_open) :
+                    context.getString(R.string.status_closed);
         } else {
-            return MainApplication.getInstance().getString(R.string.status_unknown);
+            return context.getString(R.string.status_unknown);
         }
     }
 
-    public String getPhotoUrl(List<Photo> photos) {
-        return (photos != null) ? photos.get(0).getPhotoUrl(MainApplication.getInstance().getString(R.string.MAPS_API_KEY)) : null;
+    public String getPhotoUrl(List<Photo> photos, Context context) {
+        return (photos != null) ? photos.get(0).getPhotoUrl(context.getString(R.string.MAPS_API_KEY)) : null;
     }
 
     public List<RestaurantWithDistance> getRestaurantsToDisplay() {
