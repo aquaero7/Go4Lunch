@@ -51,6 +51,8 @@
     <string name="error_no_selection">Aucun restaurant sélectionné par ce collègue\nou sélection hors du rayon de recherche défini.</string>
     <string name="info_location_provided">Position détectée</string>
     <string name="info_location_updated">Position mise à jour</string>
+    <string name="error_no_phone_number">Le numéro de téléphone de ce restaurant est inconnu.</string>
+    <string name="error_no_website">Le site web de ce restaurant est inconnu.</string>
 
     <!-- BUTTONS ACTIONS -->
     <string name="fab_checked">Restaurant sélectionné</string>

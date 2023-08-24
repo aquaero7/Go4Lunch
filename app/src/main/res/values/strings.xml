@@ -51,6 +51,8 @@
     <string name="error_no_selection">No restaurant selected by this workmate\nor selection outside the defined search radius.</string>
     <string name="info_location_provided">Location provided</string>
     <string name="info_location_updated">Location updated</string>
+    <string name="error_no_phone_number">The phone number of this restaurant is unknown.</string>
+    <string name="error_no_website">The web site of this restaurant is unknown.</string>
 
     <!-- BUTTONS ACTIONS -->
     <string name="fab_checked">Restaurant selected</string>

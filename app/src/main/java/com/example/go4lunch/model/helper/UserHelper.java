@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 
+import com.example.go4lunch.model.model.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -35,7 +36,16 @@ public class UserHelper {
     private static final String SEARCH_RADIUS_PREFS = "searchRadiusPrefs";
     private static final String NOTIFICATIONS_PREFS = "notificationsPrefs";
 
-    public UserHelper() { }
+    FirebaseFirestore firebaseFirestore;
+    FirebaseAuth firebaseAuth;
+    AuthUI authUI;
+
+
+    public UserHelper() {
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        authUI = AuthUI.getInstance();
+    }
 
     public static UserHelper getInstance() {
         UserHelper result = instance;
@@ -50,13 +60,27 @@ public class UserHelper {
         }
     }
 
+    /** For test use only : UserHelper dependency injection and new instance factory */
+    public UserHelper(FirebaseFirestore firebaseFirestore, FirebaseAuth firebaseAuth, AuthUI authUI) {
+        this.firebaseFirestore = firebaseFirestore;
+        this.firebaseAuth = firebaseAuth;
+        this.authUI = authUI;
+    }
+
+    public static UserHelper getNewInstance(FirebaseFirestore firebaseFirestore, FirebaseAuth firebaseAuth, AuthUI authUI) {
+        instance = new UserHelper(firebaseFirestore, firebaseAuth, authUI);
+        return instance;
+    }
+    /*********************************************************************************/
+
+
     // Get the Collection Reference
     public CollectionReference getUsersCollection(){
-        return FirebaseFirestore.getInstance().collection(COLLECTION_USERS);
+        return firebaseFirestore.collection(COLLECTION_USERS);
     }
 
     @Nullable public FirebaseUser getFbCurrentUser(){
-        return FirebaseAuth.getInstance().getCurrentUser();
+        return firebaseAuth.getCurrentUser();
     }
 
     // Get current user ID
@@ -71,82 +95,110 @@ public class UserHelper {
     }
 
     // Get current User Data from Firestore
-    public Task<DocumentSnapshot> getCurrentUserData(){
+    public Task<DocumentSnapshot> getCurrentUserData(String uid) {
+        /*  // TODO : To be deleted
         String uid = this.getFbCurrentUserUID();
         if(uid != null){
             return getUsersCollection().document(uid).get();
         }else{
             return null;
         }
+        */
+
+        return getUsersCollection().document(Objects.requireNonNull(uid)).get();
     }
 
     // Update selected restaurant
-    public Task<Void> updateSelectionId(String selectionId) {
+    public Task<Void> updateSelectionId(String uid, String selectionId) {
+        /*  // TODO : To be deleted
         String uid = this.getFbCurrentUserUID();
         if(uid != null){
             return getUsersCollection().document(uid).update(SELECTION_ID_FIELD, selectionId);
         }else{
             return null;
         }
+        */
+
+        return getUsersCollection().document(Objects.requireNonNull(uid)).update(SELECTION_ID_FIELD, selectionId);
     }
 
     // Update selection date
-    public Task<Void> updateSelectionDate(String selectionDate) {
+    public Task<Void> updateSelectionDate(String uid, String selectionDate) {
+        /*  // TODO : To be deleted
         String uid = this.getFbCurrentUserUID();
         if(uid != null){
             return getUsersCollection().document(uid).update(SELECTION_DATE_FIELD, selectionDate);
         }else{
             return null;
         }
+        */
+
+        return getUsersCollection().document(Objects.requireNonNull(uid)).update(SELECTION_DATE_FIELD, selectionDate);
     }
 
     // Update selection name
-    public Task<Void> updateSelectionName(String selectionName) {
+    public Task<Void> updateSelectionName(String uid, String selectionName) {
+        /*  // TODO : To be deleted
         String uid = this.getFbCurrentUserUID();
         if(uid != null){
             return getUsersCollection().document(uid).update(SELECTION_NAME_FIELD, selectionName);
         }else{
             return null;
         }
+        */
+
+        return getUsersCollection().document(Objects.requireNonNull(uid)).update(SELECTION_NAME_FIELD, selectionName);
     }
 
-    public Task<Void> updateSelectionAddress(String selectionAddress) {
+    public Task<Void> updateSelectionAddress(String uid, String selectionAddress) {
+        /*  // TODO : To be deleted
         String uid = this.getFbCurrentUserUID();
         if(uid != null){
             return getUsersCollection().document(uid).update(SELECTION_ADDRESS_FIELD, selectionAddress);
         }else{
             return null;
         }
+        */
+
+        return getUsersCollection().document(Objects.requireNonNull(uid)).update(SELECTION_ADDRESS_FIELD, selectionAddress);
     }
 
     // Update selection date
-    public Task<Void> updateSearchRadiusPrefs(String searchRadiusPrefs) {
+    public Task<Void> updateSearchRadiusPrefs(String uid, String searchRadiusPrefs) {
+        /*  // TODO : To be deleted
         String uid = this.getFbCurrentUserUID();
         if(uid != null){
             return getUsersCollection().document(uid).update(SEARCH_RADIUS_PREFS, searchRadiusPrefs);
         }else{
             return null;
         }
+        */
+
+        return getUsersCollection().document(Objects.requireNonNull(uid)).update(SEARCH_RADIUS_PREFS, searchRadiusPrefs);
     }
 
     // Update selection date
-    public Task<Void> updateNotificationsPrefs(String notificationsPrefs) {
+    public Task<Void> updateNotificationsPrefs(String uid, String notificationsPrefs) {
+        /*  // TODO : To be deleted
         String uid = this.getFbCurrentUserUID();
         if(uid != null){
             return getUsersCollection().document(uid).update(NOTIFICATIONS_PREFS, notificationsPrefs);
         }else{
             return null;
         }
+        */
+
+        return getUsersCollection().document(Objects.requireNonNull(uid)).update(NOTIFICATIONS_PREFS, notificationsPrefs);
     }
 
     // Method using AuthUI
     public Task<Void> signOut(Context context){
-        return AuthUI.getInstance().signOut(context);
+        return authUI.signOut(context);
     }
 
     // Method using FirebaseAuth
     public void signOut(){
-        FirebaseAuth.getInstance().signOut();
+        firebaseAuth.signOut();
     }
 
     public void deleteUser (String id) {
@@ -155,12 +207,12 @@ public class UserHelper {
 
     // Method using AuthUI
     public Task<Void> deleteFbUser(Context context){
-        return AuthUI.getInstance().delete(context);
+        return authUI.delete(context);
     }
 
     // Method using FirebaseAuth
     public Task<Void> deleteFbUser(){
-        return Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).delete();
+        return Objects.requireNonNull(firebaseAuth.getCurrentUser()).delete();
     }
 
 }

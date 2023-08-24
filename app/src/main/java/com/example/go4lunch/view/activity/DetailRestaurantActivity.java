@@ -34,12 +34,18 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         // Handle the button click event
         switch (EventObjectClick.fromView(view)) {
             case BTN_CALL:
-                if (rPhoneNumber != null)
+                if (rPhoneNumber != null) {
                     startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + rPhoneNumber)));
+                } else {
+                    Snackbar.make(binding.getRoot(), getString(R.string.error_no_phone_number), Snackbar.LENGTH_LONG).show();
+                }
                 break;
             case BTN_WEBSITE:
-                if (rWebsite != null)
+                if (rWebsite != null) {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(rWebsite)));
+                } else {
+                    Snackbar.make(binding.getRoot(), getString(R.string.error_no_website), Snackbar.LENGTH_LONG).show();
+                }
                 break;
             case BTN_LIKE:
             case FAB_SELECT:

@@ -1,4 +1,4 @@
-package com.example.go4lunch.tobedeleted;
+package com.example.go4lunch.tobedeletedattheend;
 
 import static org.junit.Assert.assertEquals;
 

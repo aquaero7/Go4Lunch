@@ -178,6 +178,11 @@ public class RestaurantRepositoryTest {
     }
 
     @Test
+    public void getInstanceWithSuccess() {
+        assertNotNull(RestaurantRepository.getInstance());
+    }
+
+    @Test
     public void fetchRestaurantsWithSuccess() throws InterruptedException {
         /** Also testing RestaurantRepository.getRestaurantsMutableLiveData() method */
 
