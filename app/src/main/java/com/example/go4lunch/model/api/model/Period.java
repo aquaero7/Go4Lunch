@@ -19,6 +19,7 @@ public class Period implements Serializable {
     public Period() {
     }
 
+    // Constructor
     public Period(OpenClose close, OpenClose open) {
         this.close = close;
         this.open = open;

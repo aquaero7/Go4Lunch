@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -30,9 +29,6 @@ import com.example.go4lunch.view.adapter.WorkmateAdapter;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
 import com.example.go4lunch.viewmodel.WorkmatesViewModel;
 import com.google.android.material.snackbar.Snackbar;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 public class WorkmatesFragment extends Fragment {
 
@@ -65,13 +61,10 @@ public class WorkmatesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         binding = FragmentWorkmatesBinding.inflate(inflater, container, false);
-        // Initialize ViewModel
         workmatesViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(WorkmatesViewModel.class);
 
-        /** To use if menu is handled in fragment
-         * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
+        /** To use if menu is handled in fragment. Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
         // Initialize RecyclerView
@@ -131,7 +124,8 @@ public class WorkmatesFragment extends Fragment {
                         if (restaurant != null) {
                             launchDetailRestaurantActivity(restaurant);
                         } else {
-                            Snackbar.make(binding.getRoot(), getString(R.string.error_no_selection), Snackbar.LENGTH_LONG).show();
+                            Snackbar.make(binding.getRoot(), getString(R.string.error_no_selection), Snackbar.LENGTH_LONG)
+                                    .show();
                         }
                     }
                 });

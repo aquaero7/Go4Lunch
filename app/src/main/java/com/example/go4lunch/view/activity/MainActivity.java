@@ -26,7 +26,7 @@ import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.view.fragment.ListViewFragment;
 import com.example.go4lunch.view.fragment.MapViewFragment;
-import com.example.go4lunch.view.fragment.PagerAdapter;
+import com.example.go4lunch.view.adapter.PagerAdapter;
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.utils.EventListener;
@@ -43,7 +43,8 @@ import com.google.firebase.auth.GetTokenResult;
 
 import java.util.Objects;
 
-public class MainActivity extends BaseActivity<ActivityMainBinding> implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, EventListener {
+public class MainActivity extends BaseActivity<ActivityMainBinding> implements
+        NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, EventListener {
 
     private MainViewModel mainViewModel;
     private AlertDialog dialog;
@@ -57,8 +58,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // mainViewModel = new ViewModelProvider(this, new ViewModelFactory(getApplication())).get(MainViewModel.class); // If VM extends AndroidViewModel
-        mainViewModel = new ViewModelProvider(this, new ViewModelFactory()).get(MainViewModel.class); // If VM extends ViewModel
+        mainViewModel = new ViewModelProvider(this, new ViewModelFactory()).get(MainViewModel.class);
         configureToolbar();
         configureViewPagerAndTabs();
         configureDrawerLayout();
@@ -70,9 +70,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     }
 
     /**
-     * ---------------------
      * LISTENERS
-     * ---------------------
      */
 
     @Override
@@ -104,6 +102,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             default:
                 break;
         }
+
         binding.activityMainDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -123,10 +122,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
         view.setVisibility((view.getVisibility() == View.VISIBLE) ? View.GONE : View.VISIBLE);
     }
 
+
     /**
-    * ---------------------
     * CONFIGURATIONS
-    * ---------------------
     */
 
     private void configureToolbar(){
@@ -191,7 +189,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // Get fragment's identification
-                Fragment fmt = getSupportFragmentManager().findFragmentByTag("f" + binding.activityMainViewpager.getCurrentItem());
+                Fragment fmt = getSupportFragmentManager()
+                        .findFragmentByTag("f" + binding.activityMainViewpager.getCurrentItem());
                 switch (Objects.requireNonNull(Objects.requireNonNull(fmt).getTag())) {
                     case "f0":
                         ((MapViewFragment)fmt).launchAutocomplete(query);
@@ -201,10 +200,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                         ((ListViewFragment)fmt).filterList(query);
                         break;
                     case "f2":
-                        showSnackBar(String.format(getString(R.string.error_search), mainViewModel.getTabTitles(getApplicationContext())[binding.activityMainViewpager.getCurrentItem()]));
+                        showSnackBar(String.format(getString(R.string.error_search),
+                                mainViewModel.getTabTitles(getApplicationContext())[
+                                        binding.activityMainViewpager.getCurrentItem()]));
                         binding.includedToolbar.searchView.setQuery("", false);
                         break;
                 }
+
                 binding.includedToolbar.searchView.setVisibility(View.GONE);
                 return false;
             }
@@ -212,7 +214,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Get fragment's identification
-                Fragment fmt = getSupportFragmentManager().findFragmentByTag("f" + binding.activityMainViewpager.getCurrentItem());
+                Fragment fmt = getSupportFragmentManager()
+                        .findFragmentByTag("f" + binding.activityMainViewpager.getCurrentItem());
                 switch (Objects.requireNonNull(Objects.requireNonNull(fmt).getTag())) {
                     case "f0":
                         // Don't trigger predictions before 3 chars input
@@ -228,15 +231,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                     case "f2":
                         break;
                 }
+
                 return false;
             }
-
-
         });
 
         binding.includedToolbar.searchView.setOnCloseListener(() -> {
             // Get fragment's identification
-            Fragment fmt = getSupportFragmentManager().findFragmentByTag("f" + binding.activityMainViewpager.getCurrentItem());
+            Fragment fmt = getSupportFragmentManager()
+                    .findFragmentByTag("f" + binding.activityMainViewpager.getCurrentItem());
             switch (Objects.requireNonNull(Objects.requireNonNull(fmt).getTag())) {
                 case "f0":
                 case "f2":
@@ -245,20 +248,19 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                     ((ListViewFragment)fmt).filterList("");
                     break;
             }
+
             binding.includedToolbar.searchView.setVisibility(View.GONE);
             return false;
         });
     }
 
     private void configureReAuthListener() {
-        // binding.btPwdVisibility.setOnClickListener(this);
         binding.btPwdSend.setOnClickListener(this);
     }
 
+
     /**
-     * ---------------------
      * METHODS
-     * ---------------------
      */
 
     private void launchDetailRestaurantActivity() {
@@ -289,11 +291,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                         .into(userPicture);
             }
             // Set and display name
-            String name = TextUtils.isEmpty(fbUser.getDisplayName()) ? getString(R.string.info_no_username_found) : fbUser.getDisplayName();
+            String name = TextUtils.isEmpty(fbUser.getDisplayName()) ?
+                    getString(R.string.info_no_username_found) : fbUser.getDisplayName();
             TextView userName = binding.activityMainNavView.getHeaderView(0).findViewById(R.id.user_name);
             userName.setText(name);
             // Set and display email
-            String email = TextUtils.isEmpty(fbUser.getEmail()) ? getString(R.string.info_no_email_found) : fbUser.getEmail();
+            String email = TextUtils.isEmpty(fbUser.getEmail()) ?
+                    getString(R.string.info_no_email_found) : fbUser.getEmail();
             TextView userEmail = binding.activityMainNavView.getHeaderView(0).findViewById(R.id.user_email);
             userEmail.setText(email);
         }
@@ -303,8 +307,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
     private void buildConfirmationDialog() {
         // Create the builder with a specific theme setting (i.e. for all buttons text color)...
         // builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
+
         // ...or create the builder with no specific theme setting
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
         // Configure builder and create dialog
         DialogTuple<AlertDialog, MutableLiveData<Boolean>> dialogTuple = mainViewModel.buildConfirmationDialog(builder, getApplicationContext());
         // Get dialog
@@ -329,9 +335,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                     setResult(RESULT_OK, new Intent());
                     finish();
                 })
-                .addOnFailureListener(e -> Log.w("MainActivity", e.getMessage()));
+                .addOnFailureListener(e -> Log.w("MainActivity", Objects.requireNonNull(e.getMessage())));
     }
 
+    @SuppressWarnings("unchecked")
     private void deleteAccountLogoutAndCloseActivity() {
         mainViewModel.deleteUserLikesAndUser();
         mainViewModel.deleteFbUser(getApplicationContext())
@@ -340,7 +347,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements N
                     logoutAndCloseActivity();
                 })
                 .addOnFailureListener(e -> {
-                    Log.w("MainActivity", e.getMessage());
+                    Log.w("MainActivity", Objects.requireNonNull(e.getMessage()));
                     FirebaseAuth.getInstance().getAccessToken(false).addOnSuccessListener((OnSuccessListener<GetTokenResult>) getTokenResult -> {
                                 signInProvider = getTokenResult.getSignInProvider();
                                 if (Objects.equals("password", signInProvider)) {

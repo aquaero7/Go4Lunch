@@ -61,13 +61,10 @@ public class ListViewFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         binding = FragmentListViewBinding.inflate(inflater, container, false);
-        // Initialize ViewModel
         listViewViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(ListViewViewModel.class);
 
-        /** To use if menu is handled in fragment
-         * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
+        /** To use if menu is handled in fragment. Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
         // Initialize RecyclerView
@@ -153,7 +150,8 @@ public class ListViewFragment extends Fragment {
     public void filterList(String query) {
         // Apply filter and display message if nothing matches query
         if (listViewViewModel.filterList(query, requireContext()) != null)
-            Snackbar.make(binding.getRoot(), listViewViewModel.filterList(query, requireContext()), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(binding.getRoot(), listViewViewModel.filterList(query, requireContext()), Snackbar.LENGTH_LONG)
+                    .show();
         // Update recyclerView
         listViewAdapter.notifyDataSetChanged();
     }

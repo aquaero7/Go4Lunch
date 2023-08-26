@@ -24,10 +24,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             // To keep keys and secrets hidden
+            // Using resValue
             resValue "string", "fb_id", (project.findProperty("fb_id"))
             resValue "string", "fb_token", (project.findProperty("fb_token"))
             resValue "string", "maps_api_key", (project.findProperty("maps_api_key"))
-            /*
+            /* Using buildConfig
             buildConfigField "String", "FB_ID", project.findProperty("fb_id")
             buildConfigField "String", "FB_TOKEN", project.findProperty("fb_token")
             buildConfigField "String", "MAPS_API_KEY", project.findProperty("maps_aoi_key")
@@ -36,10 +37,11 @@ android {
 
         debug {
             // To keep keys and secrets hidden
+            // Using resValue
             resValue "string", "fb_id", (project.findProperty("fb_id"))
             resValue "string", "fb_token", (project.findProperty("fb_token"))
             resValue "string", "maps_api_key", (project.findProperty("maps_api_key"))
-            /*
+            /* Using buildConfig
             buildConfigField "String", "FB_ID", project.findProperty("fb_id")
             buildConfigField "String", "FB_TOKEN", project.findProperty("fb_token")
             buildConfigField "String", "MAPS_API_KEY", project.findProperty("maps_aoi_key")
@@ -63,19 +65,17 @@ android {
             includeAndroidResources true
             returnDefaultValues true
         }
-
     }
-
 }
 
 dependencies {
 
     // FOR TOOLBAR
-    implementation 'androidx.appcompat:appcompat:1.5.1' // Also needed for ViewPager    // Do not update with sdk < 33
-    implementation 'com.google.android.material:material:1.8.0' // Also needed for TabLayout, Navigation Drawer and SnackBar
+    implementation 'androidx.appcompat:appcompat:1.5.1' // Also needed for ViewPager    // Do not update with sdk < 33 !!!!!!!
+    implementation 'com.google.android.material:material:1.9.0' // Also needed for TabLayout, Navigation Drawer and SnackBar
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1' // Needed for Recyclerview    // Do not update with sdk < 33
+    implementation 'androidx.recyclerview:recyclerview:1.2.1' // Needed for Recyclerview    // Do not update with sdk < 33 !!!!!!!
 
     // FIREBASE
     // Import the Firebase BoM
@@ -102,12 +102,12 @@ dependencies {
 
     // GOOGLE MAPS
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
-    implementation "com.google.android.gms:play-services-location:21.0.1"   // TODO : Useful ? No !
+    implementation "com.google.android.gms:play-services-location:21.0.1"
     // For distance calculation between 2 places
     implementation 'com.google.maps.android:android-maps-utils:latest.release'
 
     // GOOGLE PLACES
-    implementation 'com.google.android.libraries.places:places:3.0.0'   // TODO : Useless ?
+    implementation 'com.google.android.libraries.places:places:3.2.0'
 
     // RETROFIT
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

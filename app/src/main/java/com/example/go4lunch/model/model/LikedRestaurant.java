@@ -9,8 +9,7 @@ public class LikedRestaurant implements Serializable {
     private String uid;
 
     // Empty constructor to allow firebase to cast document to object model
-    public LikedRestaurant() {
-    }
+    public LikedRestaurant() {}
 
     // Constructor used to create and read liked restaurant from database
     public LikedRestaurant(String id, String rid, String uid) {
@@ -19,7 +18,9 @@ public class LikedRestaurant implements Serializable {
         this.uid = uid;
     }
 
+
     // GETTERS
+
     public String getId() {
         return id;
     }
@@ -30,7 +31,9 @@ public class LikedRestaurant implements Serializable {
         return uid;
     }
 
+
     // SETTERS
+
     public void setId(String id) {
         this.id = id;
     }

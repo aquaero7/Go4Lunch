@@ -32,9 +32,9 @@ import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,10 +64,14 @@ public class RestaurantRepositoryTest {
     List<Period> periods4;
     List<String> weekdayText4;
 
+    /** Needed for the use of LiveDataTestUtils
+     * InstantTaskExecutorRule is a JUnit Test Rule that swaps the background executor used by the Architecture Components
+     * with a different one which executes each task synchronously.
+     */
     @Rule
-    // Needed for the use of LiveDataTestUtils
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
+    @SuppressWarnings("unchecked")
     private void initializeData() {
         // Set and start Mockito strictness
         mockito = Mockito.mockitoSession()
@@ -81,10 +85,7 @@ public class RestaurantRepositoryTest {
         response2Mock = mock(Response.class);
         nearPlacesMock = mock(GmapsRestaurantPojo.class);
         placeDetailsMock = mock(GmapsRestaurantDetailsPojo.class);
-
         apiClientMock = mock(GmapsApiInterface.class);
-        // Class under test
-        restaurantRepository = RestaurantRepository.getNewInstance(apiClientMock);
 
         photos1 = new ArrayList<>();
         photos2 = new ArrayList<>();
@@ -143,6 +144,9 @@ public class RestaurantRepositoryTest {
                 openingHours4, "rPhoneNumber4", "rWebsite4", geometry4, (long) distance4);
 
         fakePlaceDetails = new  GmapsRestaurantDetailsPojo(restaurant4D, "");
+
+        // Class under test
+        restaurantRepository = RestaurantRepository.getNewInstance(apiClientMock);
     }
 
     private int reOrder(int rank) {
@@ -155,6 +159,7 @@ public class RestaurantRepositoryTest {
         // fakeRestaurantsWithDistance relative to fakeRestaurants : 2-3-1
         return (rank != 2) ? rank+1 : 0;
     }
+
 
     @Before // Before each test
     public void setup() {
@@ -183,11 +188,11 @@ public class RestaurantRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void fetchRestaurantsWithSuccess() throws InterruptedException {
         /** Also testing RestaurantRepository.getRestaurantsMutableLiveData() method */
 
         when(apiClientMock.getPlaces(anyString(), anyString(), anyInt(), anyString())).thenReturn(call1Mock);
-        // doReturn(call1Mock).when(apiClientMock).getPlaces(anyString(), anyString(), anyInt(), anyString());
         doAnswer(invocation -> {
             Callback<GmapsRestaurantPojo> callback1 = invocation.getArgument(0);
             callback1.onResponse(call1Mock, Response.success(fakeNearPlaces));
@@ -198,7 +203,8 @@ public class RestaurantRepositoryTest {
 
         verify(call1Mock, times(1)).enqueue(any());
         verify(apiClientMock, times(1)).getPlaces(
-                "restaurant",currentLatLng.latitude + "," + currentLatLng.longitude,1000,"key");
+                "restaurant",currentLatLng.latitude + "," + currentLatLng.longitude,1000,"key"
+        );
         verify(response1Mock,never()).isSuccessful();
         verify(nearPlacesMock, never()).getNearRestaurants();
 
@@ -223,6 +229,7 @@ public class RestaurantRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void fetchRestaurantDetailsWithSuccess() throws InterruptedException {
         /** Also testing RestaurantRepository.getRestaurantDetailsMutableLiveData() method */
 
@@ -401,5 +408,36 @@ public class RestaurantRepositoryTest {
         restaurantRepository.setRestaurantsToDisplay(fakeRestaurantsWithDistance);
         assertEquals(fakeRestaurantsWithDistance, restaurantRepository.getRestaurantsToDisplay());
     }
-    
+
+    @Test
+    public void setAndGetRestaurantsMutableLiveDataWithSuccess() {
+        List<RestaurantWithDistance> result;
+
+        result = restaurantRepository.getRestaurantsMutableLiveData().getValue();
+        assertNull(result);
+
+        restaurantRepository.setRestaurantsMutableLiveData(fakeRestaurantsWithDistance);
+
+        result = restaurantRepository.getRestaurantsMutableLiveData().getValue();
+        assertNotNull(result);
+        assertEquals(fakeRestaurantsWithDistance.size(), result.size());
+        assertEquals(restaurantWithDistance1, result.get(0));
+        assertEquals(restaurantWithDistance2, result.get(1));
+        assertEquals(restaurantWithDistance3, result.get(2));
+    }
+
+    @Test
+    public void setAndGetRestaurantDetailsMutableLiveDataWithSuccess() {
+        RestaurantWithDistance result;
+
+        result = restaurantRepository.getRestaurantDetailsMutableLiveData().getValue();
+        assertNull(result);
+
+        restaurantRepository.setRestaurantDetailsMutableLiveData(restaurantWithDistance4D);
+
+        result = restaurantRepository.getRestaurantDetailsMutableLiveData().getValue();
+        assertNotNull(result);
+        assertEquals(restaurantWithDistance4D, result);
+    }
+
 }

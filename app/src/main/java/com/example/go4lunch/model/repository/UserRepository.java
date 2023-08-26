@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.model.helper.UserHelper;
-import com.example.go4lunch.utils.Utils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -26,9 +25,6 @@ public class UserRepository {
 
     private static volatile UserRepository instance;
     private final UserHelper userHelper;
-    private FirebaseFirestore firebaseFirestore;
-    private FirebaseAuth firebaseAuth;
-    private AuthUI authUi;
     private final MutableLiveData<List<User>> workmatesMutableLiveData;
     private final MutableLiveData<User> currentUserMutableLiveData;
     private final MutableLiveData<Boolean> userCreationResponseMutableLiveData;
@@ -61,7 +57,7 @@ public class UserRepository {
         }
     }
 
-    /** For test use only : UserHelper dependency injection and new instance factory */
+    /** For test use only : UserHelper dependency injection and new instance factory **************/
     private UserRepository(UserHelper userHelper) {
         this.userHelper = userHelper;
 
@@ -82,10 +78,6 @@ public class UserRepository {
     private UserRepository(FirebaseFirestore firebaseFirestore,
                            FirebaseAuth firebaseAuth,
                            AuthUI authUI) {
-        this.firebaseFirestore = firebaseFirestore;
-        this.firebaseAuth = firebaseAuth;
-        this.authUi = authUI;
-
         userHelper = UserHelper.getNewInstance(firebaseFirestore, firebaseAuth, authUI);
 
         workmatesMutableLiveData = new MutableLiveData<>();
@@ -104,7 +96,7 @@ public class UserRepository {
         instance = new UserRepository(firebaseFirestore, firebaseAuth, authUI);
         return instance;
     }
-    /*********************************************************************************/
+    /**********************************************************************************************/
 
 
     public CollectionReference getUsersCollection() {
@@ -128,18 +120,12 @@ public class UserRepository {
 
     // Get the current user from Firestore and cast it to a User model Object
     public Task<User> getCurrentUserData() {
-        /*  // TODO : To be deleted
-        return (userHelper.getCurrentUserData() != null) ?
-                userHelper.getCurrentUserData().continueWith(task -> task.getResult().toObject(User.class)) : null;
-        */
-
         String uid = userHelper.getFbCurrentUserUID();
         return (uid != null) ? userHelper.getCurrentUserData(uid).continueWith(task -> task.getResult().toObject(User.class)) : null;
     }
 
     // Create user in Firebase
     public void createUser() {
-        // userCreationResponseMutableLiveData.setValue(false); // TODO : To be deleted
         setUserCreationResponseMutableLiveData(false);
         FirebaseUser cUser = getFbCurrentUser();
         if(cUser != null){
@@ -164,7 +150,6 @@ public class UserRepository {
                                         USER_URL_PICTURE, userUrlPicture)
                                 .addOnSuccessListener(command -> {
                                     Log.w("UserRepository", "Update successful");
-                                    // userCreationResponseMutableLiveData.setValue(true);  // TODO : To be deleted
                                     setUserCreationResponseMutableLiveData(true);
                                 })
                                 .addOnFailureListener(e -> Log.w("UserRepository",
@@ -177,7 +162,6 @@ public class UserRepository {
                                 .set(userToCreate)
                                 .addOnSuccessListener(command -> {
                                     Log.w("UserRepository", "Creation successful");
-                                    // userCreationResponseMutableLiveData.setValue(true);  // TODO : To be deleted
                                     setUserCreationResponseMutableLiveData(true);
                                 })
                                 .addOnFailureListener(e -> Log.w("UserRepository",
@@ -190,48 +174,36 @@ public class UserRepository {
 
     // Set or update user selection restaurant id
     public Task<Void> updateSelectionId(String selectionId) {
-        // return userHelper.updateSelectionId(selectionId);    // TODO : To be deleted
-
         String uid = userHelper.getFbCurrentUserUID();
         return (uid != null) ? userHelper.updateSelectionId(uid, selectionId) : null;
     }
 
     // Set or update user selection date
     public Task<Void> updateSelectionDate(String selectionDate) {
-        // return userHelper.updateSelectionDate(selectionDate);   // TODO : To be deleted
-
         String uid = userHelper.getFbCurrentUserUID();
         return (uid != null) ? userHelper.updateSelectionDate(uid, selectionDate) : null;
     }
 
     // Set or update user selection name
     public Task<Void> updateSelectionName(String selectionName) {
-        // return userHelper.updateSelectionName(selectionName);    // TODO : To be deleted
-
         String uid = userHelper.getFbCurrentUserUID();
         return (uid != null) ? userHelper.updateSelectionName(uid, selectionName) : null;
     }
 
     // Set or update user selection address
     public Task<Void> updateSelectionAddress(String selectionAddress) {
-        // return userHelper.updateSelectionAddress(selectionAddress); // TODO : To be deleted
-
         String uid = userHelper.getFbCurrentUserUID();
         return (uid != null) ? userHelper.updateSelectionAddress(uid, selectionAddress) : null;
     }
 
     // Set or update user search radius preferences
     public Task<Void> updateSearchRadiusPrefs(String searchRadiusPrefs) {
-        // return userHelper.updateSearchRadiusPrefs(searchRadiusPrefs);    // TODO : To be deleted
-
         String uid = userHelper.getFbCurrentUserUID();
         return (uid != null) ? userHelper.updateSearchRadiusPrefs(uid, searchRadiusPrefs) : null;
     }
 
     // Set or update user notifications preferences
     public Task<Void> updateNotificationsPrefs(String notificationsPrefs) {
-        // return userHelper.updateNotificationsPrefs(notificationsPrefs); // TODO : To be deleted
-
         String uid = userHelper.getFbCurrentUserUID();
         return (uid != null) ? userHelper.updateNotificationsPrefs(uid, notificationsPrefs) : null;
     }
@@ -266,7 +238,7 @@ public class UserRepository {
             if (task.isSuccessful()) {
                 if (task.getResult() != null) {
                     // Get users list
-                    if (workmatesList != null) workmatesList.clear();
+                    workmatesList.clear();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         // Map<String, Object> userData = document.getData(); // Map data for debug.
                         String uId = Objects.requireNonNull(document.getData().get("uid")).toString();
@@ -282,11 +254,10 @@ public class UserRepository {
 
                         User workmateToAdd = new User(uId, uName, uEmail, uUrlPicture, selectionId, selectionDate,
                                 selectionName, selectionAddress, searchRadiusPrefs, notificationsPrefs);
-                        workmatesList.add(workmateToAdd);
+                        Objects.requireNonNull(workmatesList).add(workmateToAdd);
                     }
-                    sortByName(workmatesList);
+                    sortByName(Objects.requireNonNull(workmatesList));
                     // Populate the LiveData
-                    // workmatesMutableLiveData.setValue(workmatesList);    // TODO : To be deleted
                     setWorkmatesMutableLiveData(workmatesList);
                 }
             } else {
@@ -296,22 +267,18 @@ public class UserRepository {
     }
 
     public void fetchCurrentUser() {
-        // userCreationResponseMutableLiveData.setValue(false);
         getCurrentUserData()
                 .addOnSuccessListener(user -> {
                     if (user != null) {
                         currentUser = user;
                         // Populate the LiveData
-                        // currentUserMutableLiveData.setValue(currentUser);    // TODO : To be deleted
                         setCurrentUserMutableLiveData(currentUser);
-                        // userCreationResponseMutableLiveData.setValue(true);
                         Log.w("UserRepository", "breakPoint");
                     } else {
                         Log.w("UserRepository", "user is null");
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // userCreationResponseMutableLiveData.setValue(false);
                     Log.w("UserRepository", e.getMessage());
                 });
     }
@@ -360,7 +327,6 @@ public class UserRepository {
                 // Sort list
                 sortByName(workmatesList);
                 // Populate the LiveData
-                // workmatesMutableLiveData.setValue(workmatesList);    // TODO : To be deleted
                 setWorkmatesMutableLiveData(workmatesList);
                 break;
             }
@@ -388,7 +354,6 @@ public class UserRepository {
                 // Sort list
                 sortByName(workmatesList);
                 // Populate the LiveData
-                // workmatesMutableLiveData.setValue(workmatesList);    // TODO : To be deleted
                 setWorkmatesMutableLiveData(workmatesList);
                 break;
             }
@@ -401,7 +366,6 @@ public class UserRepository {
         currentUser.setSelectionName(rName);
         currentUser.setSelectionAddress(rAddress);
         // Populate the LiveData
-        // currentUserMutableLiveData.setValue(currentUser);    // TODO : To be deleted
         setCurrentUserMutableLiveData(currentUser);
     }
 
@@ -418,7 +382,6 @@ public class UserRepository {
                 break;
         }
         // Populate the LiveData
-        // currentUserMutableLiveData.setValue(currentUser);    // TODO : To be deleted
         setCurrentUserMutableLiveData(currentUser);
     }
 

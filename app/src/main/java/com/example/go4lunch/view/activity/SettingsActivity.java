@@ -23,9 +23,7 @@ public class SettingsActivity extends BaseActivity<ActivitySettingsBinding>
         configureAndShowSettingsFragment();
     }
 
-    // --------------
-    // CallBack
-    // --------------
+    /** CallBack */
     @Override
     // Binding added as an argument to make it available here
     public void onButtonClicked(View view, String message) {
@@ -33,7 +31,9 @@ public class SettingsActivity extends BaseActivity<ActivitySettingsBinding>
         switch (EventObjectClick.fromView(view)) {
             case BTN_SAVE:
             case SW_NOTIFICATION:
-                if (message != null) Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
+                if (message != null) Snackbar
+                        .make(binding.getRoot(), message, Snackbar.LENGTH_LONG)
+                        .show();
                 break;
         }
     }
@@ -42,8 +42,8 @@ public class SettingsActivity extends BaseActivity<ActivitySettingsBinding>
         // Get FragmentManager (Support) and try to find existing instance of fragment in FrameLayout container
         SettingsFragment settingsFragment = (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.frameLayoutSettings);
         if (settingsFragment == null) {
-            // Create instance of settings fragment (instead of new settings fragment) TODO : To be confirmed
-            settingsFragment = SettingsFragment.newInstance(); // instead of : new SettingsFragment();
+            // Create instance of settings fragment
+            settingsFragment = SettingsFragment.newInstance();
             // Add it to FrameLayout container
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.frameLayoutSettings, settingsFragment)

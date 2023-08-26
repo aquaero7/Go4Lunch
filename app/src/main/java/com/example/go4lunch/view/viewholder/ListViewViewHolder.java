@@ -10,7 +10,6 @@ import com.example.go4lunch.databinding.RestaurantListItemBinding;
 import com.squareup.picasso.Picasso;
 
 public class ListViewViewHolder extends RecyclerView.ViewHolder {
-
     RestaurantListItemBinding binding;
 
     public ListViewViewHolder(@NonNull View itemView) {
@@ -18,8 +17,8 @@ public class ListViewViewHolder extends RecyclerView.ViewHolder {
         binding = RestaurantListItemBinding.bind(itemView);
     }
 
-    public void updateWithRestaurants(String name, double rating, String distance, int selectionsCount,
-                                      String openingInfo, String photoUrl) {
+    public void updateWithRestaurants(String name, double rating, String distance,
+                                      int selectionsCount, String openingInfo, String photoUrl) {
 
         // Display restaurant name and Setup text scrolling
         binding.restaurantItemTitle.setText(name);

@@ -54,8 +54,7 @@
                 android:paddingHorizontal="12dp"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:ellipsize="marquee"
-                />
+                android:ellipsize="marquee"/>
 
             <RatingBar
                 android:id="@+id/rating_bar_restaurant"
@@ -69,8 +68,7 @@
                 android:numStars="3"
                 android:rating="2"
                 android:stepSize="0.1"
-                android:isIndicator="true"
-                />
+                android:isIndicator="true"/>
 
         </LinearLayout>
 
@@ -87,8 +85,7 @@
             android:paddingHorizontal="12dp"
             android:maxLines="1"
             android:singleLine="true"
-            android:ellipsize="marquee"
-            />
+            android:ellipsize="marquee"/>
 
         <TextView
             android:id="@+id/tv3_restaurant"

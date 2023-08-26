@@ -19,6 +19,7 @@ public class OpenClose implements Serializable {
     public OpenClose() {
     }
 
+    // Constructor
     public OpenClose(long day, String time) {
         this.day = day;
         this.time = time;

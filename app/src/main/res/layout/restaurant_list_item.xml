@@ -56,7 +56,8 @@
         android:textStyle="bold"
         android:textColor="@color/black"
         app:layout_constraintTop_toBottomOf="@id/restaurant_item_distance"
-        app:layout_constraintEnd_toStartOf="@id/restaurant_item_picture"/>
+        app:layout_constraintEnd_toStartOf="@id/restaurant_item_picture"
+        tools:ignore="RtlSymmetry"/>
 
     <!-- Line 3 -->
     <TextView

@@ -82,5 +82,4 @@
         android:text="@string/button_sign_in_google"
         android:id="@+id/button_google"/>
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>

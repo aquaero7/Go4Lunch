@@ -32,8 +32,7 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Initialize ViewModel
-        // authViewModel = new ViewModelProvider(this, new ViewModelFactory(getApplication())).get(AuthViewModel.class); // If VM extends AndroidViewModel
-        authViewModel = new ViewModelProvider(this, new ViewModelFactory()).get(AuthViewModel.class); // If VM extends ViewModel
+        authViewModel = new ViewModelProvider(this, new ViewModelFactory()).get(AuthViewModel.class);
         // Listen to the clicks on button(s)
         setupListeners();
         // Check permissions and get device location
@@ -49,9 +48,9 @@ public class AuthActivity extends BaseActivity<ActivityAuthBinding> {
     private void checkPermissions() {
         // This is the result of the user answer to permissions request
         ActivityResultContracts.RequestMultiplePermissions permissionsContract = new ActivityResultContracts.RequestMultiplePermissions();
-        ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(permissionsContract, result -> {
-            authViewModel.manageUserAnswerForPermissions(result);
-        });
+        ActivityResultLauncher<String[]> requestPermissionsLauncher = registerForActivityResult(
+                permissionsContract, result -> authViewModel.manageUserAnswerForPermissions(result)
+        );
 
         // Check and request permissions
         authViewModel.checkAndRequestPermissions(requestPermissionsLauncher, getApplicationContext());

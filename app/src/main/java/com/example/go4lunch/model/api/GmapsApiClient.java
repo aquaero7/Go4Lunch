@@ -8,7 +8,6 @@ public class GmapsApiClient {
     private static Retrofit retrofit;
 
     public static GmapsApiInterface getApiClient() {
-
         // Build retrofit
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
@@ -16,7 +15,7 @@ public class GmapsApiClient {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
-        // Create object for the interface
+        // Create the object for the API interface
         GmapsApiInterface apiClient = retrofit.create(GmapsApiInterface.class);
 
         // Return the API interface object

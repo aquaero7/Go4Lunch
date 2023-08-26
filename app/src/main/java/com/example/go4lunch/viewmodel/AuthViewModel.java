@@ -11,9 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
-import com.example.go4lunch.model.api.GmapsApiClient;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
@@ -28,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class AuthViewModel extends ViewModel {
 
@@ -35,21 +34,12 @@ public class AuthViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
-    // private final Application application; // Only if AuthViewModel extends AndroidViewModel
 
     // Constructor
-    // public AuthViewModel(@NonNull Application application) { // Only if AuthViewModel extends AndroidViewModel
-        // super(application); // Only if AuthViewModel extends AndroidViewModel
-        // this.application = application; // Only if AuthViewModel extends AndroidViewModel
     public AuthViewModel(
             UserRepository userRepository, LocationRepository locationRepository,
             RestaurantRepository restaurantRepository, LikedRestaurantRepository likedRestaurantRepository) {
-        /*
-        userRepository = UserRepository.getInstance();
-        locationRepository = LocationRepository.getInstance();
-        restaurantRepository = RestaurantRepository.getInstance();
-        likedRestaurantRepository = LikedRestaurantRepository.getInstance();
-        */
+
         this.userRepository = userRepository;
         this.locationRepository = locationRepository;
         this.restaurantRepository = restaurantRepository;
@@ -77,10 +67,10 @@ public class AuthViewModel extends ViewModel {
     // Fetchers (using Maps and Firebase APIs)
 
     public void fetchDataExceptRestaurants(Context context) {
-        fetchCurrentUser();   // Fetch current user
-        fetchCurrentLocation(context); // Fetch current location
-        fetchWorkmates();     // Fetch workmates list
-        fetchLikedRestaurants();  // Fetch liked restaurants list
+        fetchCurrentUser();
+        fetchCurrentLocation(context);
+        fetchWorkmates();
+        fetchLikedRestaurants();
     }
 
     public void fetchCurrentUser() {
@@ -93,7 +83,6 @@ public class AuthViewModel extends ViewModel {
 
     public void fetchCurrentLocation(Context context) {
         FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
-        // locationRepository.fetchCurrentLocation(fusedLocationProviderClient, application.getApplicationContext()); // Only if AuthViewModel extends AndroidViewModel
         locationRepository.fetchCurrentLocation(fusedLocationProviderClient, context);
     }
 
@@ -109,7 +98,7 @@ public class AuthViewModel extends ViewModel {
                         }
                     })
                     .addOnFailureListener(e -> {
-                        Log.w("AuthViewModel", e.getMessage());
+                        Log.w("AuthViewModel", Objects.requireNonNull(e.getMessage()));
                     });
         } else {
             Log.w("AuthViewModel", "user is null");

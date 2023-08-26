@@ -26,9 +26,7 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         configureAndShowDetailRestaurantFragment();
     }
 
-    // --------------
-    // CallBack
-    // --------------
+    /** CallBack */
     @Override
     public void onButtonClicked(View view, String message, String rPhoneNumber, String rWebsite) {
         // Handle the button click event
@@ -37,19 +35,23 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
                 if (rPhoneNumber != null) {
                     startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + rPhoneNumber)));
                 } else {
-                    Snackbar.make(binding.getRoot(), getString(R.string.error_no_phone_number), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(binding.getRoot(), getString(R.string.error_no_phone_number), Snackbar.LENGTH_LONG)
+                            .show();
                 }
                 break;
             case BTN_WEBSITE:
                 if (rWebsite != null) {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(rWebsite)));
                 } else {
-                    Snackbar.make(binding.getRoot(), getString(R.string.error_no_website), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(binding.getRoot(), getString(R.string.error_no_website), Snackbar.LENGTH_LONG)
+                            .show();
                 }
                 break;
             case BTN_LIKE:
             case FAB_SELECT:
-                if (message != null) Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
+                if (message != null) Snackbar
+                        .make(binding.getRoot(), message, Snackbar.LENGTH_LONG)
+                        .show();
                 break;
         }
     }
@@ -59,8 +61,8 @@ public class DetailRestaurantActivity extends BaseActivity<ActivityDetailRestaur
         DetailRestaurantFragment detailRestaurantFragment =
                 (DetailRestaurantFragment) getSupportFragmentManager().findFragmentById(R.id.frameLayoutDetailRestaurant);
         if (detailRestaurantFragment == null) {
-            // Create instance of detail restaurant fragment (instead of new detail restaurant fragment) TODO : To be confirmed
-            detailRestaurantFragment = DetailRestaurantFragment.newInstance();  // instead of : new DetailRestaurantFragment();
+            // Create instance of detail restaurant fragment
+            detailRestaurantFragment = DetailRestaurantFragment.newInstance();
             // Add it to FrameLayout container
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.frameLayoutDetailRestaurant, detailRestaurantFragment)

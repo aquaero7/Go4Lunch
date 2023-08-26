@@ -9,7 +9,8 @@ import androidx.viewbinding.ViewBinding;
 
 /**
  * Base Activity class that allow to manage all the common code for the activities
- * @param <T> Should be the type of the viewBinding of your activity see more <a href="https://developer.android.com/topic/libraries/view-binding"> here </a>
+ * @param <T> Should be the type of the viewBinding of your activity
+ * see more <a href="https://developer.android.com/topic/libraries/view-binding"> here </a>
  */
 abstract class BaseActivity<T extends ViewBinding> extends AppCompatActivity {
 

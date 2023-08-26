@@ -35,14 +35,14 @@ public class SettingsViewModelTest {
         userRepositoryMock = mock(UserRepository.class);
         restaurantRepositoryMock = mock(RestaurantRepository.class);
 
-        // Class under test
-        settingsViewModel = new SettingsViewModel(userRepositoryMock, restaurantRepositoryMock);
-
         id1 = "id1"; name1 = "name1"; email1 = "email1"; url1 = "url1";
         selId1 = "selId1"; selDate1 = "selDate1"; selName1 = "selName1"; selAddress1 = "selAddress1";
         radius1 = "radius1"; notifications1 = "true";
 
         currentUser = new User(id1, name1, email1, url1, selId1, selDate1, selName1, selAddress1, radius1, notifications1);
+
+        // Class under test
+        settingsViewModel = new SettingsViewModel(userRepositoryMock, restaurantRepositoryMock);
     }
 
     @Before // Before each test

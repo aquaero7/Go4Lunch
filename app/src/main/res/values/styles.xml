@@ -3,6 +3,7 @@
 
     <!-- BASE APPLICATION THEME -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
         <!-- Customize base theme -->
         <item name="colorPrimary">@color/app_background</item>
         <item name="colorPrimaryDark">@color/app_background_dark</item>
@@ -10,6 +11,7 @@
 
         <!-- Customize color of Nav Drawer button -->
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+
     </style>
 
     <!-- NO ACTIONBAR THEME -->
@@ -17,12 +19,14 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="colorControlActivated">@color/blue_pb</item>  <!-- progressBar -->
+
     </style>
 
     <!-- TOOLBAR THEME -->
     <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <!-- Color of the title text in the Toolbar -->
         <item name="android:textColorPrimary">@color/design_default_color_primary_variant</item>
+
     </style>
 
     <!-- TOOLBAR TITLE THEME -->
@@ -30,12 +34,14 @@
         <item name="android:textSize">21sp</item>
         <item name="android:textStyle">italic</item>
         <item name="android:textColor">@color/white</item>
+
     </style>
 
     <!-- TOOLBAR NAV DRAWER BUTTON THEME -->
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <!-- Color of the Nav Drawer button in the Toolbar -->
         <item name="color">@color/white</item>
+
     </style>
 
     <!-- TOOLBAR SEARCH VIEW THEME -->
@@ -43,6 +49,7 @@
         <!-- Color of the query text in the SearchView -->
         <item name="android:editTextColor">@color/black</item>
         <item name="android:background">@color/white</item>
+
     </style>
 
     <!-- SIGN-IN ACTIVITY THEME -->
@@ -61,13 +68,13 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:textColorHint">@android:color/darker_gray</item>
+
     </style>
 
     <!-- ALERT DIALOG THEME -->
     <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
         <item name="android:colorAccent">@color/red</item>
+
     </style>
-
-
 
 </resources>

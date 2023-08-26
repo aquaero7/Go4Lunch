@@ -26,7 +26,8 @@ public class RestaurantWithDistance implements Serializable {
     // Constructor
     public RestaurantWithDistance(String rid, String name, @Nullable List<Photo> photos,
                                   String address, double rating, @Nullable OpeningHours openingHours,
-                                  @Nullable String phoneNumber, @Nullable String website, Geometry geometry, long distance) {
+                                  @Nullable String phoneNumber, @Nullable String website,
+                                  Geometry geometry, long distance) {
         this.rid = rid;
         this.name = name;
         this.photos = photos;
@@ -41,6 +42,7 @@ public class RestaurantWithDistance implements Serializable {
 
 
     // GETTERS
+
     public String getRid() {
         return rid;
     }
@@ -74,6 +76,7 @@ public class RestaurantWithDistance implements Serializable {
 
 
     // SETTERS
+
     public void setRid(String rid) {
         this.rid = rid;
     }

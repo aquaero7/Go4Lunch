@@ -10,10 +10,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import com.example.go4lunch.model.helper.UserHelper;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.model.repository.UserRepository;
+import com.example.go4lunch.utils.LiveDataTestUtils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,8 +21,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.junit.After;
@@ -32,14 +30,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoSession;
 import org.mockito.quality.Strictness;
-import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class UserRepositoryTest {
@@ -49,25 +43,25 @@ public class UserRepositoryTest {
     private UserHelper userHelper;
     private UserHelper userHelperMock;
     private Context contextMock;
-
     private FirebaseFirestore firebaseFirestoreMock;
     private FirebaseAuth firebaseAuthMock;
     private AuthUI authUiMock;
     private FirebaseUser firebaseUserMock;
     private CollectionReference collectionReferenceMock;
     private DocumentReference documentReferenceMock;
-    private Query queryMock;
     private Task<DocumentSnapshot> documentSnapshotTaskMock;
-    private DocumentSnapshot documentSnapshotMock;
     private Task<User> userTaskMock;
     private Task<QuerySnapshot> querySnapshotTaskMock;
-    private QuerySnapshot querySnapshotMock;
     private User user1, user2, user3, user4;
     private List<User> workmates;
 
 
+
+    /** Needed for the use of LiveDataTestUtils
+     * InstantTaskExecutorRule is a JUnit Test Rule that swaps the background executor used by the Architecture Components
+     * with a different one which executes each task synchronously.
+     */
     @Rule
-    // Needed for the use of LiveDataTestUtils
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     private void initializeData() {
@@ -87,11 +81,8 @@ public class UserRepositoryTest {
         collectionReferenceMock = mock(CollectionReference.class);
         documentReferenceMock = mock(DocumentReference.class);
         documentSnapshotTaskMock = mock(Task.class);
-        documentSnapshotMock = mock(DocumentSnapshot.class);
         userTaskMock = mock(Task.class);
-        queryMock = mock(Query.class);
         querySnapshotTaskMock = mock(Task.class);
-        querySnapshotMock = mock(QuerySnapshot.class);
 
         user1 = new User("uId1", "name1", "eMail1", "url1",
                 null, null, null, null, null, null);
@@ -103,39 +94,10 @@ public class UserRepositoryTest {
                 null, null, null, null, null, null);
         workmates = Arrays.asList(user3, user1, user4, user2);
 
-
         // Class under test
         userRepository = UserRepository.getNewInstance(userHelperMock);
         userRepositoryAndHelper = UserRepository.getNewInstance(firebaseFirestoreMock, firebaseAuthMock, authUiMock);
         userHelper = UserHelper.getNewInstance(firebaseFirestoreMock, firebaseAuthMock, authUiMock);
-
-
-    }
-
-    private void waitingToBeUsed() {
-
-
-        when(userHelperMock.getFbCurrentUserUID()).thenCallRealMethod();
-        when(firebaseFirestoreMock.collection("users")).thenReturn(collectionReferenceMock);
-        when(collectionReferenceMock.document(anyString())).thenReturn(documentReferenceMock);
-        when(documentReferenceMock.get()).thenReturn(documentSnapshotTaskMock);
-
-        when(collectionReferenceMock.whereEqualTo(anyString(), anyString())).thenReturn(queryMock);
-        when(queryMock.whereEqualTo(anyString(), anyString())).thenReturn(queryMock);
-        when(queryMock.get()).thenReturn(querySnapshotTaskMock);
-        when(querySnapshotTaskMock.addOnSuccessListener(any(OnSuccessListener.class))).thenReturn(querySnapshotTaskMock);
-        when(querySnapshotMock.getDocuments()).thenReturn(Collections.singletonList(documentSnapshotMock));
-
-
-        when(collectionReferenceMock.document()).thenReturn(documentReferenceMock);
-        when(documentReferenceMock.get()).thenReturn(documentSnapshotTaskMock);
-        when(documentSnapshotTaskMock.addOnCompleteListener(any())).thenReturn(documentSnapshotTaskMock);
-
-        when(documentSnapshotMock.get(anyString())).thenReturn("test");
-
-        when(userHelperMock.getUsersCollection().get().addOnCompleteListener(any(OnCompleteListener.class))).thenReturn(documentSnapshotTaskMock);
-
-
     }
 
     @Before // Before each test
@@ -215,6 +177,7 @@ public class UserRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void getUsersListWithSuccess() {
         userRepository.getUsersList(task -> {
             // Testing Repository
@@ -435,6 +398,7 @@ public class UserRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void fetchWorkmatesWithSuccess() {
         // Testing Repository
         doNothing().when(userHelperMock).getUsersList(any(OnCompleteListener.class));
@@ -477,40 +441,40 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void setAndGetUserCreationResponseMutableLiveDataWithSuccess() {
+    public void setAndGetUserCreationResponseMutableLiveDataWithSuccess() throws InterruptedException {
         // Testing Repository
 
         userRepository.setUserCreationResponseMutableLiveData(false);
-        assertEquals(Boolean.FALSE, userRepository.getUserCreationResponseMutableLiveData().getValue());
+        assertEquals(Boolean.FALSE, LiveDataTestUtils.getValue(userRepository.getUserCreationResponseMutableLiveData()));
 
         userRepository.setUserCreationResponseMutableLiveData(true);
-        assertEquals(Boolean.TRUE, userRepository.getUserCreationResponseMutableLiveData().getValue());
+        assertEquals(Boolean.TRUE, LiveDataTestUtils.getValue(userRepository.getUserCreationResponseMutableLiveData()));
     }
 
     @Test
-    public void setAndGetWorkmatesMutableLiveDataWithSuccess() {
+    public void setAndGetWorkmatesMutableLiveDataWithSuccess() throws InterruptedException {
         // Testing Repository
 
         userRepository.setWorkmatesMutableLiveData(new ArrayList<>());
-        assertEquals(0, Objects.requireNonNull(userRepository.getWorkmatesMutableLiveData().getValue()).size());
+        assertEquals(0, Objects.requireNonNull(LiveDataTestUtils.getValue(userRepository.getWorkmatesMutableLiveData())).size());
 
         userRepository.setWorkmatesMutableLiveData(workmates);
-        assertEquals(workmates, userRepository.getWorkmatesMutableLiveData().getValue());
+        assertEquals(workmates, LiveDataTestUtils.getValue(userRepository.getWorkmatesMutableLiveData()));
     }
 
     @Test
-    public void setAndGetCurrentUserMutableLiveDataWithSuccess() {
+    public void setAndGetCurrentUserMutableLiveDataWithSuccess() throws InterruptedException {
         // Testing Repository
 
         userRepository.setCurrentUserMutableLiveData(null);
-        assertNull(userRepository.getCurrentUserMutableLiveData().getValue());
+        assertNull(LiveDataTestUtils.getValue(userRepository.getCurrentUserMutableLiveData()));
 
         userRepository.setCurrentUserMutableLiveData(user1);
-        assertEquals(user1, userRepository.getCurrentUserMutableLiveData().getValue());
+        assertEquals(user1, LiveDataTestUtils.getValue(userRepository.getCurrentUserMutableLiveData()));
     }
 
     @Test
-    public void updateWorkmatesWithSelectionWithSuccess() {
+    public void updateWorkmatesWithSelectionWithSuccess() throws InterruptedException {
         // Testing Repository
         userRepository.setWorkmates(workmates);
         when(userHelperMock.getFbCurrentUserUID()).thenReturn("uId3");
@@ -530,11 +494,11 @@ public class UserRepositoryTest {
         assertEquals("rName3", userRepository.getWorkmates().get(2).getSelectionName());
         assertEquals("rAddress3", userRepository.getWorkmates().get(2).getSelectionAddress());
 
-        assertEquals(userRepository.getWorkmates(), userRepository.getWorkmatesMutableLiveData().getValue());
+        assertEquals(userRepository.getWorkmates(), LiveDataTestUtils.getValue(userRepository.getWorkmatesMutableLiveData()));
     }
 
     @Test
-    public void updateWorkmatesWithSearchRadiusPrefsWithSuccess() {
+    public void updateWorkmatesWithSearchRadiusPrefsWithSuccess() throws InterruptedException {
         // Testing Repository
         userRepository.setWorkmates(workmates);
         when(userHelperMock.getFbCurrentUserUID()).thenReturn("uId3");
@@ -552,11 +516,11 @@ public class UserRepositoryTest {
         assertEquals("radius3", userRepository.getWorkmates().get(2).getSearchRadiusPrefs());
         assertNull(userRepository.getWorkmates().get(2).getNotificationsPrefs());
 
-        assertEquals(userRepository.getWorkmates(), userRepository.getWorkmatesMutableLiveData().getValue());
+        assertEquals(userRepository.getWorkmates(), LiveDataTestUtils.getValue(userRepository.getWorkmatesMutableLiveData()));
     }
 
     @Test
-    public void updateWorkmatesWithNotificationsPrefsWithSuccess() {
+    public void updateWorkmatesWithNotificationsPrefsWithSuccess() throws InterruptedException {
         // Testing Repository
         userRepository.setWorkmates(workmates);
         when(userHelperMock.getFbCurrentUserUID()).thenReturn("uId3");
@@ -574,11 +538,11 @@ public class UserRepositoryTest {
         assertNull(userRepository.getWorkmates().get(2).getSearchRadiusPrefs());
         assertEquals("notifications3", userRepository.getWorkmates().get(2).getNotificationsPrefs());
 
-        assertEquals(userRepository.getWorkmates(), userRepository.getWorkmatesMutableLiveData().getValue());
+        assertEquals(userRepository.getWorkmates(), LiveDataTestUtils.getValue(userRepository.getWorkmatesMutableLiveData()));
     }
 
     @Test
-    public void updateCurrentUserWithSelectionWithSuccess() {
+    public void updateCurrentUserWithSelectionWithSuccess() throws InterruptedException {
         // Testing Repository
         userRepository.setCurrentUser(user1);
 
@@ -597,11 +561,11 @@ public class UserRepositoryTest {
         assertEquals("rName1", userRepository.getCurrentUser().getSelectionName());
         assertEquals("rAddress1", userRepository.getCurrentUser().getSelectionAddress());
 
-        assertEquals(userRepository.getCurrentUser(), userRepository.getCurrentUserMutableLiveData().getValue());
+        assertEquals(userRepository.getCurrentUser(), LiveDataTestUtils.getValue(userRepository.getCurrentUserMutableLiveData()));
     }
 
     @Test
-    public void updateCurrentUserWithSearchRadiusPrefsWithSuccess() {
+    public void updateCurrentUserWithSearchRadiusPrefsWithSuccess() throws InterruptedException {
         // Testing Repository
         userRepository.setCurrentUser(user1);
 
@@ -616,11 +580,11 @@ public class UserRepositoryTest {
         assertEquals("radius1", userRepository.getCurrentUser().getSearchRadiusPrefs());
         assertNull(userRepository.getCurrentUser().getNotificationsPrefs());
 
-        assertEquals(userRepository.getCurrentUser(), userRepository.getCurrentUserMutableLiveData().getValue());
+        assertEquals(userRepository.getCurrentUser(), LiveDataTestUtils.getValue(userRepository.getCurrentUserMutableLiveData()));
     }
 
     @Test
-    public void updateCurrentUserWithNotificationsPrefsWithSuccess() {
+    public void updateCurrentUserWithNotificationsPrefsWithSuccess() throws InterruptedException {
         // Testing Repository
         userRepository.setCurrentUser(user1);
 
@@ -635,7 +599,7 @@ public class UserRepositoryTest {
         assertNull(userRepository.getCurrentUser().getSearchRadiusPrefs());
         assertEquals("notifications1", userRepository.getCurrentUser().getNotificationsPrefs());
 
-        assertEquals(userRepository.getCurrentUser(), userRepository.getCurrentUserMutableLiveData().getValue());
+        assertEquals(userRepository.getCurrentUser(), LiveDataTestUtils.getValue(userRepository.getCurrentUserMutableLiveData()));
     }
 
     @Test
@@ -670,8 +634,5 @@ public class UserRepositoryTest {
         userRepository.setSelectors(workmates);
         assertEquals(workmates, userRepository.getSelectors());
     }
-
-
-
 
 }

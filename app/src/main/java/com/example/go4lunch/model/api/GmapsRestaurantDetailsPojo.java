@@ -6,9 +6,10 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
+/**
+ * POJO class to get the data from web api
+ */
 public class GmapsRestaurantDetailsPojo implements Serializable {
-    // POJO class to get the data from web api
-
     @SerializedName("result")
     @Expose
     private Restaurant restaurantDetails;
@@ -17,6 +18,7 @@ public class GmapsRestaurantDetailsPojo implements Serializable {
     @Expose
     private String status;
 
+    // Constructor
     public GmapsRestaurantDetailsPojo(Restaurant restaurantDetails, String status) {
         this.restaurantDetails = restaurantDetails;
         this.status = status;

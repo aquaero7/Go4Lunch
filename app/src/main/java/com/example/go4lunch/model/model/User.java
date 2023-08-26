@@ -54,6 +54,7 @@ public class User implements Serializable {
 
 
     // GETTERS
+
     public String getUid() {
         return uid;
     }
@@ -87,6 +88,7 @@ public class User implements Serializable {
 
 
     // SETTERS
+
     public void setUid(String uid) {
         this.uid = uid;
     }

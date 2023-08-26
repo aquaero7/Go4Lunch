@@ -35,13 +35,12 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         binding = FragmentSettingsBinding.inflate(inflater, container, false);
-        // Initialize ViewModel
         settingsViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(SettingsViewModel.class);
+
         // Initialize preferences
         initPrefs();
-        //Set listeners on buttons and switch
+        // Set listeners on buttons and switch
         setListeners();
 
         return binding.getRoot();
@@ -65,6 +64,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
                     getString(R.string.switch_checked) : getString(R.string.switch_unchecked);
                 break;
         }
+
         mCallback.onButtonClicked(v, message);
     }
 

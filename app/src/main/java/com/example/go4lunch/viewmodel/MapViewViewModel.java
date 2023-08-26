@@ -3,13 +3,10 @@ package com.example.go4lunch.viewmodel;
 import android.content.Context;
 import android.content.Intent;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.MainApplication;
-import com.example.go4lunch.model.api.GmapsApiClient;
 import com.example.go4lunch.model.repository.AutocompleteRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
@@ -22,7 +19,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.maps.android.SphericalUtil;
 
@@ -43,13 +39,7 @@ public class MapViewViewModel extends ViewModel {
             UserRepository userRepository, LocationRepository locationRepository,
             RestaurantRepository restaurantRepository, AutocompleteRepository autocompleteRepository,
             Utils utils) {
-        /*
-        userRepository = UserRepository.getInstance();
-        locationRepository = LocationRepository.getInstance();
-        restaurantRepository = RestaurantRepository.getInstance();
-        autocompleteRepository = AutocompleteRepository.getInstance();
-        utils = Utils.getInstance();
-        */
+
         this.userRepository = userRepository;
         this.locationRepository = locationRepository;
         this.restaurantRepository = restaurantRepository;

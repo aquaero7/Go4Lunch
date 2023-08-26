@@ -27,9 +27,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
         this.restaurantsList = restaurantsList;
         this.workmatesList = workmatesList;
         this.context = context;
-
     }
-
 
     @NonNull
     @Override

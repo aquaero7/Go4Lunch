@@ -1,16 +1,11 @@
 package com.example.go4lunch.viewmodel;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.go4lunch.MainApplication;
-import com.example.go4lunch.model.api.GmapsApiClient;
 import com.example.go4lunch.model.repository.AutocompleteRepository;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
@@ -18,19 +13,10 @@ import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.utils.Utils;
 
-import java.io.UncheckedIOException;
-
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
-    Application application; // For AuthViewModel and MainViewModel only if extending AndroidViewModel
-
-    // Empty constructor (for most ViewModels) extending ViewModel
+    // Constructor
     public ViewModelFactory() {}
-
-    // Constructor for AuthViewModel and MainViewModel only if extending AndroidViewModel
-    public ViewModelFactory(Application application) {
-        this.application = application;
-    }
 
     @SuppressWarnings("unchecked")
     @NonNull
@@ -44,11 +30,13 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
 
         } else if(modelClass.isAssignableFrom(ListViewViewModel.class)) {
             return (T) new ListViewViewModel(
-                    UserRepository.getInstance(), RestaurantRepository.getInstance(), Utils.getInstance());
+                    UserRepository.getInstance(), RestaurantRepository.getInstance(),
+                    Utils.getInstance());
 
         } else if(modelClass.isAssignableFrom(WorkmatesViewModel.class)) {
             return (T) new WorkmatesViewModel(
-                    UserRepository.getInstance(), RestaurantRepository.getInstance(), Utils.getInstance());
+                    UserRepository.getInstance(), RestaurantRepository.getInstance(),
+                    Utils.getInstance());
 
         } else if(modelClass.isAssignableFrom(DetailRestaurantViewModel.class)) {
             return (T) new DetailRestaurantViewModel(
@@ -60,17 +48,15 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
                     UserRepository.getInstance(), RestaurantRepository.getInstance());
 
         } else if(modelClass.isAssignableFrom(AuthViewModel.class)) {
-            // return (T) new AuthViewModel(application); // If extending AndroidViewModel
             return (T) new AuthViewModel(
                     UserRepository.getInstance(), LocationRepository.getInstance(),
-                    RestaurantRepository.getInstance(), LikedRestaurantRepository.getInstance()); // If extending ViewModel
+                    RestaurantRepository.getInstance(), LikedRestaurantRepository.getInstance());
 
         } else if (modelClass.isAssignableFrom(MainViewModel.class)) {
-            // return (T) new MainViewModel(application); // If extending AndroidViewModel
             return (T) new MainViewModel(
                     UserRepository.getInstance(), LocationRepository.getInstance(),
                     RestaurantRepository.getInstance(), LikedRestaurantRepository.getInstance(),
-                    Utils.getInstance()); // If extending ViewModel
+                    Utils.getInstance());
 
         } else {
             throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());

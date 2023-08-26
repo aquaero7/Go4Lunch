@@ -1,6 +1,5 @@
 package com.example.go4lunch.model.repository;
 
-import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
@@ -12,7 +11,6 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
@@ -49,12 +47,12 @@ public class LocationRepository {
         }
     }
 
-    /** For test use only : New instance factory */
+    /** For test use only : New instance factory **************************************************/
     public static LocationRepository getNewInstance() {
         instance = new LocationRepository();
         return instance;
     }
-    /*********************************************/
+    /**********************************************************************************************/
 
 
     @SuppressWarnings("MissingPermission")  // Permissions already checked in AuthActivity
@@ -73,7 +71,7 @@ public class LocationRepository {
                         // Initialize home
                         home = new LatLng(latitude, longitude);
                         // Populate the LiveData
-                        currentLocationMutableLiveData.setValue(home);
+                        setCurrentLocationMutableLiveData(home);
                     } else {
                         // Get the updated current location...
                         // Setup parameters of location request
@@ -93,7 +91,7 @@ public class LocationRepository {
                                         // Initialize home
                                         home = new LatLng(latitude, longitude);
                                         // Populate the LiveData
-                                        currentLocationMutableLiveData.setValue(home);
+                                        setCurrentLocationMutableLiveData(home);
                                     }
                                 }
                             }
@@ -113,6 +111,10 @@ public class LocationRepository {
 
     public MutableLiveData<LatLng> getCurrentLocationMutableLiveData() {
         return currentLocationMutableLiveData;
+    }
+
+    public void setCurrentLocationMutableLiveData(LatLng latLng) {
+        currentLocationMutableLiveData.setValue(latLng);
     }
 
     public void setPermissions(boolean granted) {

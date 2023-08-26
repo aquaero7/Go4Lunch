@@ -14,13 +14,20 @@ public class Geometry implements Serializable {
     // Empty constructor to allow firebase to cast document to object model
     public Geometry() {}
 
+    // Constructor
     public Geometry(Location location) {
         this.location = location;
     }
 
+
+    // GETTERS
+
     public Location getLocation() {
         return location;
     }
+
+
+    // SETTERS
 
     public void setLocation(Location location) {
         this.location = location;

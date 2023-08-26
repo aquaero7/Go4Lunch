@@ -47,5 +47,4 @@ public class DetailRestaurantWorkmateAdapter extends RecyclerView.Adapter<Detail
         return this.selectorsList.size();
     }
 
-
 }

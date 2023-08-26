@@ -41,7 +41,7 @@ public class RestaurantRepository {
     private final List<RestaurantWithDistance> restaurantsToDisplay;
     private RestaurantWithDistance restaurant;
     private boolean restaurantIsSelected;
-    private GmapsApiInterface apiClient;
+    private final GmapsApiInterface apiClient;
 
     private RestaurantRepository() {
         apiClient = GmapsApiClient.getApiClient();
@@ -64,7 +64,7 @@ public class RestaurantRepository {
         }
     }
 
-    /** For test use only : GmapsApiInterface dependency injection and new instance factory */
+    /** For test use only : GmapsApiInterface dependency injection and new instance factory *******/
     private RestaurantRepository(GmapsApiInterface apiClient) {
         this.apiClient = apiClient;
 
@@ -80,13 +80,14 @@ public class RestaurantRepository {
         instance = new RestaurantRepository(apiClient);
         return instance;
     }
-    /**************************************************************************************/
+    /**********************************************************************************************/
 
 
     public void fetchRestaurants(LatLng home, String radius, String apiKey) {
-        // Call Place Nearby Search API ////////////////////////////////////////////////////////////
+        // Call Place Nearby Search API <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         Call<GmapsRestaurantPojo> call1 = apiClient.getPlaces(
-                "restaurant", home.latitude + "," + home.longitude, Integer.parseInt(radius)*1000, apiKey);
+                "restaurant", home.latitude + "," + home.longitude,
+                Integer.parseInt(radius)*1000, apiKey);
         call1.enqueue(new Callback<GmapsRestaurantPojo>() {
             @Override
             public void onResponse(@NonNull Call<GmapsRestaurantPojo> call1, @NonNull Response<GmapsRestaurantPojo> response1) {
@@ -116,7 +117,7 @@ public class RestaurantRepository {
                     restaurantsListWithDistance = updateRestaurantsListWithDistances(restaurantsList, home);
                     sortByDistanceAndName(restaurantsListWithDistance);
                     // Populate the LiveData
-                    restaurantsMutableLiveData.setValue(restaurantsListWithDistance);
+                    setRestaurantsMutableLiveData(restaurantsListWithDistance);
                 } else {
                     Log.w("RestaurantRepository", "Empty nearby restaurants list");
                 }
@@ -131,16 +132,17 @@ public class RestaurantRepository {
 
     public void fetchRestaurantDetails(RestaurantWithDistance nearbyRestaurant, String apiKey) {
 
-        // Call Place Details API //////////////////////////////////////////////////////////////////
+        // Call Place Details API <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         Call<GmapsRestaurantDetailsPojo> call2 = apiClient.getPlaceDetails(
                 nearbyRestaurant.getRid(),
                 "formatted_address,formatted_phone_number,website,opening_hours",
                 apiKey);
         call2.enqueue(new Callback<GmapsRestaurantDetailsPojo>() {
             @Override
-            public void onResponse(@NonNull Call<GmapsRestaurantDetailsPojo> call2, @NonNull Response<GmapsRestaurantDetailsPojo> response2) {
+            public void onResponse(@NonNull Call<GmapsRestaurantDetailsPojo> call2,
+                                   @NonNull Response<GmapsRestaurantDetailsPojo> response2) {
                 GmapsRestaurantDetailsPojo placeDetails = response2.body();
-                Restaurant restaurantDetails = placeDetails.getRestaurantDetails();
+                Restaurant restaurantDetails = Objects.requireNonNull(placeDetails).getRestaurantDetails();
 
                 // Update fields with detail information
                 nearbyRestaurant.setAddress(restaurantDetails.getAddress());
@@ -149,7 +151,7 @@ public class RestaurantRepository {
                 nearbyRestaurant.setWebsite(restaurantDetails.getWebsite());
 
                 // Populate the LiveData
-                restaurantDetailsMutableLiveData.setValue(nearbyRestaurant);
+                setRestaurantDetailsMutableLiveData(nearbyRestaurant);
             }
 
             @Override
@@ -210,8 +212,16 @@ public class RestaurantRepository {
         return restaurantsMutableLiveData;
     }
 
+    public void setRestaurantsMutableLiveData(List<RestaurantWithDistance> restaurants) {
+        restaurantsMutableLiveData.setValue(restaurants);
+    }
+
     public MutableLiveData<RestaurantWithDistance> getRestaurantDetailsMutableLiveData() {
         return restaurantDetailsMutableLiveData;
+    }
+
+    public void setRestaurantDetailsMutableLiveData(RestaurantWithDistance restaurant) {
+        restaurantDetailsMutableLiveData.setValue(restaurant);
     }
 
     public String getDefaultRadius() {

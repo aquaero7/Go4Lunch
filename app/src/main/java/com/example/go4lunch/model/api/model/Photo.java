@@ -27,8 +27,7 @@ public class Photo implements Serializable {
     // Empty constructor to allow firebase to cast document to object model
     public Photo() {}
 
-    // CONSTRUCTOR
-
+    // Constructor
     public Photo(String photoReference, List<String> htmlAttributions, long height, long width) {
         this.photoReference = photoReference;
         this.htmlAttributions = htmlAttributions;
@@ -57,14 +56,12 @@ public class Photo implements Serializable {
 
     public String getPhotoUrl(String key) {
         String rootUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=";
-        String photoUrl = rootUrl + photoReference + "&key=" + key; // getString(R.string.MAPS_API_KEY)
-        return photoUrl;
+        return rootUrl + photoReference + "&key=" + key;
     }
 
     public static String getPhotoUrl(String photoReference, String key) {
         String rootUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=";
-        String photoUrl = rootUrl + photoReference + "&key=" + key; // getString(R.string.MAPS_API_KEY)
-        return photoUrl;
+        return rootUrl + photoReference + "&key=" + key;
     }
 
 

@@ -78,20 +78,18 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // Set the layout file as the content view.
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
-        // Initialize ViewModel
         mapViewViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(MapViewViewModel.class);
+
         // Show ProgressBar
         binding.progressbarMap.progressbar.setVisibility(View.VISIBLE);
         // Register autocomplete activity result
         createAutocompleteResultLauncher();
 
-        /** To use if menu is handled in fragment
-         * Works with onCreateOptionsMenu() and onOptionsItemSelected() */
+        /** To use if menu is handled in fragment. Works with onCreateOptionsMenu() and onOptionsItemSelected() */
         setHasOptionsMenu(true);
 
-        // Require latest version of map renderer   // Not working : Legacy version is used anyway !
+        // Require latest version of map renderer (Not working : Legacy version is used anyway !)
         MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this);
         // Initialize SDK Places for Autocomplete API
         Places.initialize(requireContext(), getString(R.string.MAPS_API_KEY));
@@ -129,11 +127,12 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
+    /** Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera.
+     */
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        /** Manipulates the map once available.
-         This callback is triggered when the map is ready to be used.
-         This is where we can add markers or lines, add listeners or move the camera. */
         mGoogleMap = googleMap;
         // Initialize the map
         initMap();
@@ -185,7 +184,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         }
     }
 
-    @SuppressWarnings("MissingPermission")  // Permissions already checked in MainActivity
+    @SuppressWarnings("MissingPermission")  // Permissions already checked in AuthActivity
     private void initMap() {
         // Display MyLocation button if permissions are granted
         mGoogleMap.setMyLocationEnabled(mapViewViewModel.arePermissionsGranted());
@@ -282,6 +281,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
                         Log.w("MapViewFragment", "User canceled autocomplete");
                     }
                 });
+
         mapViewViewModel.setStartAutocomplete(startAutocomplete);
     }
 

@@ -1,6 +1,5 @@
 package com.example.go4lunch.viewmodel;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
@@ -172,8 +171,10 @@ public class DetailRestaurantViewModel extends ViewModel {
             // Possibility of several opening and closing periods in a day
             /** Information must be either 3 char (code) or 7 char (code+schedule) length */
             boolean openNow;
-            long currentDayOfWeek = utils.getCurrentDayOfWeek();
             String currentTime = utils.getCurrentTime();
+            // DayOfWeek converted to Google PlaceOpeningHoursPeriodDetail format
+            long currentDayOfWeek = (utils.getCurrentDayOfWeek() != 7) ? utils.getCurrentDayOfWeek() : 0;
+            long nextDayOfWeek = (currentDayOfWeek != 6) ? currentDayOfWeek + 1 : 0;
 
             // Get the list of opening periods
             List<Period> periods = restaurant.getOpeningHours().getPeriods();
@@ -201,7 +202,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                             && todayPeriods.get(0).getOpen().getTime().equals("0000")
                             && todayPeriods.get(0).getClose() != null
                             && todayPeriods.get(0).getClose().getTime().equals("0000")
-                            && todayPeriods.get(0).getClose().getDay() == currentDayOfWeek + 1) {
+                            && todayPeriods.get(0).getClose().getDay() == nextDayOfWeek) {
                         // If there is only one period for today, so it is open all day
                         openingInformation = context.getString(R.string.status_open24); // Open H24 today
                     } else {
@@ -245,7 +246,7 @@ public class DetailRestaurantViewModel extends ViewModel {
                                     schedule = schedule.substring(0,2) + "h" + schedule.substring(2);
                                     openingInformation = context.getString(R.string.status_open_until) + schedule; // Open until...
                                 } else {
-                                    // Unexpected case... A problem occurs somewhere !  // As a precaution cause this case seems to be unreachable !
+                                    // Unexpected case... A problem occurs somewhere !  // As a precaution because this case seems to be unreachable !
                                     openingInformation = context.getString(R.string.status_unknown); // Unknown opening hours
                                     Log.w("Utils","A problem has occurred when trying to retrieve opening information");
                                 }

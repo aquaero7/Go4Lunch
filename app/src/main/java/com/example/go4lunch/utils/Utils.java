@@ -51,14 +51,12 @@ public class Utils {
 
     // Get current day of week
     public long getCurrentDayOfWeek() {
-        // Calendar calendar = Calendar.getInstance();
-        return calendar.get(Calendar.DAY_OF_WEEK) - 1;
+        // Returns a range from 1 (Monday) to 7 (Sunday)
+        return calendar.get(Calendar.DAY_OF_WEEK);
     }
 
     // Get current formatted time
     public String getCurrentTime() {
-        // Calendar calendar = Calendar.getInstance();
-
         String hod = (calendar.get(Calendar.HOUR_OF_DAY) > 9) ?
                 String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) : "0" + String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
         String min = (calendar.get(Calendar.MINUTE) > 9) ?
@@ -68,7 +66,6 @@ public class Utils {
     }
 
     public String getCurrentDate() {
-        // Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.FRANCE);
         Date date = calendar.getTime();
         return sdf.format(date);

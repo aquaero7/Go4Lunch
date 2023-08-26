@@ -13,7 +13,11 @@ public class LikedRestaurantHelper {
     // Firestore
     private static final String COLLECTION_LIKED_RESTAURANTS = "liked_restaurants";
 
+    FirebaseFirestore firebaseFirestore;
+
+
     public LikedRestaurantHelper() {
+        firebaseFirestore = FirebaseFirestore.getInstance();
     }
 
     public static LikedRestaurantHelper getInstance() {
@@ -29,9 +33,21 @@ public class LikedRestaurantHelper {
         }
     }
 
+    /** For test use only : UserHelper dependency injection and new instance factory **************/
+    public LikedRestaurantHelper(FirebaseFirestore firebaseFirestore) {
+        this.firebaseFirestore = firebaseFirestore;
+    }
+
+    public static LikedRestaurantHelper getNewInstance(FirebaseFirestore firebaseFirestore) {
+        instance = new LikedRestaurantHelper(firebaseFirestore);
+        return instance;
+    }
+    /**********************************************************************************************/
+
+
     // Get the Collection Reference
     private CollectionReference getLikedRestaurantsCollection() {
-        return FirebaseFirestore.getInstance().collection(COLLECTION_LIKED_RESTAURANTS);
+        return firebaseFirestore.collection(COLLECTION_LIKED_RESTAURANTS);
     }
 
     // Create liked restaurant in Firestore

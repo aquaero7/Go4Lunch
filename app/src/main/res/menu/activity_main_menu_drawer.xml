@@ -6,9 +6,10 @@
 
     <group
         android:checkableBehavior="none">
-        <!-- checkableBehavior set to none to clear last selection memory (last item colored) -->
+        <!-- checkableBehavior set to none to clear last selection memory -->
+
         <item
-            android:title="" />
+            android:title=""/>
 
         <item
             android:id="@+id/activity_main_drawer_lunch"

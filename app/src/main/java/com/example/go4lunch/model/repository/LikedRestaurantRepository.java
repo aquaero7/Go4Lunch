@@ -43,7 +43,7 @@ public class LikedRestaurantRepository {
         }
     }
 
-    /** For test use only : LikedRestaurantHelper dependency injection and new instance factory */
+    /** For test use only : LikedRestaurantHelper dependency injection and new instance factory ***/
     private LikedRestaurantRepository(LikedRestaurantHelper likedRestaurantHelper) {
         this.likedRestaurantHelper = likedRestaurantHelper;
 
@@ -54,7 +54,7 @@ public class LikedRestaurantRepository {
         instance = new LikedRestaurantRepository(likedRestaurantHelper);
         return instance;
     }
-    /********************************************************************************************/
+    /**********************************************************************************************/
 
 
     // Create liked restaurant in Firestore
@@ -89,7 +89,7 @@ public class LikedRestaurantRepository {
                         likedRestaurantsList.add(likedRestaurantToAdd);
                     }
                     // Populate the LiveData
-                    likedRestaurantsMutableLiveData.setValue(likedRestaurantsList);
+                    setLikedRestaurantsMutableLiveData(likedRestaurantsList);
                 }
             } else {
                 Log.d("LikedRestaurantRepository", "Error getting documents: ", task.getException());
@@ -101,11 +101,15 @@ public class LikedRestaurantRepository {
         return likedRestaurantsMutableLiveData;
     }
 
+    public void setLikedRestaurantsMutableLiveData(List<LikedRestaurant> likedRestaurants) {
+        likedRestaurantsMutableLiveData.setValue(likedRestaurants);
+    }
+
     // Update local list
     public void updateLikedRestaurants(String id, String rId, String uId) {
         likedRestaurantsList.add(new LikedRestaurant(id, rId, uId));
         // Populate the LiveData
-        likedRestaurantsMutableLiveData.setValue(likedRestaurantsList);
+        setLikedRestaurantsMutableLiveData(likedRestaurantsList);
     }
 
     // Update local list
@@ -114,7 +118,7 @@ public class LikedRestaurantRepository {
             if (Objects.equals(id, likedRestaurant.getId())) {
                 likedRestaurantsList.remove(likedRestaurant);
                 // Populate the LiveData
-                likedRestaurantsMutableLiveData.setValue(likedRestaurantsList);
+                setLikedRestaurantsMutableLiveData(likedRestaurantsList);
                 break;
             }
         }

@@ -95,8 +95,8 @@ public class NotificationService extends FirebaseMessagingService {
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.ic_go4lunch)
                         .setContentTitle(getString(R.string.notification_title))
-                        // .setContentText(bodyText)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(bodyText))
+                        // .setContentText(bodyText)    // Default style
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(bodyText))  // Personalized style
                         .setAutoCancel(true)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setContentIntent(pendingIntent);

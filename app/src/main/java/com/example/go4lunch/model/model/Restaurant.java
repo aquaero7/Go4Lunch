@@ -49,7 +49,6 @@ public class Restaurant implements Serializable {
     @Expose
     private Geometry geometry;
 
-
     // Empty constructor to allow firebase to cast document to object model
     public Restaurant() {}
 
@@ -70,6 +69,7 @@ public class Restaurant implements Serializable {
 
 
     // GETTERS
+
     public String getRid() {
         return rid;
     }
@@ -100,6 +100,7 @@ public class Restaurant implements Serializable {
 
 
     // SETTERS
+
     public void setRid(String rid) {
         this.rid = rid;
     }

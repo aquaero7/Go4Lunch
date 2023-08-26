@@ -6,12 +6,8 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.MainApplication;
 import com.example.go4lunch.R;
-import com.example.go4lunch.model.api.GmapsApiClient;
-import com.example.go4lunch.model.api.GmapsApiInterface;
 import com.example.go4lunch.model.model.DialogTuple;
-import com.example.go4lunch.model.repository.AutocompleteRepository;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
@@ -36,25 +32,15 @@ public class MainViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final RestaurantRepository restaurantRepository;
     private final LikedRestaurantRepository likedRestaurantRepository;
-    // private final Application application; // Only if MainViewModel extends AndroidViewModel
     private final Utils utils;
 
 
     // Constructor
-    // public MainViewModel(@NonNull Application application) { // Only if MainViewModel extends AndroidViewModel
-        // super(application); // Only if MainViewModel extends AndroidViewModel
-        // this.application = application; // Only if MainViewModel extends AndroidViewModel
     public MainViewModel(
             UserRepository userRepository, LocationRepository locationRepository,
             RestaurantRepository restaurantRepository, LikedRestaurantRepository likedRestaurantRepository,
             Utils utils) {
-        /*
-        userRepository = UserRepository.getInstance();
-        locationRepository = LocationRepository.getInstance();
-        restaurantRepository = RestaurantRepository.getInstance();
-        likedRestaurantRepository = LikedRestaurantRepository.getInstance();
-        utils = Utils.getInstance();
-        */
+
         this.userRepository = userRepository;
         this.locationRepository = locationRepository;
         this.restaurantRepository = restaurantRepository;
@@ -99,33 +85,24 @@ public class MainViewModel extends ViewModel {
 
     public Task<Void> deleteFbUser(Context context) {
         // Method using AuthUI
-        // return userRepository.deleteFbUser(application.getApplicationContext()); // Only if MainViewModel extends AndroidViewModel
         return userRepository.deleteFbUser(context);
         // Method using FirebaseAuth
         // return userRepository.deleteFbUser();
     }
 
-    // Method using AuthUI
     public Task<Void> signOut(Context context) {
-        // return userRepository.signOut(application.getApplicationContext()); // Only if MainViewModel extends AndroidViewModel
+        // Method using AuthUI
         return userRepository.signOut(context);
+        // Method using FirebaseAuth
+        // userRepository.signOut();
     }
-    //
-    /* Method using FirebaseAuth
-    public void signOut() {
-        userRepository.signOut();
-    }
-    */
 
     public DialogTuple<AlertDialog, MutableLiveData<Boolean>> buildConfirmationDialog(AlertDialog.Builder builder, Context context) {
         MutableLiveData<Boolean> dialogResponseMutableLiveData = new MutableLiveData<>(null);
-        // Add the buttons to builder
-        builder.setPositiveButton(R.string.dialog_button_ok, (dialog, which) -> {
-                    dialogResponseMutableLiveData.setValue(true);
-                })
-                .setNegativeButton(R.string.dialog_button_cancel, (dialog, which) -> {
-                    dialogResponseMutableLiveData.setValue(false);
-                })
+
+        builder // Add buttons to builder
+                .setPositiveButton(R.string.dialog_button_ok, (dialog, which) -> dialogResponseMutableLiveData.setValue(true))
+                .setNegativeButton(R.string.dialog_button_cancel, (dialog, which) -> dialogResponseMutableLiveData.setValue(false))
                 // Chain together various setter methods to set the dialog characteristics
                 .setTitle(R.string.dialog_title)
                 .setMessage(R.string.dialog_message);
@@ -186,6 +163,7 @@ public class MainViewModel extends ViewModel {
         return selectedRestaurant;
     }
 
+    // For reAuthentication
     public AuthCredential getCredential(String signInProvider, String passWord) {
         AuthCredential credential = null;
         String email = getFbCurrentUser().getEmail();
@@ -205,6 +183,5 @@ public class MainViewModel extends ViewModel {
         }
         return credential;
     }
-
 
 }

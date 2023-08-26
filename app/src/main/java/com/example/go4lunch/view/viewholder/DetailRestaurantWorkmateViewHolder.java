@@ -10,7 +10,6 @@ import com.example.go4lunch.databinding.WorkmateListItemBinding;
 import com.squareup.picasso.Picasso;
 
 public class DetailRestaurantWorkmateViewHolder extends RecyclerView.ViewHolder {
-
     private final WorkmateListItemBinding binding;
 
     public DetailRestaurantWorkmateViewHolder(@NonNull View itemView) {

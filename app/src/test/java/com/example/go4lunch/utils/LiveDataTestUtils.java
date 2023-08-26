@@ -2,7 +2,6 @@ package com.example.go4lunch.utils;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import java.util.concurrent.CountDownLatch;
@@ -30,7 +29,7 @@ public class LiveDataTestUtils {
         liveData.observeForever(observer);
         // Don't wait indefinitely if the LiveData is not set.
         latch.await(2, TimeUnit.SECONDS);
-        //noinspection unchecked
+        // noinspection unchecked
         return (T) data[0];
     }
 }

@@ -3,7 +3,6 @@ package com.example.go4lunch.view.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -49,10 +48,9 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         binding = FragmentDetailRestaurantBinding.inflate(inflater, container, false);
-        // Initialize ViewModel
         detailRestaurantViewModel = new ViewModelProvider(requireActivity(), new ViewModelFactory()).get(DetailRestaurantViewModel.class);
+
         // Set onClickListener to buttons
         setListeners();
         // Initialize RecyclerView
@@ -88,6 +86,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
                         getString(R.string.fab_checked) : getString(R.string.fab_unchecked);
                 break;
         }
+
         mCallback.onButtonClicked(v, message, restaurant.getPhoneNumber(), restaurant.getWebsite());
     }
 

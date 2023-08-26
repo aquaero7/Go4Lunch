@@ -61,15 +61,13 @@ public class DetailRestaurantViewModelTest {
         mockito = Mockito.mockitoSession()
                 .strictness(Strictness.STRICT_STUBS)
                 .startMocking();
+
         userRepositoryMock = mock(UserRepository.class);
         restaurantRepositoryMock = mock(RestaurantRepository.class);
         likedRestaurantRepositoryMock = mock(LikedRestaurantRepository.class);
         utilsMock = mock(Utils.class);
         contextMock = mock(Context.class);
         utils = Utils.getInstance();
-
-        // Class under test
-        detailRestaurantViewModel = new DetailRestaurantViewModel(userRepositoryMock, restaurantRepositoryMock, likedRestaurantRepositoryMock, utilsMock);
 
         uId1 = "uId1"; uName1 = "uName1"; uEmail1 = "uEmail1"; uUrl1 = "uUrl1";
         selId1 = "rId1"; selDate1 = "selDate1"; selName1 = "rName1"; selAddress1 = "rAddress1";
@@ -97,7 +95,8 @@ public class DetailRestaurantViewModelTest {
                 "website", new Geometry(), 1);
 
         currentDate = utils.getCurrentDate();
-        today = utils.getCurrentDayOfWeek();
+        // DayOfWeek converted to Google PlaceOpeningHoursPeriodDetail format
+        today = (utils.getCurrentDayOfWeek() != 7) ? utils.getCurrentDayOfWeek() : 0;
         tomorrow = (today != 6) ? today + 1 : 0;
         otherDay = (today != 0) ? today - 1 : 6;
 
@@ -131,7 +130,11 @@ public class DetailRestaurantViewModelTest {
         openUntil = "Open until ";
         openAt = "Open at ";
         unknown = "Unknown opening hours";
+
+        // Class under test
+        detailRestaurantViewModel = new DetailRestaurantViewModel(userRepositoryMock, restaurantRepositoryMock, likedRestaurantRepositoryMock, utilsMock);
     }
+
 
     @Before // Before each test
     public void setup() {
@@ -175,7 +178,7 @@ public class DetailRestaurantViewModelTest {
 
     @Test
     public void updateLikedRestaurantWithSuccess() {
-        // Also testing createLikedRestaurant() and deleteLikedRestaurant() called within this method only
+        /** Also testing createLikedRestaurant() and deleteLikedRestaurant() called within this method only */
 
         when(userRepositoryMock.getFbCurrentUserId()).thenReturn("uId");
 
@@ -196,7 +199,7 @@ public class DetailRestaurantViewModelTest {
 
     @Test
     public void updateSelectionWithSuccess() {
-        // Also testing createSelection() and deleteSelection() called within this method only
+        /** Also testing createSelection() and deleteSelection() called within this method only */
 
         when(utilsMock.getCurrentDate()).thenCallRealMethod();
 
@@ -303,6 +306,7 @@ public class DetailRestaurantViewModelTest {
         when(contextMock.getString(R.string.status_open_at)).thenReturn(openAt);
         when(contextMock.getString(R.string.status_unknown)).thenReturn(unknown);
         when(utilsMock.getCurrentDayOfWeek()).thenCallRealMethod();
+        when(utilsMock.getCurrentTime()).thenCallRealMethod();
         doCallRealMethod().when(restaurantRepositoryMock).sortByAscendingOpeningTime(anyList());
 
         // Scenario 1 : openingHours = null

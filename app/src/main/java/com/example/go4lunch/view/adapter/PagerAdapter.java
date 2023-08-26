@@ -1,4 +1,4 @@
-package com.example.go4lunch.view.fragment;
+package com.example.go4lunch.view.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -6,8 +6,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-public class PagerAdapter extends FragmentStateAdapter {
+import com.example.go4lunch.view.fragment.ListViewFragment;
+import com.example.go4lunch.view.fragment.MapViewFragment;
+import com.example.go4lunch.view.fragment.WorkmatesFragment;
 
+public class PagerAdapter extends FragmentStateAdapter {
 
     public PagerAdapter(@NonNull FragmentManager mgr, @NonNull Lifecycle lifecycle) {
         super(mgr, lifecycle);
@@ -27,7 +30,8 @@ public class PagerAdapter extends FragmentStateAdapter {
             // default:    //Page number 1
             //     return MapViewFragment.newInstance();
         }
-        return MapViewFragment.newInstance();   // For default = Page number 1
+
+        return MapViewFragment.newInstance();
     }
 
     @Override
