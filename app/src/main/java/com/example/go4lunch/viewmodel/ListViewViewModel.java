@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModel;
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Photo;
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.Utils;
 
@@ -48,7 +48,7 @@ public class ListViewViewModel extends ViewModel {
         return userRepository.getWorkmatesMutableLiveData();
     }
 
-    public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
+    public MutableLiveData<List<Restaurant>> getRestaurantsMutableLiveData() {
         return restaurantRepository.getRestaurantsMutableLiveData();
     }
 
@@ -71,14 +71,14 @@ public class ListViewViewModel extends ViewModel {
     }
 
     public String filterList(String query, Context context) {
-        List<RestaurantWithDistance> filteredRestaurantsList = new ArrayList<>();
+        List<Restaurant> filteredRestaurantsList = new ArrayList<>();
         if (query.isEmpty()) {
             // SearchView is cleared and closed
             restaurantRepository.setRestaurantsToDisplay(getRestaurants());
             return null;
         } else {
             // A query is sent from searchView
-            for (RestaurantWithDistance restaurant : getRestaurants()) {
+            for (Restaurant restaurant : getRestaurants()) {
                 // Switching both strings to lower case to make case insensitive comparison
                 if (restaurant.getName().toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT)))
                     filteredRestaurantsList.add(restaurant);
@@ -109,11 +109,11 @@ public class ListViewViewModel extends ViewModel {
         return (photos != null) ? photos.get(0).getPhotoUrl(context.getString(R.string.MAPS_API_KEY)) : null;
     }
 
-    public List<RestaurantWithDistance> getRestaurantsToDisplay() {
+    public List<Restaurant> getRestaurantsToDisplay() {
         return restaurantRepository.getRestaurantsToDisplay();
     }
 
-    public List<RestaurantWithDistance> getRestaurants() {
+    public List<Restaurant> getRestaurants() {
         return restaurantRepository.getRestaurants();
     }
 
@@ -124,7 +124,7 @@ public class ListViewViewModel extends ViewModel {
 
     // Setters
 
-    public void setRestaurantsToDisplay(List<RestaurantWithDistance> restaurants) {
+    public void setRestaurantsToDisplay(List<Restaurant> restaurants) {
         restaurantRepository.setRestaurantsToDisplay(restaurants);
     }
 

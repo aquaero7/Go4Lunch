@@ -19,10 +19,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.view.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentWorkmatesBinding;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.adapter.WorkmateAdapter;
@@ -119,7 +119,7 @@ public class WorkmatesFragment extends Fragment {
                 .setOnItemClickListener((recyclerView, position, v) -> {
                     if (workmatesViewModel.getWorkmates().size() != 0) {
                         // Get workmate selection
-                        RestaurantWithDistance restaurant = workmatesViewModel.getWorkmateSelection(position);
+                        Restaurant restaurant = workmatesViewModel.getWorkmateSelection(position);
                         // Launch DetailActivity or show message
                         if (restaurant != null) {
                             launchDetailRestaurantActivity(restaurant);
@@ -139,10 +139,10 @@ public class WorkmatesFragment extends Fragment {
         });
     }
 
-    private void launchDetailRestaurantActivity(RestaurantWithDistance restaurantWithDistance) {
+    private void launchDetailRestaurantActivity(Restaurant restaurant) {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("RESTAURANT", restaurantWithDistance);
+        bundle.putSerializable("RESTAURANT", restaurant);
         intent.putExtras(bundle);
         startActivity(intent);
     }

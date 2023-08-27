@@ -20,9 +20,9 @@ import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentListViewBinding;
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.view.activity.DetailRestaurantActivity;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.utils.ItemClickSupport;
 import com.example.go4lunch.view.adapter.ListViewAdapter;
@@ -118,7 +118,7 @@ public class ListViewFragment extends Fragment {
         ItemClickSupport.addTo(binding.rvListView, R.layout.restaurant_list_item)
                 .setOnItemClickListener((recyclerView, position, v) -> {
                     if (listViewViewModel.getRestaurantsToDisplay().size() != 0) {
-                        RestaurantWithDistance restaurant = listViewViewModel.getRestaurantsToDisplay().get(position);
+                        Restaurant restaurant = listViewViewModel.getRestaurantsToDisplay().get(position);
                         launchDetailRestaurantActivity(restaurant);
                     }
                 });
@@ -137,10 +137,10 @@ public class ListViewFragment extends Fragment {
         });
     }
 
-    private void launchDetailRestaurantActivity(RestaurantWithDistance restaurantWithDistance) {
+    private void launchDetailRestaurantActivity(Restaurant restaurant) {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("RESTAURANT", restaurantWithDistance);
+        bundle.putSerializable("RESTAURANT", restaurant);
         intent.putExtras(bundle);
         startActivity(intent);
     }

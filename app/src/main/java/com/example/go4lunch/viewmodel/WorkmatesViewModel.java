@@ -3,9 +3,9 @@ package com.example.go4lunch.viewmodel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.Utils;
 
@@ -49,14 +49,14 @@ public class WorkmatesViewModel extends ViewModel {
 
     // Getters
 
-    public RestaurantWithDistance getWorkmateSelection(int position) {
+    public Restaurant getWorkmateSelection(int position) {
         // Get workmate selection
         String selectionId = getWorkmates().get(position).getSelectionId();
         String selectionDate = getWorkmates().get(position).getSelectionDate();
-        RestaurantWithDistance selectedRestaurant = null;
+        Restaurant selectedRestaurant = null;
         // If a restaurant is selected, get it from restaurants list and launch detail activity
         if ((selectionId != null) && (utils.getCurrentDate().equals(selectionDate))) {
-            for (RestaurantWithDistance restaurant : getRestaurants()) {
+            for (Restaurant restaurant : getRestaurants()) {
                 if (Objects.equals(selectionId, restaurant.getRid())) {
                     selectedRestaurant = restaurant;
                     break;
@@ -73,7 +73,7 @@ public class WorkmatesViewModel extends ViewModel {
                 choiceText + workmate.getSelectionName() : "";
     }
 
-    public List<RestaurantWithDistance> getRestaurants() {
+    public List<Restaurant> getRestaurants() {
         return restaurantRepository.getRestaurants();
     }
 

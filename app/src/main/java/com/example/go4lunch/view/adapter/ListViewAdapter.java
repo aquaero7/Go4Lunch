@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.view.viewholder.ListViewViewHolder;
 import com.example.go4lunch.viewmodel.ListViewViewModel;
@@ -18,12 +18,12 @@ import java.util.List;
 
 public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
 
-    private final List<RestaurantWithDistance> restaurantsList;
+    private final List<Restaurant> restaurantsList;
     private final List<User> workmatesList;
     private final Context context;
 
     // Constructor
-    public ListViewAdapter(List<RestaurantWithDistance> restaurantsList, List<User> workmatesList, Context context) {
+    public ListViewAdapter(List<Restaurant> restaurantsList, List<User> workmatesList, Context context) {
         this.restaurantsList = restaurantsList;
         this.workmatesList = workmatesList;
         this.context = context;
@@ -45,7 +45,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewViewHolder> {
     public void onBindViewHolder(@NonNull ListViewViewHolder viewHolder, int position) {
         ListViewViewModel listViewViewModel = new ListViewViewModel();
 
-        RestaurantWithDistance restaurant = restaurantsList.get(position);
+        Restaurant restaurant = restaurantsList.get(position);
         viewHolder.updateWithRestaurants(restaurant.getName(), restaurant.getRating(),
                 listViewViewModel.getDistance(restaurant.getDistance()),
                 listViewViewModel.countSelections(restaurant.getRid(), workmatesList),

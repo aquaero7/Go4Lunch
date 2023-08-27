@@ -21,10 +21,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.view.activity.DetailRestaurantActivity;
 import com.example.go4lunch.databinding.FragmentMapViewBinding;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.viewmodel.MapViewViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
@@ -155,7 +155,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
-        for (RestaurantWithDistance restaurant : mapViewViewModel.getRestaurants()) {
+        for (Restaurant restaurant : mapViewViewModel.getRestaurants()) {
             if(restaurant.getRid().equals(marker.getTag())) {
                 launchDetailRestaurantActivity(restaurant);
                 break;
@@ -221,7 +221,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         mapViewViewModel.getRestaurantsMutableLiveData().observe(requireActivity(), restaurants -> {
             // Display restaurants on map
             if (!restaurants.isEmpty()) {
-                for (RestaurantWithDistance restaurant : restaurants) {
+                for (Restaurant restaurant : restaurants) {
                     // Add marker
                     Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(mapViewViewModel.getLatLng(restaurant))
@@ -247,7 +247,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
         });
     }
 
-    private void launchDetailRestaurantActivity(RestaurantWithDistance restaurant) {
+    private void launchDetailRestaurantActivity(Restaurant restaurant) {
         Intent intent = new Intent(requireActivity(), DetailRestaurantActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("RESTAURANT", restaurant);
@@ -265,7 +265,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback,
                         if (intent != null) {
                             Place place = Autocomplete.getPlaceFromIntent(intent);
                             Log.w("MapViewFragment", "Place: ${place.getId()}");
-                            for (RestaurantWithDistance restaurant : mapViewViewModel.getRestaurants()) {
+                            for (Restaurant restaurant : mapViewViewModel.getRestaurants()) {
                                 if (Objects.equals(restaurant.getRid(), place.getId())) {
                                     // Focus map on this restaurant
                                     if (mGoogleMap != null) mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(

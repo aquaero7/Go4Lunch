@@ -1,7 +1,19 @@
 package com.example.go4lunch;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
@@ -16,7 +28,6 @@ import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Period;
 import com.example.go4lunch.model.api.model.Photo;
 import com.example.go4lunch.model.model.Restaurant;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.utils.LiveDataTestUtils;
 import com.google.android.gms.maps.model.LatLng;
@@ -34,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,19 +60,18 @@ public class RestaurantRepositoryTest {
     private GmapsRestaurantDetailsPojo placeDetailsMock;
     private GmapsApiInterface apiClientMock;
     private RestaurantRepository restaurantRepository;
-    private List<Restaurant> fakeRestaurants;
-    private List<RestaurantWithDistance> fakeRestaurantsWithDistance;
+    private List<Restaurant> fakeApiRestaurants, fakeRestaurants;
     private GmapsRestaurantPojo fakeNearPlaces;
     private GmapsRestaurantDetailsPojo fakePlaceDetails;
-    List<Photo> photos1, photos2, photos3, photos4;
-    OpeningHours openingHours1, openingHours2, openingHours3, openingHours4;
-    LatLng latLng1, latLng2, latLng3, latLng4, currentLatLng;
-    Geometry geometry1, geometry2, geometry3, geometry4;
-    double distance1, distance2, distance3, distance4;
-    Restaurant restaurant1, restaurant2, restaurant3, restaurant4D;
-    RestaurantWithDistance restaurantWithDistance1, restaurantWithDistance2, restaurantWithDistance3, restaurantWithDistance4D;
-    List<Period> periods4;
-    List<String> weekdayText4;
+    private List<Photo> photos1, photos2, photos3, photos4;
+    private OpeningHours openingHours1, openingHours2, openingHours3, openingHours4;
+    private LatLng latLng1, latLng2, latLng3, latLng4, currentLatLng;
+    private Geometry geometry1, geometry2, geometry3, geometry4;
+    private double distance1, distance2, distance3, distance4;
+    private Restaurant apiRestaurant1, apiRestaurant2, apiRestaurant3, apiRestaurant4D;
+    private Restaurant restaurant1, restaurant2, restaurant3, restaurant4D;
+    private List<Period> periods4;
+    private List<String> weekdayText4;
 
     /** Needed for the use of LiveDataTestUtils
      * InstantTaskExecutorRule is a JUnit Test Rule that swaps the background executor used by the Architecture Components
@@ -105,28 +114,22 @@ public class RestaurantRepositoryTest {
         distance2 = (long) SphericalUtil.computeDistanceBetween(currentLatLng, latLng2);
         distance3 = (long) SphericalUtil.computeDistanceBetween(currentLatLng, latLng3);
 
-        restaurant1 = new Restaurant(
-                "rId1", "rName1", photos1, "rAddress1", 1D,
+        apiRestaurant1 = new Restaurant("rId1", "rName1", photos1, "rAddress1", 1D,
                 openingHours1, "rPhoneNumber1", "rWebsite1", geometry1);
-        restaurant2 = new Restaurant(
-                "rId2", "rName2", photos2, "rAddress2", 2D,
+        apiRestaurant2 = new Restaurant("rId2", "rName2", photos2, "rAddress2", 2D,
                 openingHours2, "rPhoneNumber2", "rWebsite2", geometry2);
-        restaurant3 = new Restaurant(
-                "rId3", "rName3", photos3, "rAddress3", 3D,
+        apiRestaurant3 = new Restaurant("rId3", "rName3", photos3, "rAddress3", 3D,
                 openingHours3, "rPhoneNumber3", "rWebsite3", geometry3);
-        restaurantWithDistance1 = new RestaurantWithDistance(
-                "rId1", "rName1", photos1, "rAddress1", 1D,
+        restaurant1 = new Restaurant("rId1", "rName1", photos1, "rAddress1", 1D,
                 openingHours1, "rPhoneNumber1", "rWebsite1", geometry1, (long) distance1);
-        restaurantWithDistance2 = new RestaurantWithDistance(
-                "rId2", "rName2", photos2, "rAddress2", 2D,
+        restaurant2 = new Restaurant("rId2", "rName2", photos2, "rAddress2", 2D,
                 openingHours2, "rPhoneNumber2", "rWebsite2", geometry2, (long) distance2);
-        restaurantWithDistance3 = new RestaurantWithDistance(
-                "rId3", "rName3", photos3, "rAddress3", 3D,
+        restaurant3 = new Restaurant("rId3", "rName3", photos3, "rAddress3", 3D,
                 openingHours3, "rPhoneNumber3", "rWebsite3", geometry3, (long) distance3);
 
-        fakeRestaurants = new ArrayList<>(Arrays.asList(restaurant2, restaurant3, restaurant1));    // Random order to test sort
-        fakeNearPlaces = new GmapsRestaurantPojo(fakeRestaurants, "", "", "");
-        fakeRestaurantsWithDistance = new ArrayList<>(Arrays.asList(restaurantWithDistance1, restaurantWithDistance2, restaurantWithDistance3));
+        fakeApiRestaurants = new ArrayList<>(Arrays.asList(apiRestaurant2, apiRestaurant3, apiRestaurant1));    // Unsorted
+        fakeNearPlaces = new GmapsRestaurantPojo(fakeApiRestaurants, "", "", "");
+        fakeRestaurants = new ArrayList<>(Arrays.asList(restaurant3, restaurant1, restaurant2));    // Sorted by distance then by name
 
         periods4 = Collections.singletonList(new Period(null, new OpenClose(0, "0000")));
         weekdayText4 = new ArrayList<>();
@@ -136,14 +139,12 @@ public class RestaurantRepositoryTest {
         geometry4 = new Geometry(new Location(latLng4.latitude, latLng4.longitude));
         distance4 = SphericalUtil.computeDistanceBetween(currentLatLng, latLng4);
 
-        restaurant4D = new Restaurant(
-                "rId4", "rName4", photos4, "rAddress4", 0D,
+        apiRestaurant4D = new Restaurant("rId4", "rName4", photos4, "rAddress4", 0D,
                 openingHours4, "rPhoneNumber4", "rWebsite4", geometry4);
-        restaurantWithDistance4D = new RestaurantWithDistance(
-                "rId4", "rName4", photos4, "rAddress4", 0D,
+        restaurant4D = new Restaurant("rId4", "rName4", photos4, "rAddress4", 0D,
                 openingHours4, "rPhoneNumber4", "rWebsite4", geometry4, (long) distance4);
 
-        fakePlaceDetails = new  GmapsRestaurantDetailsPojo(restaurant4D, "");
+        fakePlaceDetails = new  GmapsRestaurantDetailsPojo(apiRestaurant4D, "");
 
         // Class under test
         restaurantRepository = RestaurantRepository.getNewInstance(apiClientMock);
@@ -208,23 +209,23 @@ public class RestaurantRepositoryTest {
         verify(response1Mock,never()).isSuccessful();
         verify(nearPlacesMock, never()).getNearRestaurants();
 
-        MutableLiveData<List<RestaurantWithDistance>> restaurantsLiveData = restaurantRepository.getRestaurantsMutableLiveData();
-        List<RestaurantWithDistance> result = LiveDataTestUtils.getValue(restaurantsLiveData);
+        MutableLiveData<List<Restaurant>> restaurantsLiveData = restaurantRepository.getRestaurantsMutableLiveData();
+        List<Restaurant> result = LiveDataTestUtils.getValue(restaurantsLiveData);
 
-        assertEquals(fakeRestaurants.size(), fakeRestaurantsWithDistance.size());
-        assertEquals(fakeRestaurants.size(), result.size());
+        assertEquals(fakeApiRestaurants.size(), fakeRestaurants.size());
+        assertEquals(fakeApiRestaurants.size(), result.size());
         // Restaurants should be sorted by distance then by name
-        for (int i=0; i<fakeRestaurants.size(); i++) {
-            assertEquals(fakeRestaurantsWithDistance.get(reOrder(i)).getRid(), result.get(i).getRid());
-            assertEquals(fakeRestaurantsWithDistance.get(reOrder(i)).getName(), result.get(i).getName());
-            assertEquals(fakeRestaurantsWithDistance.get(reOrder(i)).getPhotos(), result.get(i).getPhotos());
-            assertEquals(fakeRestaurantsWithDistance.get(reOrder(i)).getAddress(), result.get(i).getAddress());
-            assertEquals(fakeRestaurantsWithDistance.get(reOrder(i)).getRating(), result.get(i).getRating(), 0);
-            assertEquals(fakeRestaurantsWithDistance.get(reOrder(i)).getOpeningHours(), result.get(i).getOpeningHours());
-            assertEquals(fakeRestaurantsWithDistance.get(reOrder(i)).getPhoneNumber(), result.get(i).getPhoneNumber());
-            assertEquals(fakeRestaurantsWithDistance.get(reOrder(i)).getWebsite(), result.get(i).getWebsite());
-            assertEquals(fakeRestaurantsWithDistance.get(reOrder(i)).getGeometry(), result.get(i).getGeometry());
-            assertEquals(fakeRestaurantsWithDistance.get(reOrder(i)).getDistance(), result.get(i).getDistance());
+        for (int i = 0; i< result.size(); i++) {
+            assertEquals(fakeRestaurants.get(i).getRid(), result.get(i).getRid());
+            assertEquals(fakeRestaurants.get(i).getName(), result.get(i).getName());
+            assertEquals(fakeRestaurants.get(i).getPhotos(), result.get(i).getPhotos());
+            assertEquals(fakeRestaurants.get(i).getAddress(), result.get(i).getAddress());
+            assertEquals(fakeRestaurants.get(i).getRating(), result.get(i).getRating(), 0);
+            assertEquals(fakeRestaurants.get(i).getOpeningHours(), result.get(i).getOpeningHours());
+            assertEquals(fakeRestaurants.get(i).getPhoneNumber(), result.get(i).getPhoneNumber());
+            assertEquals(fakeRestaurants.get(i).getWebsite(), result.get(i).getWebsite());
+            assertEquals(fakeRestaurants.get(i).getGeometry(), result.get(i).getGeometry());
+            assertEquals(fakeRestaurants.get(i).getDistance(), result.get(i).getDistance());
         }
     }
 
@@ -242,91 +243,77 @@ public class RestaurantRepositoryTest {
             return null;
         }).when(call2Mock).enqueue(any(Callback.class));
 
-        restaurantRepository.fetchRestaurantDetails(restaurantWithDistance4D,"key");
+        restaurantRepository.fetchRestaurantDetails(restaurant4D,"key");
 
         verify(call2Mock, times(1)).enqueue(any());
         verify(apiClientMock, times(1)).getPlaceDetails(
-                restaurant4D.getRid(),detailFields,"key");
+                apiRestaurant4D.getRid(),detailFields,"key");
         verify(response2Mock,never()).isSuccessful();
         verify(placeDetailsMock, never()).getRestaurantDetails();
 
-        MutableLiveData<RestaurantWithDistance> restaurantDetailsLiveData = restaurantRepository.getRestaurantDetailsMutableLiveData();
-        RestaurantWithDistance result = LiveDataTestUtils.getValue(restaurantDetailsLiveData);
+        MutableLiveData<Restaurant> restaurantDetailsLiveData = restaurantRepository.getRestaurantDetailsMutableLiveData();
+        Restaurant result = LiveDataTestUtils.getValue(restaurantDetailsLiveData);
 
-        assertEquals(restaurantWithDistance4D.getRid(), result.getRid());
-        assertEquals(restaurantWithDistance4D.getName(), result.getName());
-        assertEquals(restaurantWithDistance4D.getPhotos(), result.getPhotos());
-        assertEquals(restaurantWithDistance4D.getAddress(), result.getAddress());
-        assertEquals(restaurantWithDistance4D.getRating(), result.getRating(), 0);
-        assertEquals(restaurantWithDistance4D.getOpeningHours(), result.getOpeningHours());
-        assertEquals(restaurantWithDistance4D.getPhoneNumber(), result.getPhoneNumber());
-        assertEquals(restaurantWithDistance4D.getWebsite(), result.getWebsite());
-        assertEquals(restaurantWithDistance4D.getGeometry(), result.getGeometry());
-        assertEquals(restaurantWithDistance4D.getDistance(), result.getDistance());
+        assertEquals(restaurant4D.getRid(), result.getRid());
+        assertEquals(restaurant4D.getName(), result.getName());
+        assertEquals(restaurant4D.getPhotos(), result.getPhotos());
+        assertEquals(restaurant4D.getAddress(), result.getAddress());
+        assertEquals(restaurant4D.getRating(), result.getRating(), 0);
+        assertEquals(restaurant4D.getOpeningHours(), result.getOpeningHours());
+        assertEquals(restaurant4D.getPhoneNumber(), result.getPhoneNumber());
+        assertEquals(restaurant4D.getWebsite(), result.getWebsite());
+        assertEquals(restaurant4D.getGeometry(), result.getGeometry());
+        assertEquals(restaurant4D.getDistance(), result.getDistance());
     }
 
     @Test
     public void updateRestaurantsListWithDistancesWithSuccess() {
-        List<RestaurantWithDistance> result = restaurantRepository.updateRestaurantsListWithDistances(fakeRestaurants, currentLatLng);
-        assertEquals(fakeRestaurants.size(), result.size());
-        for (int i=0; i<fakeRestaurants.size(); i++) {
-            assertEquals(fakeRestaurants.get(i).getRid(), result.get(i).getRid());
-            assertEquals(fakeRestaurants.get(i).getName(), result.get(i).getName());
-            assertEquals(fakeRestaurants.get(i).getPhotos(), result.get(i).getPhotos());
-            assertEquals(fakeRestaurants.get(i).getAddress(), result.get(i).getAddress());
-            assertEquals(fakeRestaurants.get(i).getRating(), result.get(i).getRating(), 0);
-            assertEquals(fakeRestaurants.get(i).getOpeningHours(), result.get(i).getOpeningHours());
-            assertEquals(fakeRestaurants.get(i).getPhoneNumber(), result.get(i).getPhoneNumber());
-            assertEquals(fakeRestaurants.get(i).getWebsite(), result.get(i).getWebsite());
-            assertEquals(fakeRestaurants.get(i).getGeometry(), result.get(i).getGeometry());
-            assertEquals(fakeRestaurantsWithDistance.get(reverseOrder(i)).getDistance(), result.get(i).getDistance());
+        double[] distances = {distance2, distance3, distance1};
+        restaurantRepository.updateRestaurantsListWithDistances(fakeApiRestaurants, currentLatLng);
+        for (int i = 0; i< fakeApiRestaurants.size(); i++) {
+            assertEquals(distances[i], fakeApiRestaurants.get(i).getDistance(), 0);
         }
     }
 
     @Test
     public void calculateRestaurantDistanceWithSuccess() {
-        int result;
-        result = restaurantRepository.calculateRestaurantDistance(restaurant1, currentLatLng);
-        assertEquals(distance1, result, 0);
-        result = restaurantRepository.calculateRestaurantDistance(restaurant2, currentLatLng);
-        assertEquals(distance2, result, 0);
-        result = restaurantRepository.calculateRestaurantDistance(restaurant3, currentLatLng);
-        assertEquals(distance3, result, 0);
+        assertEquals(distance1, restaurantRepository.calculateRestaurantDistance(apiRestaurant1, currentLatLng), 0);
+        assertEquals(distance2, restaurantRepository.calculateRestaurantDistance(apiRestaurant2, currentLatLng), 0);
+        assertEquals(distance3, restaurantRepository.calculateRestaurantDistance(apiRestaurant3, currentLatLng), 0);
     }
 
     @Test
     public void sortByDistanceAndNameWithSuccess() {
+        List<Restaurant> testedList = Arrays.asList(restaurant2, restaurant3, restaurant1);
+
         // Before sort
-        double[] unsortedDistances = new double[]{distance1, distance2, distance3};
-        for (int i=0; i<fakeRestaurantsWithDistance.size(); i++) {
-            assertEquals(fakeRestaurants.get(reOrder(i)).getRid(), fakeRestaurantsWithDistance.get(i).getRid());
-            assertEquals(fakeRestaurants.get(reOrder(i)).getName(), fakeRestaurantsWithDistance.get(i).getName());
-            assertEquals(fakeRestaurants.get(reOrder(i)).getPhotos(), fakeRestaurantsWithDistance.get(i).getPhotos());
-            assertEquals(fakeRestaurants.get(reOrder(i)).getAddress(), fakeRestaurantsWithDistance.get(i).getAddress());
-            assertEquals(fakeRestaurants.get(reOrder(i)).getRating(), fakeRestaurantsWithDistance.get(i).getRating(), 0);
-            assertEquals(fakeRestaurants.get(reOrder(i)).getOpeningHours(), fakeRestaurantsWithDistance.get(i).getOpeningHours());
-            assertEquals(fakeRestaurants.get(reOrder(i)).getPhoneNumber(), fakeRestaurantsWithDistance.get(i).getPhoneNumber());
-            assertEquals(fakeRestaurants.get(reOrder(i)).getWebsite(), fakeRestaurantsWithDistance.get(i).getWebsite());
-            assertEquals(fakeRestaurants.get(reOrder(i)).getGeometry(), fakeRestaurantsWithDistance.get(i).getGeometry());
-            assertEquals(unsortedDistances[i], fakeRestaurantsWithDistance.get(i).getDistance(), 0);
+        boolean sorted = true;
+        for (int i = 0; i < testedList.size() - 1; i++) {
+            if (testedList.get(i).getDistance() > testedList.get(i+1).getDistance()) {
+                sorted = false;
+                break;
+            } else if (testedList.get(i).getDistance() == testedList.get(i+1).getDistance()) {
+                if (testedList.get(i).getName().compareTo(testedList.get(i+1).getName()) > 0) {
+                    sorted = false;
+                    break;
+                };
+            }
         }
+        assertFalse(sorted);
 
         // Sort
-        restaurantRepository.sortByDistanceAndName(fakeRestaurantsWithDistance);
+        restaurantRepository.sortByDistanceAndName(testedList);
 
         // After sort
-        double[] sortedDistances = new double[]{distance3, distance1, distance2};
-        for (int i=0; i<fakeRestaurantsWithDistance.size(); i++) {
-            assertEquals(fakeRestaurants.get(reverseOrder(i)).getRid(), fakeRestaurantsWithDistance.get(i).getRid());
-            assertEquals(fakeRestaurants.get(reverseOrder(i)).getName(), fakeRestaurantsWithDistance.get(i).getName());
-            assertEquals(fakeRestaurants.get(reverseOrder(i)).getPhotos(), fakeRestaurantsWithDistance.get(i).getPhotos());
-            assertEquals(fakeRestaurants.get(reverseOrder(i)).getAddress(), fakeRestaurantsWithDistance.get(i).getAddress());
-            assertEquals(fakeRestaurants.get(reverseOrder(i)).getRating(), fakeRestaurantsWithDistance.get(i).getRating(), 0);
-            assertEquals(fakeRestaurants.get(reverseOrder(i)).getOpeningHours(), fakeRestaurantsWithDistance.get(i).getOpeningHours());
-            assertEquals(fakeRestaurants.get(reverseOrder(i)).getPhoneNumber(), fakeRestaurantsWithDistance.get(i).getPhoneNumber());
-            assertEquals(fakeRestaurants.get(reverseOrder(i)).getWebsite(), fakeRestaurantsWithDistance.get(i).getWebsite());
-            assertEquals(fakeRestaurants.get(reverseOrder(i)).getGeometry(), fakeRestaurantsWithDistance.get(i).getGeometry());
-            assertEquals(sortedDistances[i], fakeRestaurantsWithDistance.get(i).getDistance(), 0);
+        assertEquals(fakeRestaurants.size(), testedList.size());
+        for (int i = 0; i < testedList.size(); i++) {
+            assertEquals(fakeRestaurants.get(i), testedList.get(i));
+        }
+        for (int i = 0; i < testedList.size() - 1; i++) {
+            assertTrue(testedList.get(i).getDistance() <= testedList.get(i+1).getDistance());
+            if (testedList.get(i).getDistance() == testedList.get(i+1).getDistance()) {
+                assertTrue(testedList.get(i).getName().compareTo(testedList.get(i+1).getName()) <= 0);
+            }
         }
     }
 
@@ -379,8 +366,8 @@ public class RestaurantRepositoryTest {
     public void setAndGetRestaurantWithSuccess() {
         assertNull(restaurantRepository.getRestaurant());
 
-        restaurantRepository.setRestaurant(restaurantWithDistance1);
-        assertEquals(restaurantWithDistance1, restaurantRepository.getRestaurant());
+        restaurantRepository.setRestaurant(restaurant1);
+        assertEquals(restaurant1, restaurantRepository.getRestaurant());
     }
 
     @Test
@@ -405,39 +392,39 @@ public class RestaurantRepositoryTest {
         assertNotNull(restaurantRepository.getRestaurantsToDisplay());
         assertTrue(restaurantRepository.getRestaurantsToDisplay().isEmpty());
 
-        restaurantRepository.setRestaurantsToDisplay(fakeRestaurantsWithDistance);
-        assertEquals(fakeRestaurantsWithDistance, restaurantRepository.getRestaurantsToDisplay());
+        restaurantRepository.setRestaurantsToDisplay(fakeRestaurants);
+        assertEquals(fakeRestaurants, restaurantRepository.getRestaurantsToDisplay());
     }
 
     @Test
     public void setAndGetRestaurantsMutableLiveDataWithSuccess() {
-        List<RestaurantWithDistance> result;
+        List<Restaurant> result;
 
         result = restaurantRepository.getRestaurantsMutableLiveData().getValue();
         assertNull(result);
 
-        restaurantRepository.setRestaurantsMutableLiveData(fakeRestaurantsWithDistance);
+        restaurantRepository.setRestaurantsMutableLiveData(fakeRestaurants);
 
         result = restaurantRepository.getRestaurantsMutableLiveData().getValue();
         assertNotNull(result);
-        assertEquals(fakeRestaurantsWithDistance.size(), result.size());
-        assertEquals(restaurantWithDistance1, result.get(0));
-        assertEquals(restaurantWithDistance2, result.get(1));
-        assertEquals(restaurantWithDistance3, result.get(2));
+        assertEquals(fakeRestaurants.size(), result.size());
+        assertEquals(restaurant3, result.get(0));
+        assertEquals(restaurant1, result.get(1));
+        assertEquals(restaurant2, result.get(2));
     }
 
     @Test
     public void setAndGetRestaurantDetailsMutableLiveDataWithSuccess() {
-        RestaurantWithDistance result;
+        Restaurant result;
 
         result = restaurantRepository.getRestaurantDetailsMutableLiveData().getValue();
         assertNull(result);
 
-        restaurantRepository.setRestaurantDetailsMutableLiveData(restaurantWithDistance4D);
+        restaurantRepository.setRestaurantDetailsMutableLiveData(restaurant4D);
 
         result = restaurantRepository.getRestaurantDetailsMutableLiveData().getValue();
         assertNotNull(result);
-        assertEquals(restaurantWithDistance4D, result);
+        assertEquals(restaurant4D, result);
     }
 
 }

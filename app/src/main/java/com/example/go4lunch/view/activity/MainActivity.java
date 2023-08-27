@@ -22,13 +22,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.model.model.DialogTuple;
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.utils.EventObjectClick;
 import com.example.go4lunch.utils.Utils;
 import com.example.go4lunch.view.fragment.ListViewFragment;
 import com.example.go4lunch.view.fragment.MapViewFragment;
 import com.example.go4lunch.view.adapter.PagerAdapter;
 import com.example.go4lunch.R;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.utils.EventListener;
 import com.example.go4lunch.viewmodel.MainViewModel;
 import com.example.go4lunch.viewmodel.ViewModelFactory;
@@ -264,7 +264,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements
      */
 
     private void launchDetailRestaurantActivity() {
-        RestaurantWithDistance restaurant = mainViewModel.getCurrentUserSelection();
+        Restaurant restaurant = mainViewModel.getCurrentUserSelection();
         // Launch DetailActivity or show message
         if (restaurant != null) {
             Intent intent = new Intent(MainActivity.this, DetailRestaurantActivity.class);

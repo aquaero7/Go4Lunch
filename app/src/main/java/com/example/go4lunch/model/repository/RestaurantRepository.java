@@ -11,7 +11,6 @@ import com.example.go4lunch.model.api.GmapsRestaurantDetailsPojo;
 import com.example.go4lunch.model.api.GmapsRestaurantPojo;
 import com.example.go4lunch.model.api.model.Period;
 import com.example.go4lunch.model.model.Restaurant;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.api.model.Geometry;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Photo;
@@ -34,12 +33,11 @@ public class RestaurantRepository {
     /********************/
 
     private static volatile RestaurantRepository instance;
-    private final MutableLiveData<List<RestaurantWithDistance>> restaurantsMutableLiveData;
-    private final MutableLiveData<RestaurantWithDistance> restaurantDetailsMutableLiveData;
+    private final MutableLiveData<List<Restaurant>> restaurantsMutableLiveData;
+    private final MutableLiveData<Restaurant> restaurantDetailsMutableLiveData;
     private final List<Restaurant> restaurantsList;
-    private List<RestaurantWithDistance> restaurantsListWithDistance;
-    private final List<RestaurantWithDistance> restaurantsToDisplay;
-    private RestaurantWithDistance restaurant;
+    private final List<Restaurant> restaurantsToDisplay;
+    private Restaurant restaurant;
     private boolean restaurantIsSelected;
     private final GmapsApiInterface apiClient;
 
@@ -50,7 +48,6 @@ public class RestaurantRepository {
         restaurantDetailsMutableLiveData = new MutableLiveData<>();
 
         restaurantsList = new ArrayList<>();
-        restaurantsListWithDistance = new ArrayList<>();
         restaurantsToDisplay = new ArrayList<>();
     }
 
@@ -72,7 +69,6 @@ public class RestaurantRepository {
         restaurantDetailsMutableLiveData = new MutableLiveData<>();
 
         restaurantsList = new ArrayList<>();
-        restaurantsListWithDistance = new ArrayList<>();
         restaurantsToDisplay = new ArrayList<>();
     }
 
@@ -114,10 +110,10 @@ public class RestaurantRepository {
                                 phoneNumber, website, geometry));
                     }
 
-                    restaurantsListWithDistance = updateRestaurantsListWithDistances(restaurantsList, home);
-                    sortByDistanceAndName(restaurantsListWithDistance);
+                    updateRestaurantsListWithDistances(restaurantsList, home);
+                    sortByDistanceAndName(restaurantsList);
                     // Populate the LiveData
-                    setRestaurantsMutableLiveData(restaurantsListWithDistance);
+                    setRestaurantsMutableLiveData(restaurantsList);
                 } else {
                     Log.w("RestaurantRepository", "Empty nearby restaurants list");
                 }
@@ -130,7 +126,7 @@ public class RestaurantRepository {
         });
     }
 
-    public void fetchRestaurantDetails(RestaurantWithDistance nearbyRestaurant, String apiKey) {
+    public void fetchRestaurantDetails(Restaurant nearbyRestaurant, String apiKey) {
 
         // Call Place Details API <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         Call<GmapsRestaurantDetailsPojo> call2 = apiClient.getPlaceDetails(
@@ -161,20 +157,10 @@ public class RestaurantRepository {
         });
     }
 
-    public List<RestaurantWithDistance> updateRestaurantsListWithDistances(List<Restaurant> restaurantsList, LatLng home) {
-        List<RestaurantWithDistance> restaurants = new ArrayList<>();
+    public void updateRestaurantsListWithDistances(List<Restaurant> restaurantsList, LatLng home) {
         for (Restaurant restaurant : restaurantsList) {
-            int distance = calculateRestaurantDistance(restaurant, home);
-
-            RestaurantWithDistance restaurantWithDistance
-                    = new RestaurantWithDistance(restaurant.getRid(), restaurant.getName(),
-                    restaurant.getPhotos(), restaurant.getAddress(), restaurant.getRating(),
-                    restaurant.getOpeningHours(), restaurant.getPhoneNumber(),
-                    restaurant.getWebsite(), restaurant.getGeometry(), distance);
-
-            restaurants.add(restaurantWithDistance);
+            restaurant.setDistance(calculateRestaurantDistance(restaurant, home));
         }
-        return restaurants;
     }
 
     public int calculateRestaurantDistance(Restaurant restaurant, LatLng currentLatLng) {
@@ -186,9 +172,9 @@ public class RestaurantRepository {
         return (int) distance;  /** Distance in meters */
     }
 
-    public void sortByDistanceAndName (List<RestaurantWithDistance> restaurantsWithDistance) {
-        restaurantsWithDistance.sort(RestaurantWithDistance.comparatorName);
-        restaurantsWithDistance.sort(RestaurantWithDistance.comparatorDistance);
+    public void sortByDistanceAndName (List<Restaurant> restaurants) {
+        restaurants.sort(Restaurant.comparatorName);
+        restaurants.sort(Restaurant.comparatorDistance);
     }
 
     public void sortByAscendingOpeningTime(List<Period> periods) {
@@ -208,19 +194,19 @@ public class RestaurantRepository {
         // periods.sort((o1, o2) -> o2.getOpen().getTime().compareTo(o1.getOpen().getTime()));
     }
 
-    public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
+    public MutableLiveData<List<Restaurant>> getRestaurantsMutableLiveData() {
         return restaurantsMutableLiveData;
     }
 
-    public void setRestaurantsMutableLiveData(List<RestaurantWithDistance> restaurants) {
+    public void setRestaurantsMutableLiveData(List<Restaurant> restaurants) {
         restaurantsMutableLiveData.setValue(restaurants);
     }
 
-    public MutableLiveData<RestaurantWithDistance> getRestaurantDetailsMutableLiveData() {
+    public MutableLiveData<Restaurant> getRestaurantDetailsMutableLiveData() {
         return restaurantDetailsMutableLiveData;
     }
 
-    public void setRestaurantDetailsMutableLiveData(RestaurantWithDistance restaurant) {
+    public void setRestaurantDetailsMutableLiveData(Restaurant restaurant) {
         restaurantDetailsMutableLiveData.setValue(restaurant);
     }
 
@@ -228,11 +214,11 @@ public class RestaurantRepository {
         return DEFAULT_RADIUS;
     }
 
-    public void setRestaurant(RestaurantWithDistance mRestaurant) {
+    public void setRestaurant(Restaurant mRestaurant) {
         restaurant = mRestaurant;
     }
 
-    public RestaurantWithDistance getRestaurant() {
+    public Restaurant getRestaurant() {
         return restaurant;
     }
 
@@ -244,15 +230,15 @@ public class RestaurantRepository {
         return restaurantIsSelected;
     }
 
-    public List<RestaurantWithDistance> getRestaurants() {
-        return restaurantsListWithDistance;
+    public List<Restaurant> getRestaurants() {
+        return restaurantsList;
     }
 
-    public List<RestaurantWithDistance> getRestaurantsToDisplay() {
+    public List<Restaurant> getRestaurantsToDisplay() {
         return restaurantsToDisplay;
     }
 
-    public void setRestaurantsToDisplay(List<RestaurantWithDistance> restaurants) {
+    public void setRestaurantsToDisplay(List<Restaurant> restaurants) {
         restaurantsToDisplay.clear();
         restaurantsToDisplay.addAll(restaurants);
     }

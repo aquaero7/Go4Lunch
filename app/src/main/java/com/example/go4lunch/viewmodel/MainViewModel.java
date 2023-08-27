@@ -8,12 +8,12 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.model.DialogTuple;
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.model.model.LikedRestaurant;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.Utils;
 import com.facebook.AccessToken;
@@ -146,14 +146,14 @@ public class MainViewModel extends ViewModel {
         };
     }
 
-    public RestaurantWithDistance getCurrentUserSelection() {
+    public Restaurant getCurrentUserSelection() {
         // Get current user selected restaurant
         String selectionId = userRepository.getCurrentUser().getSelectionId();
         String selectionDate = userRepository.getCurrentUser().getSelectionDate();
-        RestaurantWithDistance selectedRestaurant = null;
+        Restaurant selectedRestaurant = null;
         // If a restaurant is selected, check if selected restaurant is nearby
         if ((selectionId != null) && (utils.getCurrentDate().equals(selectionDate))) {
-            for (RestaurantWithDistance restaurant : restaurantRepository.getRestaurants()) {
+            for (Restaurant restaurant : restaurantRepository.getRestaurants()) {
                 if (Objects.equals(selectionId, restaurant.getRid())) {
                     selectedRestaurant = restaurant;
                     break;

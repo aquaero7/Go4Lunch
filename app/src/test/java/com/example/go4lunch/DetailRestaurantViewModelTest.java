@@ -10,7 +10,7 @@ import com.example.go4lunch.model.api.model.OpenClose;
 import com.example.go4lunch.model.api.model.OpeningHours;
 import com.example.go4lunch.model.api.model.Period;
 import com.example.go4lunch.model.model.LikedRestaurant;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
@@ -54,7 +54,7 @@ public class DetailRestaurantViewModelTest {
     private OpeningHours oh2, oh3, oh4, oh5, oh6, oh7, oh8;
     private String closed, open247, open24, openUntil, openAt, unknown;
     private User user4;
-    private RestaurantWithDistance restaurant;
+    private Restaurant restaurant;
 
     private void initializeData() {
         // Set and start Mockito strictness
@@ -89,10 +89,8 @@ public class DetailRestaurantViewModelTest {
         radius4 = "radius4"; notifications4 = "false";
         user4 = new User(uId4, uName4, uEmail4, uUrl4, selId4, selDate4, selName4, selAddress4, radius4, notifications4);
 
-        restaurant = new RestaurantWithDistance(
-                "rId", "rName", new ArrayList<>(), "rAddress",
-                1, new OpeningHours(),"phoneNumber",
-                "website", new Geometry(), 1);
+        restaurant = new Restaurant("rId", "rName", new ArrayList<>(), "rAddress",
+                1, new OpeningHours(),"phoneNumber", "website", new Geometry(), 1);
 
         currentDate = utils.getCurrentDate();
         // DayOfWeek converted to Google PlaceOpeningHoursPeriodDetail format

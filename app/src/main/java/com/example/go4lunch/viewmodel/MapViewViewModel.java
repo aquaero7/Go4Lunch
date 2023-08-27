@@ -7,11 +7,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.repository.AutocompleteRepository;
 import com.example.go4lunch.model.repository.LocationRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
@@ -60,7 +60,7 @@ public class MapViewViewModel extends ViewModel {
         return locationRepository.getCurrentLocationMutableLiveData();
     }
 
-    public MutableLiveData<List<RestaurantWithDistance>> getRestaurantsMutableLiveData() {
+    public MutableLiveData<List<Restaurant>> getRestaurantsMutableLiveData() {
         return restaurantRepository.getRestaurantsMutableLiveData();
     }
 
@@ -128,11 +128,11 @@ public class MapViewViewModel extends ViewModel {
         return locationRepository.getRestaurantZoom();
     }
 
-    public List<RestaurantWithDistance> getRestaurants() {
+    public List<Restaurant> getRestaurants() {
         return restaurantRepository.getRestaurants();
     }
 
-    public LatLng getLatLng(RestaurantWithDistance restaurant) {
+    public LatLng getLatLng(Restaurant restaurant) {
         return new LatLng(restaurant.getGeometry().getLocation().getLat(),
                 restaurant.getGeometry().getLocation().getLng());
     }

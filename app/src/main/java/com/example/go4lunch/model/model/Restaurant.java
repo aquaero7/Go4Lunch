@@ -9,6 +9,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.List;
 
 public class Restaurant implements Serializable {
@@ -49,10 +50,12 @@ public class Restaurant implements Serializable {
     @Expose
     private Geometry geometry;
 
+    private long distance;
+
     // Empty constructor to allow firebase to cast document to object model
     public Restaurant() {}
 
-    // Constructor
+    // Constructor for API
     public Restaurant(String rid, String name, @Nullable List<Photo> photos,
                       String address, double rating, @Nullable OpeningHours openingHours,
                       @Nullable String phoneNumber, @Nullable String website, Geometry geometry) {
@@ -65,6 +68,24 @@ public class Restaurant implements Serializable {
         this.phoneNumber = phoneNumber;
         this.website = website;
         this.geometry = geometry;
+        this.distance = 0;
+    }
+
+    // Full constructor
+    public Restaurant(String rid, String name, @Nullable List<Photo> photos,
+                      String address, double rating, @Nullable OpeningHours openingHours,
+                      @Nullable String phoneNumber, @Nullable String website, Geometry geometry,
+                      long distance) {
+        this.rid = rid;
+        this.name = name;
+        this.photos = photos;
+        this.address = address;
+        this.rating = rating;
+        this.openingHours = openingHours;
+        this.phoneNumber = phoneNumber;
+        this.website = website;
+        this.geometry = geometry;
+        this.distance = distance;
     }
 
 
@@ -97,6 +118,9 @@ public class Restaurant implements Serializable {
     public Geometry getGeometry() {
         return geometry;
     }
+    public long getDistance() {
+        return distance;
+    }
 
 
     // SETTERS
@@ -128,5 +152,17 @@ public class Restaurant implements Serializable {
     public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
     }
+    public void setDistance(long distance) {
+        this.distance = distance;
+    }
+
+
+    // SORTS
+
+    // Comparator for sort by distance
+    public static Comparator<Restaurant> comparatorDistance = (o1, o2) -> (int) (o1.getDistance() - o2.getDistance());
+
+    // Comparator for sort by name
+    public static Comparator<Restaurant> comparatorName = Comparator.comparing(Restaurant::getName);
 
 }

@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.FragmentDetailRestaurantBinding;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.model.api.model.Photo;
 import com.example.go4lunch.utils.EventObjectClick;
@@ -71,23 +71,25 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     @Override
     // Spread the click to the parent activity
     public void onClick(View v) {
-        RestaurantWithDistance restaurant = detailRestaurantViewModel.getRestaurant();
-        String message = null;
-        switch (EventObjectClick.fromView(v)) {
-            case BTN_CALL:
-            case BTN_WEBSITE:
-                break;
-            case BTN_LIKE:
-                message = (detailRestaurantViewModel.updateLikedRestaurant(restaurant.getRid())) ?
-                        getString(R.string.btn_like_checked) : getString(R.string.btn_like_unchecked);
-                break;
-            case FAB_SELECT:
-                message = (detailRestaurantViewModel.updateSelection(restaurant.getRid(), restaurant.getName(), restaurant.getAddress())) ?
-                        getString(R.string.fab_checked) : getString(R.string.fab_unchecked);
-                break;
-        }
+        Restaurant restaurant = detailRestaurantViewModel.getRestaurant();
+        if (restaurant != null) {
+            String message = null;
+            switch (EventObjectClick.fromView(v)) {
+                case BTN_CALL:
+                case BTN_WEBSITE:
+                    break;
+                case BTN_LIKE:
+                    message = (detailRestaurantViewModel.updateLikedRestaurant(restaurant.getRid())) ?
+                            getString(R.string.btn_like_checked) : getString(R.string.btn_like_unchecked);
+                    break;
+                case FAB_SELECT:
+                    message = (detailRestaurantViewModel.updateSelection(restaurant.getRid(), restaurant.getName(), restaurant.getAddress())) ?
+                            getString(R.string.fab_checked) : getString(R.string.fab_unchecked);
+                    break;
+            }
 
-        mCallback.onButtonClicked(v, message, restaurant.getPhoneNumber(), restaurant.getWebsite());
+            mCallback.onButtonClicked(v, message, restaurant.getPhoneNumber(), restaurant.getWebsite());
+        }
     }
 
     @Override
@@ -142,7 +144,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         if (intent != null) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
-                RestaurantWithDistance restaurant = (RestaurantWithDistance) bundle.getSerializable("RESTAURANT");
+                Restaurant restaurant = (Restaurant) bundle.getSerializable("RESTAURANT");
                 // Init and display data
                 if (restaurant != null) initData(restaurant);
                 Log.w("DetailRestaurantFragment", "Name of this restaurant : " + restaurant.getName());
@@ -151,7 +153,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private void initData(RestaurantWithDistance restaurant) {
+    private void initData(Restaurant restaurant) {
         // Initialize restaurant data
         initAndDisplayRestaurantData(restaurant);
         // Initialize selectors list
@@ -160,7 +162,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         initLikedRestaurants(restaurant.getRid());
     }
 
-    private void initAndDisplayRestaurantData(RestaurantWithDistance restaurant) {
+    private void initAndDisplayRestaurantData(Restaurant restaurant) {
         // Get restaurant details
         detailRestaurantViewModel.fetchRestaurantDetails(restaurant, getString(R.string.MAPS_API_KEY));
         detailRestaurantViewModel.getRestaurantDetailsMutableLiveData().observe(requireActivity(), restaurantWithDetails -> {
@@ -190,7 +192,7 @@ public class DetailRestaurantFragment extends Fragment implements View.OnClickLi
         });
     }
 
-    private void displayRestaurantData(RestaurantWithDistance restaurantWithDetails) {
+    private void displayRestaurantData(Restaurant restaurantWithDetails) {
         // Nearby API data
         List<Photo> rPhotos = restaurantWithDetails.getPhotos();
         if (rPhotos != null) {

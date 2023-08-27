@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.api.model.Period;
-import com.example.go4lunch.model.model.RestaurantWithDistance;
+import com.example.go4lunch.model.model.Restaurant;
 import com.example.go4lunch.model.repository.LikedRestaurantRepository;
 import com.example.go4lunch.model.repository.RestaurantRepository;
 import com.example.go4lunch.model.repository.UserRepository;
@@ -43,7 +43,7 @@ public class DetailRestaurantViewModel extends ViewModel {
      * LiveData *
      ************/
 
-    public MutableLiveData<RestaurantWithDistance> getRestaurantDetailsMutableLiveData() {
+    public MutableLiveData<Restaurant> getRestaurantDetailsMutableLiveData() {
         return restaurantRepository.getRestaurantDetailsMutableLiveData();
     }
 
@@ -62,7 +62,7 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     // Fetchers (using Maps API)
 
-    public void fetchRestaurantDetails(RestaurantWithDistance nearbyRestaurant, String apiKey) {
+    public void fetchRestaurantDetails(Restaurant nearbyRestaurant, String apiKey) {
         restaurantRepository.fetchRestaurantDetails(nearbyRestaurant, apiKey);
     }
 
@@ -164,7 +164,7 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     // Getters
 
-    public String getOpeningInformation(RestaurantWithDistance restaurant, Context context) {
+    public String getOpeningInformation(Restaurant restaurant, Context context) {
         // Built restaurant opening hours information to display
         String openingInformation = "";
         if (restaurant.getOpeningHours() != null) {
@@ -280,7 +280,7 @@ public class DetailRestaurantViewModel extends ViewModel {
         return openingInformation;
     }
 
-    public RestaurantWithDistance getRestaurant() {
+    public Restaurant getRestaurant() {
         return restaurantRepository.getRestaurant();
     }
 
@@ -304,7 +304,7 @@ public class DetailRestaurantViewModel extends ViewModel {
 
     // Setters
 
-    public void setRestaurant(RestaurantWithDistance restaurant) {
+    public void setRestaurant(Restaurant restaurant) {
         restaurantRepository.setRestaurant(restaurant);
     }
 
