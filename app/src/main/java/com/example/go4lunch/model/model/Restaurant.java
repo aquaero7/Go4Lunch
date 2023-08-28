@@ -50,7 +50,7 @@ public class Restaurant implements Serializable {
     @Expose
     private Geometry geometry;
 
-    private long distance;
+    private double distance;
 
     // Empty constructor to allow firebase to cast document to object model
     public Restaurant() {}
@@ -75,7 +75,7 @@ public class Restaurant implements Serializable {
     public Restaurant(String rid, String name, @Nullable List<Photo> photos,
                       String address, double rating, @Nullable OpeningHours openingHours,
                       @Nullable String phoneNumber, @Nullable String website, Geometry geometry,
-                      long distance) {
+                      double distance) {
         this.rid = rid;
         this.name = name;
         this.photos = photos;
@@ -118,7 +118,7 @@ public class Restaurant implements Serializable {
     public Geometry getGeometry() {
         return geometry;
     }
-    public long getDistance() {
+    public double getDistance() {
         return distance;
     }
 
@@ -152,7 +152,7 @@ public class Restaurant implements Serializable {
     public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
     }
-    public void setDistance(long distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
     }
 
@@ -160,7 +160,7 @@ public class Restaurant implements Serializable {
     // SORTS
 
     // Comparator for sort by distance
-    public static Comparator<Restaurant> comparatorDistance = (o1, o2) -> (int) (o1.getDistance() - o2.getDistance());
+    public static Comparator<Restaurant> comparatorDistance = Comparator.comparingDouble(Restaurant::getDistance);
 
     // Comparator for sort by name
     public static Comparator<Restaurant> comparatorName = Comparator.comparing(Restaurant::getName);

@@ -14,6 +14,7 @@ import com.example.go4lunch.model.repository.UserRepository;
 import com.example.go4lunch.model.model.User;
 import com.example.go4lunch.utils.Utils;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -91,8 +92,10 @@ public class ListViewViewModel extends ViewModel {
 
     // Getters
 
-    public String getDistance(long distance) {
-        return (distance < 10000) ? distance + "m" : distance / 1000 + "km";
+    public String getDistance(double distance) {
+        DecimalFormat dfKM = new DecimalFormat("0.0km");
+        DecimalFormat dfM = new DecimalFormat("0m");
+        return (distance < 1000) ? dfM.format(distance) : dfKM.format(distance / 1000);
     }
 
     public String getOpeningInfo(OpeningHours openingHours, Context context) {

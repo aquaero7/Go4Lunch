@@ -2,6 +2,12 @@ package com.example.go4lunch;
 
 import static org.junit.Assert.assertEquals;
 
+import static org.mockito.Mockito.*;
+
+import android.content.Context;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+
 import com.example.go4lunch.utils.Utils;
 
 import org.junit.After;
@@ -18,6 +24,9 @@ import java.util.Locale;
 
 public class UtilsTest {
     private MockitoSession mockito;
+    Context contextMock;
+    View viewMock;
+    InputMethodManager immMock;
     private String currentDate;
     private String currentTime;
     private long currentDayOfWeek;
@@ -29,8 +38,12 @@ public class UtilsTest {
                 .strictness(Strictness.STRICT_STUBS)
                 .startMocking();
 
+        contextMock = mock(Context.class);
+        viewMock = mock(View.class);
+        immMock = mock(InputMethodManager.class);
+
         // Class under test
-        utils = Utils.getNewInstance();
+        utils = Utils.getNewInstance(immMock);
     }
 
     private void initializeCalendar() {
@@ -60,6 +73,21 @@ public class UtilsTest {
     public void tearDown() {
         // Stop Mockito strictness
         mockito.finishMocking();
+    }
+
+
+    /***************
+     * Device test *
+     ***************/
+
+    @Test
+    public void hideVirtualKeyboardWithSuccess() {
+        when(contextMock.getSystemService(anyString())).thenReturn(immMock);
+
+        utils.hideVirtualKeyboard(contextMock, viewMock);
+
+        verify(contextMock, times(1)).getSystemService(anyString());
+        verify(immMock, times(1)).hideSoftInputFromWindow(viewMock.getWindowToken(), 0);
     }
 
 

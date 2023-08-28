@@ -110,9 +110,9 @@ public class RestaurantRepositoryTest {
         geometry3 = new Geometry(new Location(latLng3.latitude, latLng3.longitude));
 
         currentLatLng = new LatLng(48.7, 2.1);
-        distance1 = (long) SphericalUtil.computeDistanceBetween(currentLatLng, latLng1);
-        distance2 = (long) SphericalUtil.computeDistanceBetween(currentLatLng, latLng2);
-        distance3 = (long) SphericalUtil.computeDistanceBetween(currentLatLng, latLng3);
+        distance1 = SphericalUtil.computeDistanceBetween(currentLatLng, latLng1);
+        distance2 = SphericalUtil.computeDistanceBetween(currentLatLng, latLng2);
+        distance3 = SphericalUtil.computeDistanceBetween(currentLatLng, latLng3);
 
         apiRestaurant1 = new Restaurant("rId1", "rName1", photos1, "rAddress1", 1D,
                 openingHours1, "rPhoneNumber1", "rWebsite1", geometry1);
@@ -121,11 +121,11 @@ public class RestaurantRepositoryTest {
         apiRestaurant3 = new Restaurant("rId3", "rName3", photos3, "rAddress3", 3D,
                 openingHours3, "rPhoneNumber3", "rWebsite3", geometry3);
         restaurant1 = new Restaurant("rId1", "rName1", photos1, "rAddress1", 1D,
-                openingHours1, "rPhoneNumber1", "rWebsite1", geometry1, (long) distance1);
+                openingHours1, "rPhoneNumber1", "rWebsite1", geometry1, distance1);
         restaurant2 = new Restaurant("rId2", "rName2", photos2, "rAddress2", 2D,
-                openingHours2, "rPhoneNumber2", "rWebsite2", geometry2, (long) distance2);
+                openingHours2, "rPhoneNumber2", "rWebsite2", geometry2, distance2);
         restaurant3 = new Restaurant("rId3", "rName3", photos3, "rAddress3", 3D,
-                openingHours3, "rPhoneNumber3", "rWebsite3", geometry3, (long) distance3);
+                openingHours3, "rPhoneNumber3", "rWebsite3", geometry3, distance3);
 
         fakeApiRestaurants = new ArrayList<>(Arrays.asList(apiRestaurant2, apiRestaurant3, apiRestaurant1));    // Unsorted
         fakeNearPlaces = new GmapsRestaurantPojo(fakeApiRestaurants, "", "", "");
@@ -142,7 +142,7 @@ public class RestaurantRepositoryTest {
         apiRestaurant4D = new Restaurant("rId4", "rName4", photos4, "rAddress4", 0D,
                 openingHours4, "rPhoneNumber4", "rWebsite4", geometry4);
         restaurant4D = new Restaurant("rId4", "rName4", photos4, "rAddress4", 0D,
-                openingHours4, "rPhoneNumber4", "rWebsite4", geometry4, (long) distance4);
+                openingHours4, "rPhoneNumber4", "rWebsite4", geometry4, distance4);
 
         fakePlaceDetails = new  GmapsRestaurantDetailsPojo(apiRestaurant4D, "");
 
@@ -225,7 +225,7 @@ public class RestaurantRepositoryTest {
             assertEquals(fakeRestaurants.get(i).getPhoneNumber(), result.get(i).getPhoneNumber());
             assertEquals(fakeRestaurants.get(i).getWebsite(), result.get(i).getWebsite());
             assertEquals(fakeRestaurants.get(i).getGeometry(), result.get(i).getGeometry());
-            assertEquals(fakeRestaurants.get(i).getDistance(), result.get(i).getDistance());
+            assertEquals(fakeRestaurants.get(i).getDistance(), result.get(i).getDistance(), 0);
         }
     }
 
@@ -263,7 +263,7 @@ public class RestaurantRepositoryTest {
         assertEquals(restaurant4D.getPhoneNumber(), result.getPhoneNumber());
         assertEquals(restaurant4D.getWebsite(), result.getWebsite());
         assertEquals(restaurant4D.getGeometry(), result.getGeometry());
-        assertEquals(restaurant4D.getDistance(), result.getDistance());
+        assertEquals(restaurant4D.getDistance(), result.getDistance(), 0);
     }
 
     @Test

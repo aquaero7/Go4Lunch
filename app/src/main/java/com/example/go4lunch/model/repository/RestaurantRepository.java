@@ -163,13 +163,12 @@ public class RestaurantRepository {
         }
     }
 
-    public int calculateRestaurantDistance(Restaurant restaurant, LatLng currentLatLng) {
+    public double calculateRestaurantDistance(Restaurant restaurant, LatLng currentLatLng) {
         double restaurantLat = restaurant.getGeometry().getLocation().getLat();
         double restaurantLng = restaurant.getGeometry().getLocation().getLng();
         LatLng restaurantLatLng = new LatLng(restaurantLat, restaurantLng);
-        double distance = SphericalUtil.computeDistanceBetween(currentLatLng, restaurantLatLng);
-
-        return (int) distance;  /** Distance in meters */
+        /** Distance in meters */
+        return SphericalUtil.computeDistanceBetween(currentLatLng, restaurantLatLng);
     }
 
     public void sortByDistanceAndName (List<Restaurant> restaurants) {

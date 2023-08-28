@@ -14,7 +14,12 @@ import java.util.Locale;
 public class Utils {
 
     private static volatile Utils instance;
-    private static final Calendar calendar = Calendar.getInstance();
+    private static Calendar calendar;
+    private InputMethodManager imm;
+
+    public Utils() {
+        calendar = Calendar.getInstance();
+    }
 
     public static Utils getInstance() {
         Utils result = instance;
@@ -26,13 +31,18 @@ public class Utils {
         }
     }
 
-    /** For test use only : New instance factory */
-    public static Utils getNewInstance() {
-        instance = new Utils();
-        return instance;
+    /** For test use only : New instance factory **************************************************/
+    public Utils(InputMethodManager imm) {
+        calendar = Calendar.getInstance();
+        this.imm = imm;
     }
 
-    /*********************************************/
+
+    public static Utils getNewInstance(InputMethodManager imm) {
+        instance = new Utils(imm);
+        return instance;
+    }
+    /**********************************************************************************************/
 
 
     /****************
@@ -40,7 +50,7 @@ public class Utils {
      ****************/
 
     public void hideVirtualKeyboard(Context context, View view) {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 

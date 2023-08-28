@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import android.content.Context;
+import android.view.inputmethod.InputMethodManager;
 
 import com.example.go4lunch.model.api.model.Geometry;
 import com.example.go4lunch.model.api.model.OpenClose;
@@ -67,7 +68,7 @@ public class DetailRestaurantViewModelTest {
         likedRestaurantRepositoryMock = mock(LikedRestaurantRepository.class);
         utilsMock = mock(Utils.class);
         contextMock = mock(Context.class);
-        utils = Utils.getInstance();
+        utils = Utils.getNewInstance(mock(InputMethodManager.class));
 
         uId1 = "uId1"; uName1 = "uName1"; uEmail1 = "uEmail1"; uUrl1 = "uUrl1";
         selId1 = "rId1"; selDate1 = "selDate1"; selName1 = "rName1"; selAddress1 = "rAddress1";
