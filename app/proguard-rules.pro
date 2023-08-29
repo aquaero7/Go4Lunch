@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+
+# Rules added to the existing keep rules in order to suppress warnings when generating APK.
+-dontwarn android.content.pm.PackageManager$ApplicationInfoFlags*
+-dontwarn android.content.pm.PackageManager$PackageInfoFlags*

@@ -173,7 +173,7 @@ public class DetailRestaurantViewModel extends ViewModel {
             boolean openNow;
             String currentTime = utils.getCurrentTime();
             // DayOfWeek converted to Google PlaceOpeningHoursPeriodDetail format
-            long currentDayOfWeek = (utils.getCurrentDayOfWeek() != 7) ? utils.getCurrentDayOfWeek() : 0;
+            long currentDayOfWeek = utils.getCurrentDayOfWeek();
             long nextDayOfWeek = (currentDayOfWeek != 6) ? currentDayOfWeek + 1 : 0;
 
             // Get the list of opening periods

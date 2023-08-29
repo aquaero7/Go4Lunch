@@ -61,8 +61,9 @@ public class Utils {
 
     // Get current day of week
     public long getCurrentDayOfWeek() {
-        // Returns a range from 1 (Monday) to 7 (Sunday)
-        return calendar.get(Calendar.DAY_OF_WEEK);
+        // DAY_OF_WEEK returns a range from 1 (Sunday) to 7 (Saturday)
+        // from witch we subtract 1 for conversion to Google PlaceOpeningHoursPeriodDetail format
+        return calendar.get(Calendar.DAY_OF_WEEK) - 1;
     }
 
     // Get current formatted time

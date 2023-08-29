@@ -59,7 +59,7 @@ public class UtilsTest {
                 String.valueOf(calendar.get(Calendar.MINUTE)) : "0" + String.valueOf(calendar.get(Calendar.MINUTE));
         currentTime = hod + min;
 
-        currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1;
     }
 
 

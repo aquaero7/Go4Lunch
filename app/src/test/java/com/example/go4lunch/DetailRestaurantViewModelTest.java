@@ -95,7 +95,7 @@ public class DetailRestaurantViewModelTest {
 
         currentDate = utils.getCurrentDate();
         // DayOfWeek converted to Google PlaceOpeningHoursPeriodDetail format
-        today = (utils.getCurrentDayOfWeek() != 7) ? utils.getCurrentDayOfWeek() : 0;
+        today = utils.getCurrentDayOfWeek();
         tomorrow = (today != 6) ? today + 1 : 0;
         otherDay = (today != 0) ? today - 1 : 6;
 
