@@ -15,7 +15,7 @@ import com.example.go4lunch.R;
  */
 
 public enum EventObjectClick {
-    // Enum fot all objects
+    // Enum for all objects
     NONE(-1),
 
     // Enum for views
