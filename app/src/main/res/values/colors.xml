@@ -26,4 +26,6 @@
     <color name="app_background">#F35F5F</color>
     <color name="app_background_dark">#BE4141</color>
 
+    <color name="ic_launcher_go4lunch_background">#F35F5F</color>
+
 </resources>
